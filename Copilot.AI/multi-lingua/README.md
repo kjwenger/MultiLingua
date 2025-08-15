@@ -59,7 +59,14 @@ docker-compose up --build
 
 3. Start LibreTranslate (required for translation functionality):
    ```bash
+   # Basic LibreTranslate without persistence
    docker run -ti --rm -p 5000:5000 libretranslate/libretranslate
+   
+   # LibreTranslate with persistent dictionaries and models
+   docker run -ti --rm -p 5000:5000 \
+     -v lt-local:/home/libretranslate/.local \
+     -v lt-db:/app/db \
+     libretranslate/libretranslate
    ```
 
 4. Start the development server:
@@ -175,26 +182,42 @@ docker run -p 3456:3456 multi-lingua
 # Run with custom LibreTranslate URL
 docker run -p 3456:3456 -e LIBRETRANSLATE_URL=http://your-libretranslate-server:5000 multi-lingua
 
-# Run with LibreTranslate also in Docker
+# Run with LibreTranslate also in Docker (basic)
 docker run -d --name libretranslate -p 5000:5000 libretranslate/libretranslate
+docker run -p 3456:3456 --link libretranslate:libretranslate -e LIBRETRANSLATE_URL=http://libretranslate:5000 multi-lingua
+
+# Run with LibreTranslate in Docker (with persistent storage)
+docker run -d --name libretranslate -p 5000:5000 \
+  -v lt-local:/home/libretranslate/.local \
+  -v lt-db:/app/db \
+  libretranslate/libretranslate
 docker run -p 3456:3456 --link libretranslate:libretranslate -e LIBRETRANSLATE_URL=http://libretranslate:5000 multi-lingua
 ```
 
 ### Using Docker Compose (Recommended)
 
 ```bash
-# Start both Multi-Lingua and LibreTranslate
+# Start both Multi-Lingua and LibreTranslate with persistent storage
 docker-compose up -d
 
 # View logs
 docker-compose logs -f
 
-# Stop services
+# Stop services (preserves volumes)
 docker-compose down
 
 # Rebuild and restart
 docker-compose up --build -d
+
+# Clean up everything including volumes
+docker-compose down -v
 ```
+
+### Persistence
+
+The Docker Compose setup includes persistent storage for:
+- **LibreTranslate models and dictionaries**: Stored in `lt-local` and `lt-db` volumes
+- **Multi-Lingua database**: Stored in `./data` directory on host
 
 ## Troubleshooting
 
