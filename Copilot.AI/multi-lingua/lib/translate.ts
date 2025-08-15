@@ -1,6 +1,30 @@
 import axios from 'axios';
 
-const LIBRETRANSLATE_URL = 'http://localhost:5000';
+// LibreTranslate URL configuration with fallbacks for different environments
+const getLibreTranslateUrl = () => {
+  // 1. Use environment variable if set
+  if (process.env.LIBRETRANSLATE_URL) {
+    return process.env.LIBRETRANSLATE_URL;
+  }
+  
+  // 2. For Docker Compose, use service name
+  if (process.env.NODE_ENV === 'production' && process.env.DOCKER_COMPOSE) {
+    return 'http://libretranslate:5000';
+  }
+  
+  // 3. For standalone Docker container, try to reach host
+  if (process.env.NODE_ENV === 'production') {
+    return 'http://host.docker.internal:5000';
+  }
+  
+  // 4. Default for local development
+  return 'http://localhost:5000';
+};
+
+const LIBRETRANSLATE_URL = getLibreTranslateUrl();
+
+// Log the LibreTranslate URL being used (helpful for debugging)
+console.log(`Using LibreTranslate URL: ${LIBRETRANSLATE_URL}`);
 
 export interface TranslationResult {
   translatedText: string;

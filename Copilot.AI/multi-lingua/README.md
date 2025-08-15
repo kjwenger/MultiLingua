@@ -20,6 +20,33 @@ A modern Next.js application that provides real-time translation services using 
 
 ## Installation
 
+### Option 1: Docker (Recommended)
+
+The easiest way to run the application is using Docker Compose, which will automatically set up both the Multi-Lingua app and LibreTranslate:
+
+```bash
+# Clone the repository and navigate to the project
+cd multi-lingua
+
+# Start both services using Docker Compose
+docker-compose up -d
+
+# The app will be available at http://localhost:3456
+# LibreTranslate will be available at http://localhost:5000
+```
+
+To stop the services:
+```bash
+docker-compose down
+```
+
+To rebuild the app after changes:
+```bash
+docker-compose up --build
+```
+
+### Option 2: Local Development
+
 1. Navigate to the project directory:
    ```bash
    cd multi-lingua
@@ -30,12 +57,17 @@ A modern Next.js application that provides real-time translation services using 
    npm install
    ```
 
-3. Start the development server:
+3. Start LibreTranslate (required for translation functionality):
+   ```bash
+   docker run -ti --rm -p 5000:5000 libretranslate/libretranslate
+   ```
+
+4. Start the development server:
    ```bash
    npm run dev
    ```
 
-4. Open your browser and visit `http://localhost:3456`
+5. Open your browser and visit `http://localhost:3456`
 
 ## Usage
 
@@ -85,10 +117,33 @@ CREATE TABLE translations (
 
 ## Configuration
 
-The app is configured to connect to LibreTranslate at `http://localhost:5000`. To change this:
+The app is configured to connect to LibreTranslate. You can customize the connection using environment variables:
 
-1. Edit `lib/translate.ts`
-2. Update the `LIBRETRANSLATE_URL` constant
+### Environment Variables
+
+- `LIBRETRANSLATE_URL`: Custom LibreTranslate server URL (default: auto-detected based on environment)
+- `NODE_ENV`: Set to `production` for production builds
+- `PORT`: Port for the Next.js app (default: 3456)
+
+### LibreTranslate Connection
+
+The app automatically detects the LibreTranslate URL based on the environment:
+
+1. **Docker Compose**: Uses `http://libretranslate:5000` (service name)
+2. **Standalone Docker**: Uses `http://host.docker.internal:5000` (connects to host)
+3. **Local Development**: Uses `http://localhost:5000`
+4. **Custom**: Set `LIBRETRANSLATE_URL` environment variable
+
+To change the LibreTranslate URL manually:
+
+```bash
+# For Docker
+docker run -p 3456:3456 -e LIBRETRANSLATE_URL=http://your-server:5000 multi-lingua
+
+# For local development
+export LIBRETRANSLATE_URL=http://your-server:5000
+npm run dev
+```
 
 ## Development
 
@@ -104,6 +159,41 @@ npm start
 
 # Run linting
 npm run lint
+```
+
+## Docker
+
+### Building the Docker Image
+
+```bash
+# Build the Docker image
+docker build -t multi-lingua .
+
+# Run with LibreTranslate on host machine (localhost:5000)
+docker run -p 3456:3456 multi-lingua
+
+# Run with custom LibreTranslate URL
+docker run -p 3456:3456 -e LIBRETRANSLATE_URL=http://your-libretranslate-server:5000 multi-lingua
+
+# Run with LibreTranslate also in Docker
+docker run -d --name libretranslate -p 5000:5000 libretranslate/libretranslate
+docker run -p 3456:3456 --link libretranslate:libretranslate -e LIBRETRANSLATE_URL=http://libretranslate:5000 multi-lingua
+```
+
+### Using Docker Compose (Recommended)
+
+```bash
+# Start both Multi-Lingua and LibreTranslate
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild and restart
+docker-compose up --build -d
 ```
 
 ## Troubleshooting

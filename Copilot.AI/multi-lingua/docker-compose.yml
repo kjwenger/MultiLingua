@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # LibreTranslate service
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate
+    ports:
+      - "5000:5000"
+    environment:
+      - LT_HOST=0.0.0.0
+      - LT_PORT=5000
+    restart: unless-stopped
+    networks:
+      - multi-lingua-network
+
+  # Multi-Lingua app
+  multi-lingua:
+    build: .
+    container_name: multi-lingua-app
+    ports:
+      - "3456:3456"
+    environment:
+      - NODE_ENV=production
+      - PORT=3456
+      - HOSTNAME=0.0.0.0
+      - DOCKER_COMPOSE=true
+      - LIBRETRANSLATE_URL=http://libretranslate:5000
+    volumes:
+      # Persist the SQLite database
+      - ./data:/app/data
+    depends_on:
+      - libretranslate
+    restart: unless-stopped
+    networks:
+      - multi-lingua-network
+
+networks:
+  multi-lingua-network:
+    driver: bridge

@@ -1,7 +1,18 @@
 import sqlite3 from 'sqlite3';
 import path from 'path';
+import fs from 'fs';
 
-const dbPath = path.join(process.cwd(), 'translations.db');
+// Use /app/data for Docker, fall back to current directory for local development
+const dataDir = process.env.NODE_ENV === 'production' 
+  ? '/app/data' 
+  : process.cwd();
+
+// Ensure the data directory exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const dbPath = path.join(dataDir, 'translations.db');
 
 export interface Translation {
   id: number;
