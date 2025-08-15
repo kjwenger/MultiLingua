@@ -2,10 +2,20 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-// Use /app/data for Docker, fall back to current directory for local development
-const dataDir = process.env.NODE_ENV === 'production' 
-  ? '/app/data' 
-  : process.cwd();
+// Use /app/data if running in Docker, otherwise use local app/data. Allow override via DATA_DIR env var.
+function isDocker() {
+  try {
+    return fs.existsSync('/.dockerenv') || (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf8').includes('docker'));
+  } catch {
+    return false;
+  }
+}
+
+const dataDir = process.env.DATA_DIR
+  ? process.env.DATA_DIR
+  : isDocker()
+    ? '/app/data'
+    : path.join(process.cwd(), 'app', 'data');
 
 // Ensure the data directory exists
 if (!fs.existsSync(dataDir)) {

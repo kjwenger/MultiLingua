@@ -2,23 +2,33 @@ import axios from 'axios';
 
 // LibreTranslate URL configuration with fallbacks for different environments
 const getLibreTranslateUrl = () => {
-  // 1. Use environment variable if set
+  // 1. Use environment variable if set, default to localhost:5000
   if (process.env.LIBRETRANSLATE_URL) {
-    return process.env.LIBRETRANSLATE_URL;
+    return process.env.LIBRETRANSLATE_URL.replace(/5000/, '5432');
   }
-  
-  // 2. For Docker Compose, use service name
-  if (process.env.NODE_ENV === 'production' && process.env.DOCKER_COMPOSE) {
-    return 'http://libretranslate:5000';
+
+  // 2. Detect Docker environment
+  const fs = require('fs');
+  function isDocker() {
+    try {
+      return fs.existsSync('/.dockerenv') || (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf8').includes('docker'));
+    } catch {
+      return false;
+    }
   }
-  
-  // 3. For standalone Docker container, try to reach host
-  if (process.env.NODE_ENV === 'production') {
-    return 'http://host.docker.internal:5000';
+
+  // 3. Use Docker Compose service name if DOCKER_COMPOSE env is set
+  if (process.env.DOCKER_COMPOSE) {
+    return 'http://libretranslate:5432';
   }
-  
-  // 4. Default for local development
-  return 'http://localhost:5000';
+
+  // 4. Use host.docker.internal if running in Docker
+  if (isDocker()) {
+    return 'http://host.docker.internal:5432';
+  }
+
+  // 5. Default for local development
+  return 'http://localhost:5432';
 };
 
 const LIBRETRANSLATE_URL = getLibreTranslateUrl();
@@ -34,13 +44,22 @@ export interface TranslationResult {
 export class LibreTranslateService {
   private async translate(text: string, source: string, target: string): Promise<string> {
     try {
-      const response = await axios.post(`${LIBRETRANSLATE_URL}/translate`, {
+      const payload: any = {
         q: text,
         source: source,
         target: target,
         format: 'text'
-      });
-      
+      };
+      // Add api_key if set in environment
+      if (process.env.LIBRETRANSLATE_API_KEY) {
+        payload.api_key = process.env.LIBRETRANSLATE_API_KEY;
+      }
+      console.log('Sending payload to LibreTranslate:', JSON.stringify(payload));
+      const response = await axios.post(
+        `${LIBRETRANSLATE_URL}/translate`,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       return response.data.translatedText || '';
     } catch (error) {
       console.error(`Translation error (${source} -> ${target}):`, error);

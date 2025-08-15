@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -55,10 +55,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Create directory for SQLite database
 RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
-USER nextjs
+USER root
 
 EXPOSE 3456
 
-# Server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"]
+# Install su-exec for Alpine
+RUN apk add --no-cache su-exec
+
+# Ensure /app/data is writable by nextjs user at runtime and start as nextjs
+CMD chown -R nextjs:nodejs /app/data && chmod 777 /app/data && su-exec nextjs node server.js
