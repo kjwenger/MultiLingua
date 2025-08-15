@@ -35,7 +35,7 @@ A modern Next.js application that provides real-time translation services using 
    npm run dev
    ```
 
-4. Open your browser and visit `http://localhost:3000`
+4. Open your browser and visit `http://localhost:3456`
 
 ## Usage
 

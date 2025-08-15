@@ -23,6 +23,7 @@ interface TranslationProposals {
 export default function Home() {
   const [translations, setTranslations] = useState<Translation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [translatingIds, setTranslatingIds] = useState<Set<number>>(new Set());
   const [ttsPlayingIds, setTtsPlayingIds] = useState<Set<string>>(new Set());
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -33,11 +34,22 @@ export default function Home() {
 
   const fetchTranslations = async () => {
     try {
-      const response = await fetch('/api/translations');
+      setError(null);
+      const response = await fetch('/api/translations', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setTranslations(data);
+      setTranslations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching translations:', error);
+      setError('Failed to load translations');
+      setTranslations([]);
     } finally {
       setLoading(false);
     }
@@ -226,7 +238,26 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-200">
-        <div className="text-xl text-gray-900 dark:text-gray-100">Loading...</div>
+        <div className="text-center">
+          <div className="text-xl text-gray-900 dark:text-gray-100 mb-4">Loading translations...</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-200">
+        <div className="text-center">
+          <div className="text-xl text-red-600 dark:text-red-400 mb-4">{error}</div>
+          <button 
+            onClick={fetchTranslations}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
