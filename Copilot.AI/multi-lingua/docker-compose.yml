@@ -29,7 +29,7 @@ services:
       - LIBRETRANSLATE_URL=http://libretranslate:5000
     volumes:
       # Persist the SQLite database
-      - ./data:/app/data
+      - ml-data:/app/data
     depends_on:
       - libretranslate
     restart: unless-stopped
@@ -43,4 +43,7 @@ networks:
 volumes:
   # LibreTranslate persistent storage - use existing external volume
   lt-local:
+    external: true
+  # Multi-Lingua SQLite database storage - use existing external volume
+  ml-data:
     external: true

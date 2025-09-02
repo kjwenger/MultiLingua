@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI\\multi-lingua/**)",
+      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI\\multi-lingua/**)",
+      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI\\multi-lingua/**)",
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(code .)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker-compose:*)",
+      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

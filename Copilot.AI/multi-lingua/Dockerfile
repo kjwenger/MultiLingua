@@ -33,8 +33,8 @@ ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Environment variables for LibreTranslate connection
-ENV LIBRETRANSLATE_URL=http://host.docker.internal:5000
-ENV PORT=3456
+ENV LIBRETRANSLATE_URL=http://libretranslate:5000
+ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 RUN addgroup --system --gid 1001 nodejs
@@ -57,7 +57,7 @@ RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
 USER root
 
-EXPOSE 3456
+EXPOSE 3000
 
 # Install su-exec for Alpine
 RUN apk add --no-cache su-exec
