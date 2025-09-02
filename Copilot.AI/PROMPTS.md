@@ -532,3 +532,106 @@ You can now access the application at **http://localhost:3456**
 **User:** Please update the PROMPTS.md with all the prompts and answers so far, commit and push with auto-comments
 
 **Claude:** I've updated PROMPTS.md with the complete conversation history including the Docker Compose setup, VSCode launch, and successful containerized deployment of the multi-lingua application.
+
+### User Request #24
+**User:** When running it all in Docker Compose, there seem to be no calls to libretranslate on port 5432 ... only calls to localhost:3456. Is there a mixup in the network location of the API?
+
+**Claude:** You're absolutely right! There's a network configuration issue. Let me check the current configuration and fix it.
+
+I found the problem! The issue was in the translate.ts file on line 7, there's a `.replace(/5000/, '5432')` that was incorrectly changing port 5000 to 5432. Also, the docker-compose.yml was configured with port 5432 instead of the standard LibreTranslate port 5000.
+
+The key fixes were:
+1. **Corrected LibreTranslate port** from 5432 to 5000 (standard port)
+2. **Fixed docker-compose environment variable** to use `http://libretranslate:5000`  
+3. **Removed the incorrect port replacement logic** in translate.ts that was changing 5000 to 5432
+
+However, after testing, the logs showed that LibreTranslate was returning HTTP 400 errors for all translation requests, indicating the requests were reaching LibreTranslate but being rejected.
+
+### User Request #25
+**User:** Nope, API calls still go to http://localhost:3456/api/translations
+
+**Claude:** You're right - the API calls are going to the Next.js API routes, not directly to LibreTranslate. Let me trace the flow:
+
+1. Frontend calls → `http://localhost:3456/api/translate` (Next.js API route)
+2. Next.js API route should then call → LibreTranslate service
+
+The issue was that LibreTranslate was receiving requests but returning 400 Bad Request errors for all translation attempts. The network connectivity was working (app was successfully sending requests to `http://libretranslate:5000`), but LibreTranslate was rejecting all requests.
+
+### User Request #26
+**User:** stop docker compose
+
+**Claude:** Docker Compose services have been stopped and containers removed.
+
+### User Request #27
+**User:** In the docker compose file, leave the internal port of LibreTranslate at 5000 but map it to an external port of 5432
+
+**Claude:** Updated! Now LibreTranslate will:
+- Run internally on port 5000 (inside the container)
+- Be accessible externally on port 5432 (from the host)
+- The multi-lingua app will still connect to `http://libretranslate:5000` internally within the Docker network
+
+### User Request #28
+**User:** Secondly, I ran LibreTranslate in Docker already using the switch -v lt-local:/home/libretranslate/.local, so we should have a fully filled language database in that volume lt-local. Maybe the volume mapping fails with docker compose?
+
+**Claude:** You're absolutely right! The volume might not be properly mapped. When Docker Compose creates volumes, it prefixes them with the project name. So:
+
+- **Your original volume**: `lt-local` (from when you ran LibreTranslate standalone)
+- **Docker Compose volume**: `multi-lingua_lt-local` (created by our docker-compose.yml)
+
+This means the Docker Compose setup was creating and using a **new, empty volume** instead of using your existing `lt-local` volume that already has the downloaded language models!
+
+### User Request #29
+**User:** Yes, update the docker-compose.yml to use your existing lt-local volume as an external volume.
+
+**Claude:** Perfect! Now the docker-compose.yml is configured to use your existing `lt-local` volume that already contains the downloaded language models. The volume configuration now:
+- **References the existing** `lt-local` volume (with your language models)
+- **Prevents Docker Compose** from creating a new `multi-lingua_lt-local` volume
+- **Ensures LibreTranslate** has access to all the language models you previously downloaded
+
+### User Request #30
+**User:** Run docker compose again
+
+**Claude:** **Excellent!** 🎉 The translation is now working perfectly!
+
+The API returned proper translations:
+- **French**: "bonjour monde" 
+- **Italian**: "ciao mondo"
+- **Spanish**: "hola mundo"
+
+Plus multiple alternatives for each language. 
+
+**The issue is now resolved!** The problem was indeed that Docker Compose was creating a new empty volume (`multi-lingua_lt-local`) instead of using your existing `lt-local` volume that contained all the pre-downloaded language models. By configuring it as an external volume, LibreTranslate now has access to all the language data it needs.
+
+The multi-lingua application is now fully functional in Docker Compose at **http://localhost:3456**
+
+### User Request #31
+**User:** That worked but I still don't get why the API call is curl -X POST http://localhost:3456/api/translate in your curl test. Please don't change any code, just explain
+
+**Claude:** Great question! Let me explain the API call flow:
+
+The curl command `curl -X POST http://localhost:3456/api/translate` is calling the **Next.js API route**, not LibreTranslate directly. Here's the complete flow:
+
+## API Call Flow:
+
+1. **Frontend/curl** → `http://localhost:3456/api/translate` (Next.js API route)
+2. **Next.js API route** → `http://libretranslate:5000/translate` (LibreTranslate service)
+
+## Why this architecture:
+
+- **Port 3456**: Next.js application (includes both frontend AND API routes)
+- **Port 5432**: LibreTranslate service (only accessible externally for debugging)
+
+## The Next.js API route acts as a proxy:
+
+1. **Receives** the request from frontend/curl at `/api/translate`
+2. **Processes** the text (calls `translateService.translateToAllLanguages()`)
+3. **Makes multiple calls** to LibreTranslate internally at `http://libretranslate:5000`
+4. **Aggregates** the responses from French, Italian, and Spanish
+5. **Returns** a formatted JSON response with all translations + alternatives
+
+So when you curl `localhost:3456/api/translate`, you're hitting the Next.js server, which then internally makes the actual LibreTranslate API calls. This design provides a single API endpoint that handles all three languages at once.
+
+### User Request #32
+**User:** Please update the PROMPTS.md file with all the prompts and answers so far, the README.md and then commit and push with auto-comments
+
+**Claude:** I've updated PROMPTS.md with the complete Docker network troubleshooting session, including the volume configuration fix that resolved the LibreTranslate 400 errors.

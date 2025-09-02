@@ -4,7 +4,7 @@ import axios from 'axios';
 const getLibreTranslateUrl = () => {
   // 1. Use environment variable if set, default to localhost:5000
   if (process.env.LIBRETRANSLATE_URL) {
-    return process.env.LIBRETRANSLATE_URL.replace(/5000/, '5432');
+    return process.env.LIBRETRANSLATE_URL;
   }
 
   // 2. Detect Docker environment

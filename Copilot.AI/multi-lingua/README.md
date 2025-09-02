@@ -213,17 +213,50 @@ docker-compose up --build -d
 docker-compose down -v
 ```
 
-### Persistence
+### Persistence & Volume Configuration
 
 The Docker Compose setup includes persistent storage for:
-- **LibreTranslate models and dictionaries**: Stored in `lt-local` and `lt-db` volumes
+- **LibreTranslate models and dictionaries**: Uses external `lt-local` volume (must exist)
 - **Multi-Lingua database**: Stored in `./data` directory on host
+
+**Important**: The Docker Compose configuration expects an existing `lt-local` volume with pre-downloaded LibreTranslate language models. If you don't have this volume, either:
+
+1. **Create and populate the volume first**:
+   ```bash
+   # Run LibreTranslate standalone to download models
+   docker run -d --name temp-libretranslate -p 5000:5000 \
+     -v lt-local:/home/libretranslate/.local \
+     libretranslate/libretranslate
+   
+   # Wait for models to download, then stop
+   docker stop temp-libretranslate && docker rm temp-libretranslate
+   ```
+
+2. **Or modify docker-compose.yml** to create a new volume instead of using external.
+
+### Port Configuration
+
+- **Multi-Lingua App**: http://localhost:3456
+- **LibreTranslate API** (external access): http://localhost:5432
+- **Internal network**: Multi-Lingua connects to LibreTranslate via `http://libretranslate:5000`
 
 ## Troubleshooting
 
-1. **LibreTranslate Connection Issues**: Ensure LibreTranslate is running on port 5000
-2. **Database Issues**: The SQLite database file will be created automatically
-3. **Translation Errors**: Check the browser console for API error messages
+1. **LibreTranslate 400 Errors**: Usually indicates missing language models
+   - Ensure the `lt-local` volume exists and contains downloaded models
+   - Check LibreTranslate logs: `docker-compose logs libretranslate`
+
+2. **Volume Issues**: If getting "external volume not found" error
+   - Run LibreTranslate standalone first to create the `lt-local` volume
+   - Or change `external: true` to `driver: local` in docker-compose.yml
+
+3. **Network Connectivity**: 
+   - Multi-Lingua app logs should show: "Using LibreTranslate URL: http://libretranslate:5000"
+   - Test with: `curl -X POST http://localhost:3456/api/translate -H "Content-Type: application/json" -d '{"text": "hello"}'`
+
+4. **Database Issues**: The SQLite database file will be created automatically in `./data/`
+
+5. **Translation Errors**: Check the browser console for API error messages
 
 ## License
 
