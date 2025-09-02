@@ -796,3 +796,40 @@ Were you trying to refresh environment variables for the Docker Hub setup we wer
 **User:** Please update the PROMPTS.md file with all the prompts and answers so far and then commit and push with auto-comments
 
 **Claude:** I'll update the PROMPTS.md file with our current conversation and then commit and push the changes with an auto-generated commit message.
+
+### User Request #40
+**User:** The docker hub markdown seems outdated, please update, update the readme if need be, update the prompts markdown, commit and push with autocomments
+
+**Claude:** I've successfully updated the Docker Hub documentation, README, and PROMPTS.md with comprehensive improvements:
+
+## Updated Documentation
+
+### DOCKER-HUB.md Updates:
+- ✅ Added **pre-population step** for LibreTranslate models (addresses the common 400 error issue)
+- ✅ Updated **Docker Hub repository link** and **platform support** details
+- ✅ Enhanced **troubleshooting section** with specific solutions for volume and connectivity issues
+- ✅ Added **GitHub Actions workflow documentation** explaining automated builds
+- ✅ Detailed **CI/CD process** with multi-architecture support (AMD64, ARM64, ARM/v7)
+- ✅ Added **required secrets** information for automated publishing
+
+### README.md Updates:
+- ✅ Added **dual deployment options**: Published images vs Local development
+- ✅ **Quick Start section** using pre-built Docker images from Docker Hub
+- ✅ **Clear separation** between production deployment and development workflow
+- ✅ **Volume pre-population instructions** to prevent LibreTranslate 400 errors
+- ✅ **Release docker-compose.yml** download instructions for easy deployment
+
+### Key Improvements:
+- **Solved the volume issue**: Clear instructions for creating and pre-populating `lt-local`
+- **Production-ready deployment**: One-command setup using published Docker images
+- **Better troubleshooting**: Specific solutions for common Docker network and volume issues
+- **Multi-architecture support**: ARM64 support for modern Synology and Apple Silicon
+- **Automated CI/CD**: GitHub Actions workflow for hands-off publishing
+
+### For Portainer Users:
+The updated documentation now provides a seamless one-command deployment path:
+1. Download `docker-compose.release.yml`
+2. Create and pre-populate the LibreTranslate volume
+3. Deploy in Portainer with zero build requirements
+
+The documentation is now current with the existing GitHub Actions workflow and addresses all the pain points from the Docker network troubleshooting session.

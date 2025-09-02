@@ -16,7 +16,19 @@ curl -O https://raw.githubusercontent.com/kjwenger/NaturalStupidity/main/MultiLi
 docker volume create lt-local
 ```
 
-3. **Deploy in Portainer:**
+3. **Pre-populate LibreTranslate models (recommended):**
+```bash
+# Download language models first - this can take several minutes
+docker run -d --name temp-libretranslate -p 5000:5000 \
+  -v lt-local:/home/libretranslate/.local \
+  libretranslate/libretranslate:latest
+
+# Wait for models to download (check logs), then stop
+docker logs -f temp-libretranslate
+docker stop temp-libretranslate && docker rm temp-libretranslate
+```
+
+4. **Deploy in Portainer:**
    - Go to Stacks
    - Click "Add Stack"
    - Name: `multi-lingua`
@@ -54,16 +66,24 @@ docker run -d \
 ### Available Images
 
 - **Main Application**: `kjwenger/multi-lingua:latest`
+- **Docker Hub Repository**: https://hub.docker.com/r/kjwenger/multi-lingua
 - **Platform Support**: 
   - `linux/amd64` (Intel/AMD 64-bit)
-  - `linux/arm64` (Apple Silicon, newer ARM)
-  - `linux/arm/v7` (Raspberry Pi, older ARM)
+  - `linux/arm64` (Apple Silicon, newer ARM, modern Synology)
+  - `linux/arm/v7` (Raspberry Pi, older ARM devices)
 
 ### Image Tags
 
 - `latest` - Latest stable release from main branch
-- `v1.0.0` - Specific version tags (when released)
 - `main` - Development builds from main branch
+- `v*.*.*` - Semantic version tags (e.g., `v1.0.0`, `v1.1.0`)
+
+### Automatic Building
+
+Images are automatically built and published via GitHub Actions when:
+- Code is pushed to the `main` branch → `kjwenger/multi-lingua:latest`
+- Version tags are created → `kjwenger/multi-lingua:v1.0.0`
+- Pull requests are opened → `kjwenger/multi-lingua:pr-123` (for testing)
 
 ## Configuration
 
@@ -137,31 +157,50 @@ networks:
     driver: bridge
 ```
 
-## Automated Updates
+## GitHub Actions Workflow
 
-The Docker images are automatically built and published when:
+The project includes automated CI/CD via GitHub Actions (`.github/workflows/docker-publish.yml`):
 
-- Code is pushed to the `main` branch
-- Version tags are created (e.g., `git tag v1.0.0`)
-- Pull requests are opened (for testing)
+### Build Process
+1. **Multi-architecture builds** for AMD64, ARM64, and ARM/v7
+2. **Automated tagging** based on git branches and tags
+3. **Docker layer caching** for faster builds
+4. **Release artifacts** including `docker-compose.release.yml`
+
+### Publishing Triggers
+- **Push to main** → `kjwenger/multi-lingua:latest` + `kjwenger/multi-lingua:main`
+- **Version tags** → `kjwenger/multi-lingua:v1.0.0` (semantic versioning)
+- **Pull requests** → `kjwenger/multi-lingua:pr-123` (testing only, not pushed)
+
+### Required Secrets
+- `DOCKER_HUB_USERNAME` - Docker Hub username
+- `DOCKER_HUB_ACCESS_TOKEN` - Docker Hub personal access token
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **LibreTranslate returns 400 errors**
-   - Ensure the `lt-local` volume exists and is properly mounted
-   - Check LibreTranslate logs: `docker logs libretranslate`
-   - Wait for language models to fully download
+   - **Most common cause**: Empty or missing `lt-local` volume
+   - **Solution**: Pre-populate the volume with language models (see step 3 above)
+   - Check LibreTranslate logs: `docker logs libretranslate` or `docker-compose logs libretranslate`
+   - Wait for language models to fully download (can take 5-15 minutes)
 
 2. **Multi-Lingua can't connect to LibreTranslate**
    - Verify both services are on the same Docker network
-   - Check the `LIBRETRANSLATE_URL` environment variable
-   - Ensure LibreTranslate health check passes
+   - Check the `LIBRETRANSLATE_URL` environment variable is `http://libretranslate:5000`
+   - Ensure LibreTranslate health check passes: `docker-compose ps`
+   - Test internal connectivity: `docker-compose exec multi-lingua curl http://libretranslate:5000/languages`
 
 3. **Database not persisting**
-   - Verify the `./data` directory is mounted correctly
-   - Check file permissions on the host system
+   - Verify the `./data` directory is mounted correctly in docker-compose.yml
+   - Check file permissions: `ls -la ./data` (should be writable)
+   - Create directory if needed: `mkdir -p ./data && chmod 777 ./data`
+
+4. **Volume issues in Docker Compose**
+   - **External volume error**: Run LibreTranslate standalone first to create `lt-local`
+   - **Alternative**: Change `external: true` to `driver: local` in volumes section
+   - **Check volumes**: `docker volume ls | grep lt-local`
 
 ### Health Checks
 

@@ -22,17 +22,35 @@ A modern Next.js application that provides real-time translation services using 
 
 ### Option 1: Docker (Recommended)
 
-The easiest way to run the application is using Docker Compose, which will automatically set up both the Multi-Lingua app and LibreTranslate:
+#### Quick Start with Published Images
+The fastest way to get Multi-Lingua running using pre-built Docker images:
+
+```bash
+# Download release configuration
+curl -O https://raw.githubusercontent.com/kjwenger/NaturalStupidity/main/MultiLingua/Copilot.AI/docker-compose.release.yml
+
+# Create and pre-populate LibreTranslate models volume
+docker volume create lt-local
+docker run -d --name temp-libretranslate -p 5000:5000 -v lt-local:/home/libretranslate/.local libretranslate/libretranslate:latest
+# Wait for language models to download (check: docker logs -f temp-libretranslate)
+docker stop temp-libretranslate && docker rm temp-libretranslate
+
+# Start services
+docker-compose -f docker-compose.release.yml up -d
+
+# The app will be available at http://localhost:3456
+# LibreTranslate admin will be available at http://localhost:5432
+```
+
+#### Local Development Setup
+For development or if you want to build locally:
 
 ```bash
 # Clone the repository and navigate to the project
 cd multi-lingua
 
-# Start both services using Docker Compose
+# Start both services using Docker Compose (builds locally)
 docker-compose up -d
-
-# The app will be available at http://localhost:3456
-# LibreTranslate will be available at http://localhost:5000
 ```
 
 To stop the services:
@@ -196,8 +214,23 @@ docker run -p 3456:3456 --link libretranslate:libretranslate -e LIBRETRANSLATE_U
 
 ### Using Docker Compose (Recommended)
 
+#### Option 1: Published Images (No Build Required)
 ```bash
-# Start both Multi-Lingua and LibreTranslate with persistent storage
+# Download the release docker-compose file
+curl -O https://raw.githubusercontent.com/kjwenger/NaturalStupidity/main/MultiLingua/Copilot.AI/docker-compose.release.yml
+
+# Create and pre-populate LibreTranslate volume (recommended)
+docker volume create lt-local
+docker run -d --name temp-libretranslate -p 5000:5000 -v lt-local:/home/libretranslate/.local libretranslate/libretranslate:latest
+# Wait for models to download, then: docker stop temp-libretranslate && docker rm temp-libretranslate
+
+# Start services using published images
+docker-compose -f docker-compose.release.yml up -d
+```
+
+#### Option 2: Local Development Build
+```bash
+# Start both Multi-Lingua and LibreTranslate with local build
 docker-compose up -d
 
 # View logs
