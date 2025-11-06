@@ -31,6 +31,7 @@ export interface Translation {
   french: string;
   italian: string;
   spanish: string;
+  english_proposals: string;
   german_proposals: string;
   french_proposals: string;
   italian_proposals: string;
@@ -56,6 +57,7 @@ export class Database {
         french TEXT,
         italian TEXT,
         spanish TEXT,
+        english_proposals TEXT,
         german_proposals TEXT,
         french_proposals TEXT,
         italian_proposals TEXT,
@@ -71,6 +73,7 @@ export class Database {
       } else {
         console.log('Database initialized successfully');
         this.addGermanColumn();
+        this.addEnglishProposalsColumn();
       }
     });
   }
@@ -84,6 +87,14 @@ export class Database {
     this.db.run('ALTER TABLE translations ADD COLUMN german_proposals TEXT', (err: Error | null) => {
       if (err && !err.message.includes('duplicate column')) {
         console.error('Error adding german_proposals column:', err);
+      }
+    });
+  }
+
+  private addEnglishProposalsColumn() {
+    this.db.run('ALTER TABLE translations ADD COLUMN english_proposals TEXT', (err: Error | null) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding english_proposals column:', err);
       }
     });
   }
@@ -106,6 +117,7 @@ export class Database {
     french?: string;
     italian?: string;
     spanish?: string;
+    english_proposals?: string;
     german_proposals?: string;
     french_proposals?: string;
     italian_proposals?: string;
@@ -114,8 +126,8 @@ export class Database {
     return new Promise((resolve, reject) => {
       const query = `
         INSERT INTO translations 
-        (english, german, french, italian, spanish, german_proposals, french_proposals, italian_proposals, spanish_proposals)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (english, german, french, italian, spanish, english_proposals, german_proposals, french_proposals, italian_proposals, spanish_proposals)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       
       this.db.run(query, [
@@ -124,6 +136,7 @@ export class Database {
         data.french || '',
         data.italian || '',
         data.spanish || '',
+        data.english_proposals || '',
         data.german_proposals || '',
         data.french_proposals || '',
         data.italian_proposals || '',
@@ -144,6 +157,7 @@ export class Database {
     french?: string;
     italian?: string;
     spanish?: string;
+    english_proposals?: string;
     german_proposals?: string;
     french_proposals?: string;
     italian_proposals?: string;

@@ -11,6 +11,7 @@ interface Translation {
   french: string;
   italian: string;
   spanish: string;
+  english_proposals: string;
   german_proposals: string;
   french_proposals: string;
   italian_proposals: string;
@@ -172,55 +173,6 @@ export default function Home() {
     });
   };
 
-  const handleTranslateRow = async (id: number) => {
-    const translation = translations.find(t => t.id === id);
-    if (!translation || !translation.english.trim()) {
-      return;
-    }
-
-    // Set loading state
-    setTranslatingIds(prev => new Set(prev).add(id));
-
-    try {
-      const translationResult = await translateText(translation.english);
-      if (translationResult) {
-        const updatedTranslation = {
-          german: translationResult.german.translation,
-          french: translationResult.french.translation,
-          italian: translationResult.italian.translation,
-          spanish: translationResult.spanish.translation,
-          german_proposals: JSON.stringify(translationResult.german.alternatives),
-          french_proposals: JSON.stringify(translationResult.french.alternatives),
-          italian_proposals: JSON.stringify(translationResult.italian.alternatives),
-          spanish_proposals: JSON.stringify(translationResult.spanish.alternatives),
-        };
-
-        // Update the database
-        await fetch('/api/translations', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ id, ...updatedTranslation }),
-        });
-
-        // Update local state with translations
-        setTranslations(prev => prev.map(t => 
-          t.id === id ? { ...t, ...updatedTranslation } : t
-        ));
-      }
-    } catch (error) {
-      console.error('Translation error:', error);
-    } finally {
-      // Remove loading state
-      setTranslatingIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
-      });
-    }
-  };
-
   const handleTranslationChange = async (id: number, field: string, value: string) => {
     // Update local state
     setTranslations(prev => prev.map(t => 
@@ -272,6 +224,7 @@ export default function Home() {
           french: '',
           italian: '',
           spanish: '',
+          english_proposals: '[]',
           german_proposals: '[]',
           french_proposals: '[]',
           italian_proposals: '[]',
@@ -431,6 +384,22 @@ export default function Home() {
                         </button>
                         </div>
                       </div>
+                      {getProposals(translation.english_proposals || '[]').length > 0 && (
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          <strong>Suggestions:</strong>
+                          <ul className="list-disc list-inside">
+                            {getProposals(translation.english_proposals || '[]').slice(0, 5).map((proposal, idx) => (
+                              <li 
+                                key={idx} 
+                                className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                onClick={() => handleTranslationChange(translation.id, 'english', proposal)}
+                              >
+                                {proposal}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </td>
                     
                     <td className="px-4 py-3 align-top">
@@ -674,25 +643,15 @@ export default function Home() {
                     </td>
                     
                     <td className="px-4 py-3 align-top">
-                      <div className="flex flex-col gap-1.5 mb-4">
-                        <button
-                          onClick={() => handleTranslateRow(translation.id)}
-                          disabled={!translation.english.trim() || translatingIds.has(translation.id)}
-                          className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-1 px-3 rounded text-sm transition-colors duration-200 w-full min-w-[90px] whitespace-nowrap"
-                        >
-                          {translatingIds.has(translation.id) ? (
-                            <div className="flex items-center justify-center">
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            </div>
-                          ) : (
-                            'Translate'
-                          )}
-                        </button>
+                      <div className="flex justify-center items-start pt-2">
                         <button
                           onClick={() => deleteRow(translation.id)}
-                          className="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white font-bold py-1 px-3 rounded text-sm transition-colors duration-200 w-full min-w-[90px] whitespace-nowrap"
+                          className="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                          title="Delete translation"
                         >
-                          Delete
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
                         </button>
                       </div>
                     </td>
