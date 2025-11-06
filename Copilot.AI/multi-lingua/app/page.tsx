@@ -309,12 +309,12 @@ export default function Home() {
           <div className="overflow-x-auto">
             <table className="w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700" style={{ minWidth: '650px' }}>
               <colgroup>
-                <col style={{ minWidth: '140px', width: '20%' }} />
-                <col style={{ minWidth: '140px', width: '20%' }} />
-                <col style={{ minWidth: '140px', width: '20%' }} />
-                <col style={{ minWidth: '140px', width: '20%' }} />
-                <col style={{ minWidth: '140px', width: '20%' }} />
-                <col style={{ minWidth: '120px', width: '120px' }} />
+                <col style={{ minWidth: '140px' }} />
+                <col style={{ minWidth: '140px' }} />
+                <col style={{ minWidth: '140px' }} />
+                <col style={{ minWidth: '140px' }} />
+                <col style={{ minWidth: '140px' }} />
+                <col style={{ width: '60px' }} />
               </colgroup>
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
