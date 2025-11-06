@@ -355,15 +355,15 @@ export default function Home() {
                       <div className="space-y-2">
                         <div className="flex items-start gap-2">
                           <textarea
-                            value={translation.german}
+                            value={translation.german || ''}
                             onChange={(e) => handleTranslationChange(translation.id, 'german', e.target.value)}
                             className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                             rows={2}
                             placeholder="German translation"
                           />
                           <button
-                            onClick={() => handleTTS(translation.id, 'german', translation.german)}
-                            disabled={!translation.german.trim() || ttsPlayingIds.has(`${translation.id}-german`)}
+                            onClick={() => handleTTS(translation.id, 'german', translation.german || '')}
+                            disabled={!translation.german?.trim() || ttsPlayingIds.has(`${translation.id}-german`)}
                             className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                             title="Play German audio"
                           >
@@ -376,7 +376,7 @@ export default function Home() {
                             )}
                           </button>
                         </div>
-                        {getProposals(translation.german_proposals).length > 0 && (
+                        {getProposals(translation.german_proposals || '[]').length > 0 && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
                             <strong>Suggestions:</strong>
                             <ul className="list-disc list-inside">
