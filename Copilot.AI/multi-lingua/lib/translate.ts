@@ -99,6 +99,16 @@ export class LibreTranslateService {
     return alternatives.slice(0, 5); // Return up to 5 alternatives
   }
 
+  public async translateToGerman(text: string): Promise<TranslationResult> {
+    const translatedText = await this.translate(text, 'en', 'de');
+    const alternatives = await this.getAlternatives(text, 'en', 'de');
+    
+    return {
+      translatedText,
+      alternatives
+    };
+  }
+
   public async translateToFrench(text: string): Promise<TranslationResult> {
     const translatedText = await this.translate(text, 'en', 'fr');
     const alternatives = await this.getAlternatives(text, 'en', 'fr');
@@ -130,17 +140,19 @@ export class LibreTranslateService {
   }
 
   public async translateToAllLanguages(text: string): Promise<{
+    german: TranslationResult;
     french: TranslationResult;
     italian: TranslationResult;
     spanish: TranslationResult;
   }> {
-    const [french, italian, spanish] = await Promise.all([
+    const [german, french, italian, spanish] = await Promise.all([
+      this.translateToGerman(text),
       this.translateToFrench(text),
       this.translateToItalian(text),
       this.translateToSpanish(text)
     ]);
 
-    return { french, italian, spanish };
+    return { german, french, italian, spanish };
   }
 }
 

@@ -12,6 +12,10 @@ export async function POST(request: NextRequest) {
     const translations = await translateService.translateToAllLanguages(text);
     
     return NextResponse.json({
+      german: {
+        translation: translations.german.translatedText,
+        alternatives: translations.german.alternatives || []
+      },
       french: {
         translation: translations.french.translatedText,
         alternatives: translations.french.alternatives || []

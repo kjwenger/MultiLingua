@@ -7,9 +7,11 @@ import { playTextToSpeech } from '../lib/tts';
 interface Translation {
   id: number;
   english: string;
+  german: string;
   french: string;
   italian: string;
   spanish: string;
+  german_proposals: string;
   french_proposals: string;
   italian_proposals: string;
   spanish_proposals: string;
@@ -117,9 +119,11 @@ export default function Home() {
       const translationResult = await translateText(translation.english);
       if (translationResult) {
         const updatedTranslation = {
+          german: translationResult.german.translation,
           french: translationResult.french.translation,
           italian: translationResult.italian.translation,
           spanish: translationResult.spanish.translation,
+          german_proposals: JSON.stringify(translationResult.german.alternatives),
           french_proposals: JSON.stringify(translationResult.french.alternatives),
           italian_proposals: JSON.stringify(translationResult.italian.alternatives),
           spanish_proposals: JSON.stringify(translationResult.spanish.alternatives),
@@ -167,7 +171,7 @@ export default function Home() {
     });
   };
 
-  const handleTTS = async (id: number, language: 'english' | 'french' | 'italian' | 'spanish', text: string) => {
+  const handleTTS = async (id: number, language: 'english' | 'german' | 'french' | 'italian' | 'spanish', text: string) => {
     const ttsId = `${id}-${language}`;
     
     if (ttsPlayingIds.has(ttsId)) {
@@ -198,9 +202,11 @@ export default function Home() {
         },
         body: JSON.stringify({
           english: '',
+          german: '',
           french: '',
           italian: '',
           spanish: '',
+          german_proposals: '[]',
           french_proposals: '[]',
           italian_proposals: '[]',
           spanish_proposals: '[]',
@@ -284,10 +290,11 @@ export default function Home() {
           <div className="overflow-x-auto">
             <table className="w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700" style={{ minWidth: '650px' }}>
               <colgroup>
-                <col style={{ minWidth: '140px', width: '25%' }} />
-                <col style={{ minWidth: '140px', width: '25%' }} />
-                <col style={{ minWidth: '140px', width: '25%' }} />
-                <col style={{ minWidth: '140px', width: '25%' }} />
+                <col style={{ minWidth: '140px', width: '20%' }} />
+                <col style={{ minWidth: '140px', width: '20%' }} />
+                <col style={{ minWidth: '140px', width: '20%' }} />
+                <col style={{ minWidth: '140px', width: '20%' }} />
+                <col style={{ minWidth: '140px', width: '20%' }} />
                 <col style={{ minWidth: '120px', width: '120px' }} />
               </colgroup>
               <thead className="bg-gray-50 dark:bg-gray-700">
@@ -297,6 +304,9 @@ export default function Home() {
                     onClick={handleSort}
                   >
                     English {sortOrder === 'asc' ? '↑' : '↓'}
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    German
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     French
@@ -338,6 +348,50 @@ export default function Home() {
                             </svg>
                           )}
                         </button>
+                      </div>
+                    </td>
+                    
+                    <td className="px-4 py-3 align-top">
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <textarea
+                            value={translation.german}
+                            onChange={(e) => handleTranslationChange(translation.id, 'german', e.target.value)}
+                            className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                            rows={2}
+                            placeholder="German translation"
+                          />
+                          <button
+                            onClick={() => handleTTS(translation.id, 'german', translation.german)}
+                            disabled={!translation.german.trim() || ttsPlayingIds.has(`${translation.id}-german`)}
+                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                            title="Play German audio"
+                          >
+                            {ttsPlayingIds.has(`${translation.id}-german`) ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                            ) : (
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.776l-4.146-3.117H2a1 1 0 01-1-1V7.24a1 1 0 011-1h2.237l4.146-3.116a1 1 0 011.617.776zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd"/>
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                        {getProposals(translation.german_proposals).length > 0 && (
+                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                            <strong>Suggestions:</strong>
+                            <ul className="list-disc list-inside">
+                              {getProposals(translation.german_proposals).slice(0, 5).map((proposal, idx) => (
+                                <li 
+                                  key={idx} 
+                                  className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                  onClick={() => handleTranslationChange(translation.id, 'german', proposal)}
+                                >
+                                  {proposal}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </td>
                     

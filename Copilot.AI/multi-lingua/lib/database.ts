@@ -27,9 +27,11 @@ const dbPath = path.join(dataDir, 'translations.db');
 export interface Translation {
   id: number;
   english: string;
+  german: string;
   french: string;
   italian: string;
   spanish: string;
+  german_proposals: string;
   french_proposals: string;
   italian_proposals: string;
   spanish_proposals: string;
@@ -50,9 +52,11 @@ export class Database {
       CREATE TABLE IF NOT EXISTS translations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         english TEXT NOT NULL,
+        german TEXT,
         french TEXT,
         italian TEXT,
         spanish TEXT,
+        german_proposals TEXT,
         french_proposals TEXT,
         italian_proposals TEXT,
         spanish_proposals TEXT,
@@ -66,6 +70,20 @@ export class Database {
         console.error('Error creating table:', err);
       } else {
         console.log('Database initialized successfully');
+        this.addGermanColumn();
+      }
+    });
+  }
+
+  private addGermanColumn() {
+    this.db.run('ALTER TABLE translations ADD COLUMN german TEXT', (err: Error | null) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding german column:', err);
+      }
+    });
+    this.db.run('ALTER TABLE translations ADD COLUMN german_proposals TEXT', (err: Error | null) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding german_proposals column:', err);
       }
     });
   }
@@ -84,9 +102,11 @@ export class Database {
 
   public addTranslation(data: {
     english: string;
+    german?: string;
     french?: string;
     italian?: string;
     spanish?: string;
+    german_proposals?: string;
     french_proposals?: string;
     italian_proposals?: string;
     spanish_proposals?: string;
@@ -94,15 +114,17 @@ export class Database {
     return new Promise((resolve, reject) => {
       const query = `
         INSERT INTO translations 
-        (english, french, italian, spanish, french_proposals, italian_proposals, spanish_proposals)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (english, german, french, italian, spanish, german_proposals, french_proposals, italian_proposals, spanish_proposals)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       
       this.db.run(query, [
         data.english,
+        data.german || '',
         data.french || '',
         data.italian || '',
         data.spanish || '',
+        data.german_proposals || '',
         data.french_proposals || '',
         data.italian_proposals || '',
         data.spanish_proposals || ''
@@ -118,9 +140,11 @@ export class Database {
 
   public updateTranslation(id: number, data: {
     english?: string;
+    german?: string;
     french?: string;
     italian?: string;
     spanish?: string;
+    german_proposals?: string;
     french_proposals?: string;
     italian_proposals?: string;
     spanish_proposals?: string;

@@ -1,5 +1,5 @@
 // Text-to-Speech functionality using Web Speech API
-export const playTextToSpeech = async (text: string, language: 'english' | 'french' | 'italian' | 'spanish'): Promise<void> => {
+export const playTextToSpeech = async (text: string, language: 'english' | 'german' | 'french' | 'italian' | 'spanish'): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!('speechSynthesis' in window)) {
       reject(new Error('Speech synthesis not supported'));
@@ -14,6 +14,7 @@ export const playTextToSpeech = async (text: string, language: 'english' | 'fren
     // Set language codes
     const languageCodes = {
       english: 'en-US',
+      german: 'de-DE',
       french: 'fr-FR',
       italian: 'it-IT',
       spanish: 'es-ES'
