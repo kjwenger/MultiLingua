@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MultiLinguaDroid</string>
+    <string name="english">English</string>
+    <string name="french">French</string>
+    <string name="italian">Italian</string>
+    <string name="spanish">Spanish</string>
+    <string name="translate">Translate</string>
+    <string name="delete">Delete</string>
+    <string name="add_translation">Add Translation</string>
+    <string name="enter_english">Enter English text</string>
+    <string name="french_translation">French translation</string>
+    <string name="italian_translation">Italian translation</string>
+    <string name="spanish_translation">Spanish translation</string>
+    <string name="sort_by_english">Sort by English</string>
+    <string name="toggle_theme">Toggle Theme</string>
+</resources>
