@@ -99,6 +99,37 @@ export class LibreTranslateService {
     return alternatives.slice(0, 5); // Return up to 5 alternatives
   }
 
+  public async translateFromLanguage(text: string, sourceLanguage: 'en' | 'de' | 'fr' | 'it' | 'es'): Promise<{
+    english?: TranslationResult;
+    german?: TranslationResult;
+    french?: TranslationResult;
+    italian?: TranslationResult;
+    spanish?: TranslationResult;
+  }> {
+    const results: any = {};
+    const targets = [];
+    
+    if (sourceLanguage !== 'en') targets.push({ key: 'english', code: 'en' });
+    if (sourceLanguage !== 'de') targets.push({ key: 'german', code: 'de' });
+    if (sourceLanguage !== 'fr') targets.push({ key: 'french', code: 'fr' });
+    if (sourceLanguage !== 'it') targets.push({ key: 'italian', code: 'it' });
+    if (sourceLanguage !== 'es') targets.push({ key: 'spanish', code: 'es' });
+
+    const translations = await Promise.all(
+      targets.map(async (target) => {
+        const translatedText = await this.translate(text, sourceLanguage, target.code);
+        const alternatives = await this.getAlternatives(text, sourceLanguage, target.code);
+        return { key: target.key, result: { translatedText, alternatives } };
+      })
+    );
+
+    translations.forEach(({ key, result }) => {
+      results[key] = result;
+    });
+
+    return results;
+  }
+
   public async translateToGerman(text: string): Promise<TranslationResult> {
     const translatedText = await this.translate(text, 'en', 'de');
     const alternatives = await this.getAlternatives(text, 'en', 'de');

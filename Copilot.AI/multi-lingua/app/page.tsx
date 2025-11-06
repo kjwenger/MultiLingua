@@ -72,14 +72,14 @@ export default function Home() {
     setTranslations(sorted);
   };
 
-  const translateText = async (text: string) => {
+  const translateText = async (text: string, sourceLanguage?: 'en' | 'de' | 'fr' | 'it' | 'es') => {
     try {
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, sourceLanguage }),
       });
       
       const data = await response.json();
@@ -87,6 +87,72 @@ export default function Home() {
     } catch (error) {
       console.error('Translation error:', error);
       return null;
+    }
+  };
+
+  const handleTranslateFromLanguage = async (id: number, language: 'english' | 'german' | 'french' | 'italian' | 'spanish') => {
+    const translation = translations.find(t => t.id === id);
+    if (!translation) return;
+
+    const sourceText = translation[language];
+    if (!sourceText?.trim()) return;
+
+    const languageCodeMap = {
+      english: 'en',
+      german: 'de',
+      french: 'fr',
+      italian: 'it',
+      spanish: 'es'
+    };
+
+    setTranslatingIds(prev => new Set(prev).add(id));
+
+    try {
+      const translationResult = await translateText(sourceText, languageCodeMap[language] as any);
+      if (translationResult) {
+        const updatedTranslation: any = {};
+        
+        if (translationResult.english) {
+          updatedTranslation.english = translationResult.english.translation;
+          updatedTranslation.english_proposals = JSON.stringify(translationResult.english.alternatives);
+        }
+        if (translationResult.german) {
+          updatedTranslation.german = translationResult.german.translation;
+          updatedTranslation.german_proposals = JSON.stringify(translationResult.german.alternatives);
+        }
+        if (translationResult.french) {
+          updatedTranslation.french = translationResult.french.translation;
+          updatedTranslation.french_proposals = JSON.stringify(translationResult.french.alternatives);
+        }
+        if (translationResult.italian) {
+          updatedTranslation.italian = translationResult.italian.translation;
+          updatedTranslation.italian_proposals = JSON.stringify(translationResult.italian.alternatives);
+        }
+        if (translationResult.spanish) {
+          updatedTranslation.spanish = translationResult.spanish.translation;
+          updatedTranslation.spanish_proposals = JSON.stringify(translationResult.spanish.alternatives);
+        }
+
+        await fetch('/api/translations', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id, ...updatedTranslation }),
+        });
+
+        setTranslations(prev => prev.map(t => 
+          t.id === id ? { ...t, ...updatedTranslation } : t
+        ));
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+    } finally {
+      setTranslatingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
     }
   };
 
@@ -334,12 +400,27 @@ export default function Home() {
                           rows={2}
                           placeholder="Enter English text"
                         />
-                        <button
-                          onClick={() => handleTTS(translation.id, 'english', translation.english)}
-                          disabled={!translation.english.trim() || ttsPlayingIds.has(`${translation.id}-english`)}
-                          className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                          title="Play English audio"
-                        >
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => handleTranslateFromLanguage(translation.id, 'english')}
+                            disabled={!translation.english?.trim() || translatingIds.has(translation.id)}
+                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                            title="Translate from English to all languages"
+                          >
+                            {translatingIds.has(translation.id) ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                              </svg>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleTTS(translation.id, 'english', translation.english)}
+                            disabled={!translation.english.trim() || ttsPlayingIds.has(`${translation.id}-english`)}
+                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                            title="Play English audio"
+                          >
                           {ttsPlayingIds.has(`${translation.id}-english`) ? (
                             <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
                           ) : (
@@ -348,6 +429,7 @@ export default function Home() {
                             </svg>
                           )}
                         </button>
+                        </div>
                       </div>
                     </td>
                     
@@ -361,12 +443,27 @@ export default function Home() {
                             rows={2}
                             placeholder="German translation"
                           />
-                          <button
-                            onClick={() => handleTTS(translation.id, 'german', translation.german || '')}
-                            disabled={!translation.german?.trim() || ttsPlayingIds.has(`${translation.id}-german`)}
-                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                            title="Play German audio"
-                          >
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => handleTranslateFromLanguage(translation.id, 'german')}
+                              disabled={!translation.german?.trim() || translatingIds.has(translation.id)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Translate from German to all languages"
+                            >
+                              {translatingIds.has(translation.id) ? (
+                                <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                </svg>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleTTS(translation.id, 'german', translation.german || '')}
+                              disabled={!translation.german?.trim() || ttsPlayingIds.has(`${translation.id}-german`)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Play German audio"
+                            >
                             {ttsPlayingIds.has(`${translation.id}-german`) ? (
                               <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
                             ) : (
@@ -375,6 +472,7 @@ export default function Home() {
                               </svg>
                             )}
                           </button>
+                          </div>
                         </div>
                         {getProposals(translation.german_proposals || '[]').length > 0 && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -405,12 +503,27 @@ export default function Home() {
                             rows={2}
                             placeholder="French translation"
                           />
-                          <button
-                            onClick={() => handleTTS(translation.id, 'french', translation.french)}
-                            disabled={!translation.french.trim() || ttsPlayingIds.has(`${translation.id}-french`)}
-                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                            title="Play French audio"
-                          >
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => handleTranslateFromLanguage(translation.id, 'french')}
+                              disabled={!translation.french?.trim() || translatingIds.has(translation.id)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Translate from French to all languages"
+                            >
+                              {translatingIds.has(translation.id) ? (
+                                <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                </svg>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleTTS(translation.id, 'french', translation.french)}
+                              disabled={!translation.french.trim() || ttsPlayingIds.has(`${translation.id}-french`)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Play French audio"
+                            >
                             {ttsPlayingIds.has(`${translation.id}-french`) ? (
                               <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
                             ) : (
@@ -419,6 +532,7 @@ export default function Home() {
                               </svg>
                             )}
                           </button>
+                          </div>
                         </div>
                         {getProposals(translation.french_proposals).length > 0 && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -449,12 +563,27 @@ export default function Home() {
                             rows={2}
                             placeholder="Italian translation"
                           />
-                          <button
-                            onClick={() => handleTTS(translation.id, 'italian', translation.italian)}
-                            disabled={!translation.italian.trim() || ttsPlayingIds.has(`${translation.id}-italian`)}
-                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                            title="Play Italian audio"
-                          >
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => handleTranslateFromLanguage(translation.id, 'italian')}
+                              disabled={!translation.italian?.trim() || translatingIds.has(translation.id)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Translate from Italian to all languages"
+                            >
+                              {translatingIds.has(translation.id) ? (
+                                <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                </svg>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleTTS(translation.id, 'italian', translation.italian)}
+                              disabled={!translation.italian.trim() || ttsPlayingIds.has(`${translation.id}-italian`)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Play Italian audio"
+                            >
                             {ttsPlayingIds.has(`${translation.id}-italian`) ? (
                               <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
                             ) : (
@@ -463,6 +592,7 @@ export default function Home() {
                               </svg>
                             )}
                           </button>
+                          </div>
                         </div>
                         {getProposals(translation.italian_proposals).length > 0 && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -493,12 +623,27 @@ export default function Home() {
                             rows={2}
                             placeholder="Spanish translation"
                           />
-                          <button
-                            onClick={() => handleTTS(translation.id, 'spanish', translation.spanish)}
-                            disabled={!translation.spanish.trim() || ttsPlayingIds.has(`${translation.id}-spanish`)}
-                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                            title="Play Spanish audio"
-                          >
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => handleTranslateFromLanguage(translation.id, 'spanish')}
+                              disabled={!translation.spanish?.trim() || translatingIds.has(translation.id)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Translate from Spanish to all languages"
+                            >
+                              {translatingIds.has(translation.id) ? (
+                                <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                </svg>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleTTS(translation.id, 'spanish', translation.spanish)}
+                              disabled={!translation.spanish.trim() || ttsPlayingIds.has(`${translation.id}-spanish`)}
+                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              title="Play Spanish audio"
+                            >
                             {ttsPlayingIds.has(`${translation.id}-spanish`) ? (
                               <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
                             ) : (
@@ -507,6 +652,7 @@ export default function Home() {
                               </svg>
                             )}
                           </button>
+                          </div>
                         </div>
                         {getProposals(translation.spanish_proposals).length > 0 && (
                           <div className="text-xs text-gray-600 dark:text-gray-400">
