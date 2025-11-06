@@ -79,7 +79,12 @@ export class LibreTranslateService {
         text.toLowerCase(),
         text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
         `the ${text}`,
-        `a ${text}`
+        `a ${text}`,
+        `${text}.`,
+        `${text}!`,
+        `${text}?`,
+        text.toUpperCase(),
+        text.trim()
       ];
 
       for (const variation of variations) {
@@ -96,7 +101,7 @@ export class LibreTranslateService {
       console.error('Error getting alternatives:', error);
     }
 
-    return alternatives.slice(0, 5); // Return up to 5 alternatives
+    return alternatives.slice(0, 10); // Return up to 10 alternatives
   }
 
   public async translateFromLanguage(text: string, sourceLanguage: 'en' | 'de' | 'fr' | 'it' | 'es'): Promise<{

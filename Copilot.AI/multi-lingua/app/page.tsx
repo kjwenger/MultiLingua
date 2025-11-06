@@ -384,19 +384,34 @@ export default function Home() {
                         </div>
                       </div>
                       {getProposals(translation.english_proposals || '[]').length > 0 && (
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                           <strong>Suggestions:</strong>
-                          <ul className="list-disc list-inside">
-                            {getProposals(translation.english_proposals || '[]').slice(0, 5).map((proposal, idx) => (
-                              <li 
-                                key={idx} 
-                                className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                                onClick={() => handleTranslationChange(translation.id, 'english', proposal)}
-                              >
-                                {proposal}
-                              </li>
-                            ))}
-                          </ul>
+                          <div className="grid grid-cols-2 gap-2">
+                            <ul className="list-disc list-inside">
+                              {getProposals(translation.english_proposals || '[]').slice(0, 5).map((proposal, idx) => (
+                                <li 
+                                  key={idx} 
+                                  className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                  onClick={() => handleTranslationChange(translation.id, 'english', proposal)}
+                                >
+                                  {proposal}
+                                </li>
+                              ))}
+                            </ul>
+                            {getProposals(translation.english_proposals || '[]').length > 5 && (
+                              <ul className="list-disc list-inside">
+                                {getProposals(translation.english_proposals || '[]').slice(5, 10).map((proposal, idx) => (
+                                  <li 
+                                    key={idx + 5} 
+                                    className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                    onClick={() => handleTranslationChange(translation.id, 'english', proposal)}
+                                  >
+                                    {proposal}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
                         </div>
                       )}
                     </td>
@@ -443,19 +458,34 @@ export default function Home() {
                           </div>
                         </div>
                         {getProposals(translation.german_proposals || '[]').length > 0 && (
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                             <strong>Suggestions:</strong>
-                            <ul className="list-disc list-inside">
-                              {getProposals(translation.german_proposals).slice(0, 5).map((proposal, idx) => (
-                                <li 
-                                  key={idx} 
-                                  className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                                  onClick={() => handleTranslationChange(translation.id, 'german', proposal)}
-                                >
-                                  {proposal}
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="grid grid-cols-2 gap-2">
+                              <ul className="list-disc list-inside">
+                                {getProposals(translation.german_proposals || '[]').slice(0, 5).map((proposal, idx) => (
+                                  <li 
+                                    key={idx} 
+                                    className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                    onClick={() => handleTranslationChange(translation.id, 'german', proposal)}
+                                  >
+                                    {proposal}
+                                  </li>
+                                ))}
+                              </ul>
+                              {getProposals(translation.german_proposals || '[]').length > 5 && (
+                                <ul className="list-disc list-inside">
+                                  {getProposals(translation.german_proposals || '[]').slice(5, 10).map((proposal, idx) => (
+                                    <li 
+                                      key={idx + 5} 
+                                      className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                      onClick={() => handleTranslationChange(translation.id, 'german', proposal)}
+                                    >
+                                      {proposal}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -503,19 +533,34 @@ export default function Home() {
                           </div>
                         </div>
                         {getProposals(translation.french_proposals).length > 0 && (
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                             <strong>Suggestions:</strong>
-                            <ul className="list-disc list-inside">
-                              {getProposals(translation.french_proposals).slice(0, 5).map((proposal, idx) => (
-                                <li 
-                                  key={idx} 
-                                  className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                                  onClick={() => handleTranslationChange(translation.id, 'french', proposal)}
-                                >
-                                  {proposal}
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="grid grid-cols-2 gap-2">
+                              <ul className="list-disc list-inside">
+                                {getProposals(translation.french_proposals).slice(0, 5).map((proposal, idx) => (
+                                  <li 
+                                    key={idx} 
+                                    className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                    onClick={() => handleTranslationChange(translation.id, 'french', proposal)}
+                                  >
+                                    {proposal}
+                                  </li>
+                                ))}
+                              </ul>
+                              {getProposals(translation.french_proposals).length > 5 && (
+                                <ul className="list-disc list-inside">
+                                  {getProposals(translation.french_proposals).slice(5, 10).map((proposal, idx) => (
+                                    <li 
+                                      key={idx + 5} 
+                                      className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                      onClick={() => handleTranslationChange(translation.id, 'french', proposal)}
+                                    >
+                                      {proposal}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -563,19 +608,34 @@ export default function Home() {
                           </div>
                         </div>
                         {getProposals(translation.italian_proposals).length > 0 && (
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                             <strong>Suggestions:</strong>
-                            <ul className="list-disc list-inside">
-                              {getProposals(translation.italian_proposals).slice(0, 5).map((proposal, idx) => (
-                                <li 
-                                  key={idx} 
-                                  className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                                  onClick={() => handleTranslationChange(translation.id, 'italian', proposal)}
-                                >
-                                  {proposal}
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="grid grid-cols-2 gap-2">
+                              <ul className="list-disc list-inside">
+                                {getProposals(translation.italian_proposals).slice(0, 5).map((proposal, idx) => (
+                                  <li 
+                                    key={idx} 
+                                    className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                    onClick={() => handleTranslationChange(translation.id, 'italian', proposal)}
+                                  >
+                                    {proposal}
+                                  </li>
+                                ))}
+                              </ul>
+                              {getProposals(translation.italian_proposals).length > 5 && (
+                                <ul className="list-disc list-inside">
+                                  {getProposals(translation.italian_proposals).slice(5, 10).map((proposal, idx) => (
+                                    <li 
+                                      key={idx + 5} 
+                                      className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                      onClick={() => handleTranslationChange(translation.id, 'italian', proposal)}
+                                    >
+                                      {proposal}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -623,19 +683,34 @@ export default function Home() {
                           </div>
                         </div>
                         {getProposals(translation.spanish_proposals).length > 0 && (
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                             <strong>Suggestions:</strong>
-                            <ul className="list-disc list-inside">
-                              {getProposals(translation.spanish_proposals).slice(0, 5).map((proposal, idx) => (
-                                <li 
-                                  key={idx} 
-                                  className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                                  onClick={() => handleTranslationChange(translation.id, 'spanish', proposal)}
-                                >
-                                  {proposal}
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="grid grid-cols-2 gap-2">
+                              <ul className="list-disc list-inside">
+                                {getProposals(translation.spanish_proposals).slice(0, 5).map((proposal, idx) => (
+                                  <li 
+                                    key={idx} 
+                                    className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                    onClick={() => handleTranslationChange(translation.id, 'spanish', proposal)}
+                                  >
+                                    {proposal}
+                                  </li>
+                                ))}
+                              </ul>
+                              {getProposals(translation.spanish_proposals).length > 5 && (
+                                <ul className="list-disc list-inside">
+                                  {getProposals(translation.spanish_proposals).slice(5, 10).map((proposal, idx) => (
+                                    <li 
+                                      key={idx + 5} 
+                                      className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                                      onClick={() => handleTranslationChange(translation.id, 'spanish', proposal)}
+                                    >
+                                      {proposal}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
