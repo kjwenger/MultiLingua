@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- English -->
+        <include
+            android:id="@+id/englishLayout"
+            layout="@layout/item_language_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="8dp"
+            android:background="?android:attr/divider" />
+
+        <!-- German -->
+        <include
+            android:id="@+id/germanLayout"
+            layout="@layout/item_language_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="8dp"
+            android:background="?android:attr/divider" />
+
+        <!-- French -->
+        <include
+            android:id="@+id/frenchLayout"
+            layout="@layout/item_language_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="8dp"
+            android:background="?android:attr/divider" />
+
+        <!-- Italian -->
+        <include
+            android:id="@+id/italianLayout"
+            layout="@layout/item_language_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="8dp"
+            android:background="?android:attr/divider" />
+
+        <!-- Spanish -->
+        <include
+            android:id="@+id/spanishLayout"
+            layout="@layout/item_language_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Delete button -->
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:text="@string/delete"
+            android:textColor="@color/error"
+            style="@style/Widget.Material3.Button.TextButton" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
