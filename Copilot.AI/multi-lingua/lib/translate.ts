@@ -1,40 +1,69 @@
 import axios from 'axios';
+import sqlite3 from 'sqlite3';
+import path from 'path';
+import fs from 'fs';
+
+function isDocker() {
+  try {
+    return fs.existsSync('/.dockerenv') || (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf8').includes('docker'));
+  } catch {
+    return false;
+  }
+}
+
+const dataDir = process.env.DATA_DIR
+  ? process.env.DATA_DIR
+  : isDocker()
+    ? '/app/data'
+    : path.join(process.cwd(), 'app', 'data');
+
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const dbPath = path.join(dataDir, 'translations.db');
 
 // LibreTranslate URL configuration with fallbacks for different environments
-const getLibreTranslateUrl = () => {
-  // 1. Use environment variable if set, default to localhost:5000
+const getLibreTranslateUrlFromDb = async (): Promise<string | null> => {
+  return new Promise((resolve) => {
+    try {
+      const db = new sqlite3.Database(dbPath);
+      
+      db.get('SELECT value FROM settings WHERE key = ?', ['libretranslate_url'], (err, row: { value: string } | undefined) => {
+        db.close();
+        
+        if (!err && row?.value && row.value !== 'ENV_DEFAULT') {
+          resolve(row.value);
+        } else {
+          resolve(null);
+        }
+      });
+    } catch (error) {
+      resolve(null);
+    }
+  });
+};
+
+const getDefaultLibreTranslateUrl = (): string => {
   if (process.env.LIBRETRANSLATE_URL) {
     return process.env.LIBRETRANSLATE_URL;
   }
 
-  // 2. Detect Docker environment
-  const fs = require('fs');
-  function isDocker() {
-    try {
-      return fs.existsSync('/.dockerenv') || (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf8').includes('docker'));
-    } catch {
-      return false;
-    }
-  }
-
-  // 3. Use Docker Compose service name if DOCKER_COMPOSE env is set
   if (process.env.DOCKER_COMPOSE) {
-    return 'http://libretranslate:5432';
+    return 'http://libretranslate:5000';
   }
 
-  // 4. Use host.docker.internal if running in Docker
   if (isDocker()) {
     return 'http://host.docker.internal:5432';
   }
 
-  // 5. Default for local development
   return 'http://localhost:5432';
 };
 
-const LIBRETRANSLATE_URL = getLibreTranslateUrl();
+const DEFAULT_URL = getDefaultLibreTranslateUrl();
 
-// Log the LibreTranslate URL being used (helpful for debugging)
-console.log(`Using LibreTranslate URL: ${LIBRETRANSLATE_URL}`);
+// Log the default LibreTranslate URL being used (helpful for debugging)
+console.log(`Default LibreTranslate URL: ${DEFAULT_URL}`);
 
 export interface TranslationResult {
   translatedText: string;
@@ -42,6 +71,11 @@ export interface TranslationResult {
 }
 
 export class LibreTranslateService {
+  private async getUrl(): Promise<string> {
+    const dbUrl = await getLibreTranslateUrlFromDb();
+    return dbUrl || DEFAULT_URL;
+  }
+
   private async translate(text: string, source: string, target: string): Promise<string> {
     try {
       const payload: any = {
@@ -55,8 +89,9 @@ export class LibreTranslateService {
         payload.api_key = process.env.LIBRETRANSLATE_API_KEY;
       }
       console.log('Sending payload to LibreTranslate:', JSON.stringify(payload));
+      const url = await this.getUrl();
       const response = await axios.post(
-        `${LIBRETRANSLATE_URL}/translate`,
+        `${url}/translate`,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
