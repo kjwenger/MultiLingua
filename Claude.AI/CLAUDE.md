@@ -71,17 +71,22 @@ docker-compose down -v
 multi-lingua/
 ├── app/
 │   ├── api/
-│   │   ├── translate/route.ts      # Translation API endpoint
+│   │   ├── settings/route.ts        # Settings API (GET/POST for LibreTranslate URL)
+│   │   ├── translate/route.ts       # Translation API endpoint
 │   │   └── translations/route.ts    # CRUD operations for translations
+│   ├── settings/
+│   │   └── page.tsx                 # Settings page (dynamic route)
 │   ├── layout.tsx                   # Root layout with ThemeProvider
 │   ├── page.tsx                     # Main UI component (table interface)
 │   └── test/page.tsx                # Test page
 ├── components/
+│   ├── SettingsButton.tsx           # Gear icon link to settings page
+│   ├── SettingsContent.tsx          # Settings page UI with presets
 │   ├── ThemeProvider.tsx            # Dark/light theme context
 │   └── ThemeToggle.tsx              # Theme toggle button
 ├── lib/
 │   ├── database.ts                  # SQLite database layer
-│   ├── translate.ts                 # LibreTranslate service wrapper
+│   ├── translate.ts                 # LibreTranslate service wrapper (DB-aware)
 │   └── tts.ts                       # Browser Text-to-Speech using Web Speech API
 ├── Dockerfile                       # Multi-stage Docker build
 └── docker-compose.yml               # Orchestrates app + LibreTranslate
@@ -102,10 +107,14 @@ multi-lingua/
 - Translations stored with main text + JSON-serialized proposals array
 
 **3. Translation Service (lib/translate.ts)**
-- Environment-aware LibreTranslate URL detection:
-  - `DOCKER_COMPOSE=true` → uses `http://libretranslate:5432` (service name)
-  - Running in Docker → `http://host.docker.internal:5432`
-  - Local development → `http://localhost:5432`
+- **Database-first URL resolution**: Reads LibreTranslate URL from settings table first, then falls back to environment/defaults
+- URL priority order:
+  1. Database settings table (`libretranslate_url` key, if not 'ENV_DEFAULT')
+  2. `LIBRETRANSLATE_URL` environment variable
+  3. Auto-detection based on environment:
+     - `DOCKER_COMPOSE=true` → `http://libretranslate:5000`
+     - Running in Docker → `http://host.docker.internal:5432`
+     - Local development → `http://localhost:5432`
 - Generates translation alternatives by translating variations of input text
 - Parallel translation execution using `Promise.all()`
 
@@ -121,17 +130,40 @@ multi-lingua/
   - `ml-data`: SQLite database (external volume)
 - Local development: Database stored in `app/data/translations.db`
 
-**6. API Routes (Next.js 14 App Router)**
+**6. Settings System**
+- Settings stored in separate SQLite table with key-value pairs
+- Settings page (`/settings`) with:
+  - Theme toggle
+  - LibreTranslate API URL configuration with presets
+  - About section
+- **Preset URLs** (components/SettingsContent.tsx):
+  - "Environment Default" → Uses 'ENV_DEFAULT' marker in DB, triggers fallback to env vars
+  - "Localhost:5432" → `http://localhost:5432`
+  - "LibreTranslate.com" → `https://libretranslate.com`
+  - "Gertrun Synology" → Custom preset for specific deployment
+  - "Custom URL" → User-entered URL
+- Settings API (`/api/settings`):
+  - GET: Returns current `libretranslate_url` from DB or default
+  - POST: Saves `libretranslate_url` to settings table (UPSERT)
+- Gear icon (SettingsButton) in header navigates to settings page
+
+**7. API Routes (Next.js 14 App Router)**
 - RESTful pattern in `/api/translations`:
   - GET: Fetch all (ordered by English ASC)
   - POST: Create new translation
   - PUT: Update existing (partial updates supported)
   - DELETE: Remove by ID
 - `/api/translate` POST: Translate text with optional source language
+- `/api/settings`:
+  - GET: Fetch LibreTranslate URL setting
+  - POST: Update LibreTranslate URL setting
 
 ## Database Schema
 
+The app uses a single SQLite database file (`translations.db`) with two tables:
+
 ```sql
+-- Main translations table
 CREATE TABLE translations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   english TEXT NOT NULL,
@@ -147,13 +179,30 @@ CREATE TABLE translations (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Settings table (key-value store)
+CREATE TABLE settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
 ```
+
+**Settings Keys:**
+- `libretranslate_url`: LibreTranslate API base URL (special value 'ENV_DEFAULT' triggers env var fallback)
 
 ## Configuration
 
+### UI-based Configuration
+
+The app provides a **Settings page** (`/settings`) accessible via the gear icon in the header:
+- Configure LibreTranslate URL via preset dropdown or custom URL
+- Presets include: Environment Default, Localhost:5432, LibreTranslate.com, Gertrun Synology, Custom
+- Settings are persisted to database and take precedence over environment variables
+- Selecting "Environment Default" delegates to environment variables/auto-detection
+
 ### Environment Variables
 
-- `LIBRETRANSLATE_URL`: Override LibreTranslate server URL
+- `LIBRETRANSLATE_URL`: Override LibreTranslate server URL (used when DB setting is 'ENV_DEFAULT' or not set)
 - `LIBRETRANSLATE_API_KEY`: API key for LibreTranslate (optional)
 - `NODE_ENV`: Set to `production` for production builds
 - `PORT`: App port (default: 3456)
@@ -233,3 +282,12 @@ curl -X POST http://localhost:3456/api/translate \
 5. **Client vs Server Components**: Main page.tsx is a client component (`'use client'`) due to interactive state. API routes and lib modules are server-side.
 
 6. **Database Updates**: When updating translations, the app does optimistic UI updates (local state first) then syncs with database. No explicit loading states for individual field updates.
+
+7. **Settings URL Resolution**: The LibreTranslate URL is resolved in this priority order:
+   - Database settings table (unless value is 'ENV_DEFAULT')
+   - `LIBRETRANSLATE_URL` environment variable
+   - Auto-detection based on Docker/Docker Compose environment
+
+   If translations aren't working, check the settings page and verify the URL is correct. The translation service queries the database on every translation request, so URL changes take effect immediately.
+
+8. **Settings Table Creation**: The settings table is created lazily by the `/api/settings` endpoint on first access. It's not created by the main Database class in lib/database.ts.
