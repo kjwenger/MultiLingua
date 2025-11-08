@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { SettingsButton } from '../components/SettingsButton';
 import { playTextToSpeech } from '../lib/tts';
 
 interface Translation {
@@ -295,6 +296,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation</h1>
               <div className="flex items-center space-x-4">
+                <SettingsButton />
                 <ThemeToggle />
                 <button
                   onClick={addNewRow}
