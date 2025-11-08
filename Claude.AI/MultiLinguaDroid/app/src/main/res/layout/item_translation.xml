@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="?android:attr/divider" />
+            android:background="?attr/colorOutlineVariant" />
 
         <!-- German -->
         <include
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="?android:attr/divider" />
+            android:background="?attr/colorOutlineVariant" />
 
         <!-- French -->
         <include
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="?android:attr/divider" />
+            android:background="?attr/colorOutlineVariant" />
 
         <!-- Italian -->
         <include
@@ -63,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="?android:attr/divider" />
+            android:background="?attr/colorOutlineVariant" />
 
         <!-- Spanish -->
         <include

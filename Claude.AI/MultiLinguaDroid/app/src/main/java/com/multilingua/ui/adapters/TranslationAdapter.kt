@@ -1,5 +1,7 @@
 package com.multilingua.ui.adapters
 
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -64,14 +66,31 @@ class TranslationAdapter(
 
         private var currentTranslation: Translation? = null
         private var fieldName: String? = null
+        private val handler = Handler(Looper.getMainLooper())
+        private var pendingUpdate: Runnable? = null
 
         init {
             label.text = langName
         }
 
         fun bind(translation: Translation, text: String, field: String) {
+            // Always update current translation and field
             currentTranslation = translation
             fieldName = field
+
+            // Update button click listeners
+            btnTranslate.setOnClickListener {
+                currentTranslation?.let { onTranslate(it, langCode) }
+            }
+
+            btnSpeak.setOnClickListener {
+                onSpeak(editText.text.toString(), langCode)
+            }
+
+            // Skip text update if user is currently editing this field
+            if (editText.hasFocus()) {
+                return
+            }
 
             // Remove existing text watcher before setting text
             editText.tag?.let { editText.removeTextChangedListener(it as TextWatcher) }
@@ -82,21 +101,20 @@ class TranslationAdapter(
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
-                    currentTranslation?.let {
-                        onTextChanged(it, field, s.toString())
+                    // Cancel any pending update
+                    pendingUpdate?.let { handler.removeCallbacks(it) }
+
+                    // Schedule a new update after 800ms of inactivity
+                    pendingUpdate = Runnable {
+                        currentTranslation?.let {
+                            onTextChanged(it, field, s.toString())
+                        }
                     }
+                    handler.postDelayed(pendingUpdate!!, 800)
                 }
             }
             editText.addTextChangedListener(textWatcher)
             editText.tag = textWatcher
-
-            btnTranslate.setOnClickListener {
-                currentTranslation?.let { onTranslate(it, langCode) }
-            }
-
-            btnSpeak.setOnClickListener {
-                onSpeak(editText.text.toString(), langCode)
-            }
         }
     }
 
