@@ -1,0 +1,28 @@
+services:
+  # Multi-Lingua app
+  multi-lingua:
+    build: .
+    container_name: multi-lingua
+    ports:
+      - "3456:3456"
+    environment:
+      - NODE_ENV=production
+      - PORT=3456
+      - HOSTNAME=0.0.0.0
+      - DOCKER_COMPOSE=true
+      - LIBRETRANSLATE_URL=https://libretranslate.gertrun.synology.me
+    volumes:
+      # Persist the SQLite database
+      - ml-data:/app/data
+    restart: unless-stopped
+    networks:
+      - multi-lingua-network
+
+networks:
+  multi-lingua-network:
+    driver: bridge
+
+volumes:
+  # Multi-Lingua SQLite database storage - use existing external volume
+  ml-data:
+    external: true
