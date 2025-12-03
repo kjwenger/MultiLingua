@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Multi-Lingua app
   multi-lingua:
-    image: ${DOCKER_IMAGE:-multi-lingua:latest}
+    image: ${DOCKER_IMAGE:-registry.gertrun.synology.me/multi-lingua:latest}
     container_name: multi-lingua
     ports:
       - "3456:3456"
