@@ -4,6 +4,7 @@ services:
   # Multi-Lingua app
   multi-lingua:
     image: ${DOCKER_IMAGE:-registry.gertrun.synology.me/multi-lingua:latest}
+    platform: linux/amd64
     container_name: multi-lingua
     ports:
       - "3456:3456"

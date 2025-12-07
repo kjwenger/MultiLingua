@@ -88,6 +88,7 @@ export class LibreTranslateService {
       if (process.env.LIBRETRANSLATE_API_KEY) {
         payload.api_key = process.env.LIBRETRANSLATE_API_KEY;
       }
+      console.log(`Translating "${text}" from ${source} to ${target}`);
       console.log('Sending payload to LibreTranslate:', JSON.stringify(payload));
       const url = await this.getUrl();
       const response = await axios.post(
@@ -95,7 +96,9 @@ export class LibreTranslateService {
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
-      return response.data.translatedText || '';
+      const result = response.data.translatedText || '';
+      console.log(`Translation result (${source} -> ${target}): "${result}"`);
+      return result;
     } catch (error) {
       console.error(`Translation error (${source} -> ${target}):`, error);
       return '';
@@ -146,6 +149,11 @@ export class LibreTranslateService {
     italian?: TranslationResult;
     spanish?: TranslationResult;
   }> {
+    const languageNames = { en: 'English', de: 'German', fr: 'French', it: 'Italian', es: 'Spanish' };
+    console.log(`\n=== Translation Request ===`);
+    console.log(`Source: ${languageNames[sourceLanguage]} (${sourceLanguage})`);
+    console.log(`Text: "${text}"`);
+    
     const results: any = {};
     const targets = [];
     
@@ -155,10 +163,13 @@ export class LibreTranslateService {
     if (sourceLanguage !== 'it') targets.push({ key: 'italian', code: 'it' });
     if (sourceLanguage !== 'es') targets.push({ key: 'spanish', code: 'es' });
 
+    console.log(`Target languages: ${targets.map(t => `${t.key} (${t.code})`).join(', ')}`);
+
     const translations = await Promise.all(
       targets.map(async (target) => {
         const translatedText = await this.translate(text, sourceLanguage, target.code);
         const alternatives = await this.getAlternatives(text, sourceLanguage, target.code);
+        console.log(`✓ Placing into ${target.key}: "${translatedText}"`);
         return { key: target.key, result: { translatedText, alternatives } };
       })
     );
@@ -167,6 +178,7 @@ export class LibreTranslateService {
       results[key] = result;
     });
 
+    console.log(`=== Translation Complete ===\n`);
     return results;
   }
 

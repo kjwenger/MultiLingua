@@ -14,36 +14,43 @@ export async function POST(request: NextRequest) {
       const translations = await translateService.translateFromLanguage(text, sourceLanguage);
       
       const response: any = {};
+      console.log('=== API Response Mapping ===');
       if (translations.english) {
         response.english = {
           translation: translations.english.translatedText,
           alternatives: translations.english.alternatives || []
         };
+        console.log(`english -> response.english: "${translations.english.translatedText}"`);
       }
       if (translations.german) {
         response.german = {
           translation: translations.german.translatedText,
           alternatives: translations.german.alternatives || []
         };
+        console.log(`german -> response.german: "${translations.german.translatedText}"`);
       }
       if (translations.french) {
         response.french = {
           translation: translations.french.translatedText,
           alternatives: translations.french.alternatives || []
         };
+        console.log(`french -> response.french: "${translations.french.translatedText}"`);
       }
       if (translations.italian) {
         response.italian = {
           translation: translations.italian.translatedText,
           alternatives: translations.italian.alternatives || []
         };
+        console.log(`italian -> response.italian: "${translations.italian.translatedText}"`);
       }
       if (translations.spanish) {
         response.spanish = {
           translation: translations.spanish.translatedText,
           alternatives: translations.spanish.alternatives || []
         };
+        console.log(`spanish -> response.spanish: "${translations.spanish.translatedText}"`);
       }
+      console.log('===========================\n');
       
       return NextResponse.json(response);
     }
