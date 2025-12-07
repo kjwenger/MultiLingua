@@ -76,7 +76,7 @@ export class LibreTranslateService {
     return dbUrl || DEFAULT_URL;
   }
 
-  private async translate(text: string, source: string, target: string): Promise<string> {
+  private async translate(text: string, source: string, target: string, requestAlternatives: boolean = false): Promise<{ translatedText: string; alternatives: string[] }> {
     try {
       const payload: any = {
         q: text,
@@ -84,6 +84,12 @@ export class LibreTranslateService {
         target: target,
         format: 'text'
       };
+      
+      // Request alternatives from LibreTranslate
+      if (requestAlternatives) {
+        payload.alternatives = 10; // Request up to 10 alternatives
+      }
+      
       // Add api_key if set in environment
       if (process.env.LIBRETRANSLATE_API_KEY) {
         payload.api_key = process.env.LIBRETRANSLATE_API_KEY;
@@ -97,50 +103,19 @@ export class LibreTranslateService {
         { headers: { 'Content-Type': 'application/json' } }
       );
       const result = response.data.translatedText || '';
+      const alternatives = response.data.alternatives || [];
       console.log(`Translation result (${source} -> ${target}): "${result}"`);
-      return result;
+      if (alternatives.length > 0) {
+        console.log(`Alternatives: ${alternatives.join(', ')}`);
+      }
+      return { translatedText: result, alternatives };
     } catch (error) {
       console.error(`Translation error (${source} -> ${target}):`, error);
-      return '';
+      return { translatedText: '', alternatives: [] };
     }
   }
 
-  private async getAlternatives(text: string, source: string, target: string): Promise<string[]> {
-    // LibreTranslate doesn't provide alternatives by default, so we'll generate
-    // variations by modifying the source text slightly and translating
-    const alternatives: string[] = [];
-    
-    try {
-      // Try different variations of the input text to get alternative translations
-      const variations = [
-        text,
-        text.toLowerCase(),
-        text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
-        `the ${text}`,
-        `a ${text}`,
-        `${text}.`,
-        `${text}!`,
-        `${text}?`,
-        text.toUpperCase(),
-        text.trim()
-      ];
 
-      for (const variation of variations) {
-        try {
-          const result = await this.translate(variation, source, target);
-          if (result && !alternatives.includes(result)) {
-            alternatives.push(result);
-          }
-        } catch (error) {
-          // Continue with next variation
-        }
-      }
-    } catch (error) {
-      console.error('Error getting alternatives:', error);
-    }
-
-    return alternatives.slice(0, 10); // Return up to 10 alternatives
-  }
 
   public async translateFromLanguage(text: string, sourceLanguage: 'en' | 'de' | 'fr' | 'it' | 'es'): Promise<{
     english?: TranslationResult;
@@ -167,8 +142,7 @@ export class LibreTranslateService {
 
     const translations = await Promise.all(
       targets.map(async (target) => {
-        const translatedText = await this.translate(text, sourceLanguage, target.code);
-        const alternatives = await this.getAlternatives(text, sourceLanguage, target.code);
+        const { translatedText, alternatives } = await this.translate(text, sourceLanguage, target.code, true);
         console.log(`✓ Placing into ${target.key}: "${translatedText}"`);
         return { key: target.key, result: { translatedText, alternatives } };
       })
@@ -183,43 +157,19 @@ export class LibreTranslateService {
   }
 
   public async translateToGerman(text: string): Promise<TranslationResult> {
-    const translatedText = await this.translate(text, 'en', 'de');
-    const alternatives = await this.getAlternatives(text, 'en', 'de');
-    
-    return {
-      translatedText,
-      alternatives
-    };
+    return await this.translate(text, 'en', 'de', true);
   }
 
   public async translateToFrench(text: string): Promise<TranslationResult> {
-    const translatedText = await this.translate(text, 'en', 'fr');
-    const alternatives = await this.getAlternatives(text, 'en', 'fr');
-    
-    return {
-      translatedText,
-      alternatives
-    };
+    return await this.translate(text, 'en', 'fr', true);
   }
 
   public async translateToItalian(text: string): Promise<TranslationResult> {
-    const translatedText = await this.translate(text, 'en', 'it');
-    const alternatives = await this.getAlternatives(text, 'en', 'it');
-    
-    return {
-      translatedText,
-      alternatives
-    };
+    return await this.translate(text, 'en', 'it', true);
   }
 
   public async translateToSpanish(text: string): Promise<TranslationResult> {
-    const translatedText = await this.translate(text, 'en', 'es');
-    const alternatives = await this.getAlternatives(text, 'en', 'es');
-    
-    return {
-      translatedText,
-      alternatives
-    };
+    return await this.translate(text, 'en', 'es', true);
   }
 
   public async translateToAllLanguages(text: string): Promise<{
