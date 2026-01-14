@@ -289,18 +289,18 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors duration-200">
-      <div className="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg transition-colors duration-200">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      <div className="w-full max-w-none mx-auto">
+        <div className="bg-white dark:bg-gray-800 shadow-xl transition-colors duration-200">
+          <div className="px-2 py-2 border-b border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation</h1>
-              <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation</h1>
+              <div className="flex items-center space-x-2">
                 <SettingsButton />
                 <ThemeToggle />
                 <button
                   onClick={addNewRow}
-                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
+                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-bold py-1 px-3 rounded transition-colors duration-200"
                 >
                   Add New Translation
                 </button>
@@ -316,49 +316,49 @@ export default function Home() {
                 <col style={{ minWidth: '140px' }} />
                 <col style={{ minWidth: '140px' }} />
                 <col style={{ minWidth: '140px' }} />
-                <col style={{ width: '60px' }} />
+                <col style={{ width: '40px' }} />
               </colgroup>
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th 
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+                    className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
                     onClick={handleSort}
                   >
                     English {sortOrder === 'asc' ? '↑' : '↓'}
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     German
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     French
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Italian
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Spanish
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {translations.map((translation) => (
                   <tr key={translation.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                    <td className="px-4 py-3 align-top">
-                      <div className="flex items-start gap-2">
+                    <td className="px-2 py-1 align-top">
+                      <div className="flex items-start gap-1">
                         <textarea
                           value={translation.english}
                           onChange={(e) => handleEnglishChange(translation.id, e.target.value)}
-                          className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                          className="flex-1 min-w-[130px] p-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                           rows={2}
                           placeholder="Enter English text"
                         />
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5">
                           <button
                             onClick={() => handleTranslateFromLanguage(translation.id, 'english')}
                             disabled={!translation.english?.trim() || translatingIds.has(translation.id)}
-                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                            className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                             title="Translate from English to all languages"
                           >
                             {translatingIds.has(translation.id) ? (
@@ -372,7 +372,7 @@ export default function Home() {
                           <button
                             onClick={() => handleTTS(translation.id, 'english', translation.english)}
                             disabled={!translation.english.trim() || ttsPlayingIds.has(`${translation.id}-english`)}
-                            className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                            className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                             title="Play English audio"
                           >
                           {ttsPlayingIds.has(`${translation.id}-english`) ? (
@@ -418,21 +418,21 @@ export default function Home() {
                       )}
                     </td>
                     
-                    <td className="px-4 py-3 align-top">
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
+                    <td className="px-2 py-1 align-top">
+                      <div className="space-y-1">
+                        <div className="flex items-start gap-1">
                           <textarea
                             value={translation.german || ''}
                             onChange={(e) => handleTranslationChange(translation.id, 'german', e.target.value)}
-                            className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                            className="flex-1 min-w-[130px] p-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                             rows={2}
                             placeholder="German translation"
                           />
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => handleTranslateFromLanguage(translation.id, 'german')}
                               disabled={!translation.german?.trim() || translatingIds.has(translation.id)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Translate from German to all languages"
                             >
                               {translatingIds.has(translation.id) ? (
@@ -446,7 +446,7 @@ export default function Home() {
                             <button
                               onClick={() => handleTTS(translation.id, 'german', translation.german || '')}
                               disabled={!translation.german?.trim() || ttsPlayingIds.has(`${translation.id}-german`)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Play German audio"
                             >
                             {ttsPlayingIds.has(`${translation.id}-german`) ? (
@@ -493,21 +493,21 @@ export default function Home() {
                       </div>
                     </td>
                     
-                    <td className="px-4 py-3 align-top">
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
+                    <td className="px-2 py-1 align-top">
+                      <div className="space-y-1">
+                        <div className="flex items-start gap-1">
                           <textarea
                             value={translation.french}
                             onChange={(e) => handleTranslationChange(translation.id, 'french', e.target.value)}
-                            className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                            className="flex-1 min-w-[130px] p-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                             rows={2}
                             placeholder="French translation"
                           />
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => handleTranslateFromLanguage(translation.id, 'french')}
                               disabled={!translation.french?.trim() || translatingIds.has(translation.id)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Translate from French to all languages"
                             >
                               {translatingIds.has(translation.id) ? (
@@ -521,7 +521,7 @@ export default function Home() {
                             <button
                               onClick={() => handleTTS(translation.id, 'french', translation.french)}
                               disabled={!translation.french.trim() || ttsPlayingIds.has(`${translation.id}-french`)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Play French audio"
                             >
                             {ttsPlayingIds.has(`${translation.id}-french`) ? (
@@ -568,21 +568,21 @@ export default function Home() {
                       </div>
                     </td>
                     
-                    <td className="px-4 py-3 align-top">
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
+                    <td className="px-2 py-1 align-top">
+                      <div className="space-y-1">
+                        <div className="flex items-start gap-1">
                           <textarea
                             value={translation.italian}
                             onChange={(e) => handleTranslationChange(translation.id, 'italian', e.target.value)}
-                            className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                            className="flex-1 min-w-[130px] p-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                             rows={2}
                             placeholder="Italian translation"
                           />
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => handleTranslateFromLanguage(translation.id, 'italian')}
                               disabled={!translation.italian?.trim() || translatingIds.has(translation.id)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Translate from Italian to all languages"
                             >
                               {translatingIds.has(translation.id) ? (
@@ -596,7 +596,7 @@ export default function Home() {
                             <button
                               onClick={() => handleTTS(translation.id, 'italian', translation.italian)}
                               disabled={!translation.italian.trim() || ttsPlayingIds.has(`${translation.id}-italian`)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Play Italian audio"
                             >
                             {ttsPlayingIds.has(`${translation.id}-italian`) ? (
@@ -643,21 +643,21 @@ export default function Home() {
                       </div>
                     </td>
                     
-                    <td className="px-4 py-3 align-top">
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
+                    <td className="px-2 py-1 align-top">
+                      <div className="space-y-1">
+                        <div className="flex items-start gap-1">
                           <textarea
                             value={translation.spanish}
                             onChange={(e) => handleTranslationChange(translation.id, 'spanish', e.target.value)}
-                            className="flex-1 min-w-[130px] p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                            className="flex-1 min-w-[130px] p-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                             rows={2}
                             placeholder="Spanish translation"
                           />
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => handleTranslateFromLanguage(translation.id, 'spanish')}
                               disabled={!translation.spanish?.trim() || translatingIds.has(translation.id)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Translate from Spanish to all languages"
                             >
                               {translatingIds.has(translation.id) ? (
@@ -671,7 +671,7 @@ export default function Home() {
                             <button
                               onClick={() => handleTTS(translation.id, 'spanish', translation.spanish)}
                               disabled={!translation.spanish.trim() || ttsPlayingIds.has(`${translation.id}-spanish`)}
-                              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                              className="flex-shrink-0 p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
                               title="Play Spanish audio"
                             >
                             {ttsPlayingIds.has(`${translation.id}-spanish`) ? (
@@ -718,18 +718,16 @@ export default function Home() {
                       </div>
                     </td>
                     
-                    <td className="px-4 py-3 align-top">
-                      <div className="flex justify-center items-start pt-2">
-                        <button
-                          onClick={() => deleteRow(translation.id)}
-                          className="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
-                          title="Delete translation"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
+                    <td className="px-1 py-1 align-top">
+                      <button
+                        onClick={() => deleteRow(translation.id)}
+                        className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                        title="Delete translation"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     </td>
                   </tr>
                 ))}
