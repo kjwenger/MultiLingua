@@ -44,6 +44,13 @@ export function SettingsContent() {
       setProviders(data.providers || []);
       setFallbackOrder(data.fallbackOrder || ['libretranslate']);
       
+      // Find the selected provider (the one that's enabled)
+      const enabledProvider = data.providers?.find((p: any) => p.enabled === 1 || p.enabled === true);
+      if (enabledProvider) {
+        setSelectedProvider(enabledProvider.type);
+        console.log(`Selected provider from DB: ${enabledProvider.type}`);
+      }
+      
       // Set LibreTranslate preset based on URL
       const libreConfig = data.providers?.find((p: any) => p.type === 'libretranslate');
       if (libreConfig?.api_url) {
@@ -77,9 +84,23 @@ export function SettingsContent() {
   };
 
   const toggleProvider = async (type: string) => {
+    console.log(`[CLIENT] Toggling to provider: ${type}`);
     setIsSaving(true);
     try {
-      // Simply enable the selected provider and ensure it has proper config
+      // Update local state immediately for UI responsiveness
+      setSelectedProvider(type);
+      
+      // Disable all providers first
+      const disablePromises = PROVIDER_TYPES.map(async (pt) => {
+        if (pt.type !== type) {
+          const provider = providers.find(p => p.type === pt.type) || {};
+          console.log(`[CLIENT] Disabling provider: ${pt.type}`);
+          await saveProvider(pt.type, { ...provider, enabled: false });
+        }
+      });
+      await Promise.all(disablePromises);
+      
+      // Enable the selected provider
       const provider = providers.find(p => p.type === type) || {};
       
       // For LibreTranslate, ensure we have the URL
@@ -87,10 +108,16 @@ export function SettingsContent() {
         provider.api_url = libreTranslatePreset !== 'CUSTOM' ? libreTranslatePreset : libreTranslateCustomUrl;
       }
       
+      console.log(`[CLIENT] Enabling provider: ${type}`, provider);
       await saveProvider(type, { ...provider, enabled: true });
-      setSelectedProvider(type);
+      
+      // Refresh providers from database to sync UI
+      console.log(`[CLIENT] Refreshing providers from DB`);
+      await fetchProviders();
+      
+      console.log(`[CLIENT] Provider ${type} is now active`);
     } catch (error) {
-      console.error('Error toggling provider:', error);
+      console.error('[CLIENT] Error toggling provider:', error);
     } finally {
       setIsSaving(false);
     }
@@ -168,14 +195,19 @@ export function SettingsContent() {
                     
                     return (
                       <div key={providerType.type} className="border border-gray-300 dark:border-gray-600 rounded-lg">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 cursor-pointer" onClick={() => {
+                          console.log('[CLICK] Clicked on provider:', providerType.type, 'isEnabled:', isEnabled, 'isSaving:', isSaving);
+                          if (!isSaving) {
+                            toggleProvider(providerType.type);
+                          }
+                        }}>
                           <div className="flex items-center space-x-3 flex-1">
                             <input
                               type="radio"
                               name="translation-provider"
                               checked={isEnabled}
-                              onChange={() => toggleProvider(providerType.type)}
-                              className="w-4 h-4"
+                              onChange={() => {}}
+                              className="w-4 h-4 pointer-events-none"
                               disabled={isSaving}
                             />
                             <div className="flex-1">
@@ -301,26 +333,6 @@ export function SettingsContent() {
                     );
                   })}
                 </div>
-              </div>
-
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Fallback Priority</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                  Enabled providers will be tried in order:
-                </p>
-                <ol className="list-decimal list-inside space-y-1 text-gray-700 dark:text-gray-300">
-                  {fallbackOrder.filter(type => {
-                    const config = getProviderConfig(type);
-                    return config.enabled === 1 || config.enabled === true;
-                  }).map((type, index) => {
-                    const providerInfo = PROVIDER_TYPES.find(p => p.type === type);
-                    return (
-                      <li key={type}>
-                        {providerInfo?.name || type}
-                      </li>
-                    );
-                  })}
-                </ol>
               </div>
 
               <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
