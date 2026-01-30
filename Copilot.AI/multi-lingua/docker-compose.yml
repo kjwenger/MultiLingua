@@ -17,7 +17,11 @@ services:
 
   # Multi-Lingua app
   multi-lingua:
-    build: .
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION:-0.1.0}
+    image: registry.gertrun.synology.me/multi-lingua:${VERSION:-0.1.0}
     container_name: multi-lingua
     ports:
       - "3456:3456"

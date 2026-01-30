@@ -1,4 +1,5 @@
 # Multi-stage build for Next.js application
+ARG VERSION=0.1.0
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
@@ -13,6 +14,7 @@ RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
+ARG VERSION
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -21,6 +23,7 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_PUBLIC_APP_VERSION=${VERSION}
 
 RUN npm run build
 
@@ -36,6 +39,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV LIBRETRANSLATE_URL=http://libretranslate:5000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ARG VERSION
+ENV APP_VERSION=${VERSION}
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
