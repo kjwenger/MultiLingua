@@ -103,6 +103,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     apiLogger.error('Translation failed', error);
-    return NextResponse.json({ error: 'Translation failed' }, { status: 500 });
+    const translationService = await getTranslationService();
+    const activeProvider = translationService.getActiveProviderName();
+    return NextResponse.json({ 
+      error: 'Translation failed',
+      provider: activeProvider 
+    }, { status: 500 });
   }
 }

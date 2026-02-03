@@ -5,6 +5,7 @@ import { ThemeToggle } from '../components/ThemeToggle';
 import { SettingsButton } from '../components/SettingsButton';
 import { ApiDocsButton } from '../components/ApiDocsButton';
 import { HelpButton } from '../components/HelpButton';
+import { ProviderSelector } from '../components/ProviderSelector';
 import { playTextToSpeech } from '../lib/tts';
 import { logger } from '../lib/logger';
 import { APP_VERSION } from '../lib/version';
@@ -321,6 +322,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation v{APP_VERSION}</h1>
               <div className="flex items-center space-x-2">
+                <ProviderSelector />
                 <HelpButton />
                 <ApiDocsButton />
                 <SettingsButton />

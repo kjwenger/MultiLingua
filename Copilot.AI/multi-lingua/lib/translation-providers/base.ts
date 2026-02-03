@@ -6,10 +6,11 @@ export interface TranslationProvider {
 }
 
 export interface ProviderConfig {
-  type: 'libretranslate' | 'google' | 'deepl' | 'azure' | 'aws' | 'mymemory' | 'pons';
+  type: 'libretranslate' | 'google' | 'deepl' | 'azure' | 'aws' | 'mymemory' | 'pons' | 'merriam-webster' | 'free-dictionary' | 'oxford';
   enabled: boolean;
   apiKey?: string;
   apiUrl?: string;
   region?: string;
   email?: string;
+  appId?: string;
 }

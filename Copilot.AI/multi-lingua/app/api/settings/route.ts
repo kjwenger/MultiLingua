@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { resetTranslationService } from '@/lib/translation-providers';
 
 function isDocker() {
   try {
@@ -40,17 +41,27 @@ export async function GET() {
   return new Promise((resolve) => {
     const db = getDb();
     
-    db.get('SELECT value FROM settings WHERE key = ?', ['libretranslate_url'], (err, row: { value: string } | undefined) => {
+    db.all('SELECT key, value FROM settings', (err, rows: Array<{ key: string; value: string }> | undefined) => {
       db.close();
       
       if (err) {
         console.error('Error fetching settings:', err);
         resolve(NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 }));
       } else {
-        const defaultUrl = process.env.LIBRETRANSLATE_URL || 'http://localhost:5432';
-        resolve(NextResponse.json({ 
-          libretranslate_url: row?.value || defaultUrl
-        }));
+        const settings: Record<string, string> = {};
+        rows?.forEach(row => {
+          settings[row.key] = row.value;
+        });
+        
+        // Set defaults for missing values
+        if (!settings.libretranslate_url) {
+          settings.libretranslate_url = process.env.LIBRETRANSLATE_URL || 'http://localhost:5000';
+        }
+        if (!settings.active_provider) {
+          settings.active_provider = 'libretranslate';
+        }
+        
+        resolve(NextResponse.json(settings));
       }
     });
   });
@@ -59,28 +70,40 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   return new Promise(async (resolve) => {
     const body = await request.json();
-    const { libretranslate_url } = body;
-
-    if (!libretranslate_url) {
-      resolve(NextResponse.json({ error: 'libretranslate_url is required' }, { status: 400 }));
-      return;
-    }
-
-    const db = getDb();
     
-    db.run(`
+    const db = getDb();
+    const stmt = db.prepare(`
       INSERT INTO settings (key, value) 
       VALUES (?, ?)
       ON CONFLICT(key) DO UPDATE SET value = excluded.value
-    `, ['libretranslate_url', libretranslate_url], (err) => {
-      db.close();
-      
-      if (err) {
-        console.error('Error saving settings:', err);
-        resolve(NextResponse.json({ error: 'Failed to save settings' }, { status: 500 }));
-      } else {
-        resolve(NextResponse.json({ success: true, libretranslate_url }));
-      }
-    });
+    `);
+    
+    let hasError = false;
+    let count = 0;
+    const total = Object.keys(body).length;
+    
+    for (const [key, value] of Object.entries(body)) {
+      stmt.run(key, String(value), (err) => {
+        if (err) {
+          hasError = true;
+          console.error(`Error saving setting ${key}:`, err);
+        }
+        
+        count++;
+        if (count === total) {
+          stmt.finalize();
+          db.close();
+          
+          // Reset translation service to pick up new settings
+          resetTranslationService();
+          
+          if (hasError) {
+            resolve(NextResponse.json({ error: 'Failed to save some settings' }, { status: 500 }));
+          } else {
+            resolve(NextResponse.json({ success: true, ...body }));
+          }
+        }
+      });
+    }
   });
 }

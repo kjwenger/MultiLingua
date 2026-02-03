@@ -5,6 +5,9 @@ import { DeepLProvider } from './deepl';
 import { GoogleProvider } from './google';
 import { AzureProvider } from './azure';
 import { PonsProvider } from './pons';
+import { MerriamWebsterProvider } from './merriam-webster';
+import { FreeDictionaryProvider } from './free-dictionary';
+import { OxfordProvider } from './oxford';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -36,77 +39,124 @@ export class TranslationService {
   async initialize() {
     providerLogger.info('Initializing TranslationService...');
     const configs = await this.loadProviderConfigs();
-    providerLogger.debug(`Loaded ${configs.length} provider configs`, configs);
+    const activeProviderType = await this.getActiveProvider();
+    providerLogger.debug(`Loaded ${configs.length} provider configs, active: ${activeProviderType}`, configs);
 
+    // Find the active provider config
+    const activeConfig = configs.find(c => c.type === activeProviderType);
+    
+    if (activeConfig && activeConfig.enabled) {
+      this.provider = this.createProvider(activeConfig);
+      if (this.provider) {
+        providerLogger.info(`Active provider set to: ${activeConfig.type}`);
+        return;
+      }
+    }
+
+    // Fallback: use first enabled provider
     for (const config of configs) {
-      providerLogger.debug(`Checking ${config.type}: enabled=${config.enabled}, apiUrl=${config.apiUrl}`);
-      if (!config.enabled) {
-        providerLogger.debug(`Skipping ${config.type} (not enabled)`);
-        continue;
-      }
-
-      let provider: TranslationProvider | null = null;
-
-      switch (config.type) {
-        case 'libretranslate':
-          if (config.apiUrl) {
-            providerLogger.info(`Creating LibreTranslateProvider with URL: ${config.apiUrl}`);
-            provider = new LibreTranslateProvider(config.apiUrl, config.apiKey);
-          } else {
-            providerLogger.debug('LibreTranslate skipped (no apiUrl)');
-          }
-          break;
-        case 'mymemory':
-          const myMemoryEmail = config.email || process.env.MYMEMORY_EMAIL;
-          providerLogger.info(`Creating MyMemoryProvider with email: ${myMemoryEmail || '(none)'}`);
-          provider = new MyMemoryProvider(myMemoryEmail);
-          break;
-        case 'deepl':
-          if (config.apiKey) {
-            providerLogger.info('Creating DeepLProvider');
-            provider = new DeepLProvider(config.apiKey, true);
-          } else {
-            providerLogger.debug('DeepL skipped (no apiKey)');
-          }
-          break;
-        case 'google':
-          if (config.apiKey) {
-            providerLogger.info('Creating GoogleProvider');
-            provider = new GoogleProvider(config.apiKey);
-          } else {
-            providerLogger.debug('Google skipped (no apiKey)');
-          }
-          break;
-        case 'azure':
-          if (config.apiKey) {
-            providerLogger.info('Creating AzureProvider');
-            provider = new AzureProvider(config.apiKey, config.region);
-          } else {
-            providerLogger.debug('Azure skipped (no apiKey)');
-          }
-          break;
-        case 'pons':
-          if (config.apiKey) {
-            providerLogger.info('Creating PonsProvider');
-            provider = new PonsProvider(config.apiKey);
-          } else {
-            providerLogger.debug('PONS skipped (no apiKey)');
-          }
-          break;
-      }
-
+      if (!config.enabled) continue;
+      
+      const provider = this.createProvider(config);
       if (provider) {
         this.provider = provider;
-        providerLogger.info(`Active provider: ${config.type}`);
-        break; // Only one provider is used
-      } else {
-        providerLogger.debug(`Provider ${config.type} not registered`);
+        providerLogger.info(`Fallback to first enabled provider: ${config.type}`);
+        return;
       }
     }
 
     if (!this.provider) {
       providerLogger.warn('No translation provider configured!');
     }
+  }
+
+  private createProvider(config: ProviderConfig): TranslationProvider | null {
+    let provider: TranslationProvider | null = null;
+
+    switch (config.type) {
+      case 'libretranslate':
+        if (config.apiUrl) {
+          providerLogger.info(`Creating LibreTranslateProvider with URL: ${config.apiUrl}`);
+          provider = new LibreTranslateProvider(config.apiUrl, config.apiKey);
+        } else {
+          providerLogger.debug('LibreTranslate skipped (no apiUrl)');
+        }
+        break;
+      case 'mymemory':
+        const myMemoryEmail = config.email || process.env.MYMEMORY_EMAIL;
+        providerLogger.info(`Creating MyMemoryProvider with email: ${myMemoryEmail || '(none)'}`);
+        provider = new MyMemoryProvider(myMemoryEmail);
+        break;
+      case 'deepl':
+        if (config.apiKey) {
+          providerLogger.info('Creating DeepLProvider');
+          provider = new DeepLProvider(config.apiKey, true);
+        } else {
+          providerLogger.debug('DeepL skipped (no apiKey)');
+        }
+        break;
+      case 'google':
+        if (config.apiKey) {
+          providerLogger.info('Creating GoogleProvider');
+          provider = new GoogleProvider(config.apiKey);
+        } else {
+          providerLogger.debug('Google skipped (no apiKey)');
+        }
+        break;
+      case 'azure':
+        if (config.apiKey) {
+          providerLogger.info('Creating AzureProvider');
+          provider = new AzureProvider(config.apiKey, config.region);
+        } else {
+          providerLogger.debug('Azure skipped (no apiKey)');
+        }
+        break;
+      case 'pons':
+        if (config.apiKey) {
+          providerLogger.info('Creating PonsProvider');
+          provider = new PonsProvider(config.apiKey);
+        } else {
+          providerLogger.debug('PONS skipped (no apiKey)');
+        }
+        break;
+      case 'merriam-webster':
+        if (config.apiKey) {
+          providerLogger.info('Creating MerriamWebsterProvider');
+          provider = new MerriamWebsterProvider(config.apiKey);
+        } else {
+          providerLogger.debug('Merriam-Webster skipped (no apiKey)');
+        }
+        break;
+      case 'free-dictionary':
+        providerLogger.info('Creating FreeDictionaryProvider (no API key required)');
+        provider = new FreeDictionaryProvider();
+        break;
+      case 'oxford':
+        if (config.apiKey && config.appId) {
+          providerLogger.info('Creating OxfordProvider');
+          provider = new OxfordProvider(config.appId, config.apiKey);
+        } else {
+          providerLogger.debug('Oxford skipped (no apiKey or appId)');
+        }
+        break;
+    }
+
+    return provider;
+  }
+
+  private async getActiveProvider(): Promise<string> {
+    return new Promise((resolve) => {
+      const db = new sqlite3.Database(dbPath);
+      
+      db.get('SELECT value FROM settings WHERE key = ?', ['active_provider'], (err, row: any) => {
+        db.close();
+        if (err || !row) {
+          resolve('libretranslate'); // default
+        } else {
+          resolve(row.value);
+        }
+      });
+    });
   }
 
   private async loadProviderConfigs(): Promise<ProviderConfig[]> {
@@ -121,7 +171,8 @@ export class TranslationService {
           api_key TEXT,
           api_url TEXT,
           region TEXT,
-          email TEXT
+          email TEXT,
+          app_id TEXT
         )
       `, (err) => {
         if (err) providerLogger.error('Error creating provider_configs table', err);
@@ -129,6 +180,8 @@ export class TranslationService {
 
       // Add email column if it doesn't exist (for existing databases)
       db.run(`ALTER TABLE provider_configs ADD COLUMN email TEXT`, () => {});
+      // Add app_id column if it doesn't exist (for Oxford)
+      db.run(`ALTER TABLE provider_configs ADD COLUMN app_id TEXT`, () => {});
 
       db.all('SELECT * FROM provider_configs', (err, rows: any[]) => {
         if (err || !rows || rows.length === 0) {
@@ -155,7 +208,8 @@ export class TranslationService {
             apiKey: row.api_key,
             apiUrl: row.api_url,
             region: row.region,
-            email: row.email
+            email: row.email,
+            appId: row.app_id
           }));
 
           // Fix any libretranslate entries with null URL
@@ -249,8 +303,9 @@ let translationServiceInstance: TranslationService | null = null;
 export async function getTranslationService(): Promise<TranslationService> {
   if (!translationServiceInstance) {
     translationServiceInstance = new TranslationService();
-    await translationServiceInstance.initialize();
   }
+  // Always reinitialize to ensure we have the latest active provider
+  await translationServiceInstance.initialize();
   return translationServiceInstance;
 }
 

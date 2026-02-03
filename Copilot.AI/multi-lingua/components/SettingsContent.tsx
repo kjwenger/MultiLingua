@@ -10,7 +10,10 @@ const PROVIDER_TYPES = [
   { type: 'deepl', name: 'DeepL', needsUrl: false, needsApiKey: true, freeInfo: '500K chars/month free' },
   { type: 'google', name: 'Google Translate', needsUrl: false, needsApiKey: true, freeInfo: '500K chars/month free' },
   { type: 'azure', name: 'Azure Translator', needsUrl: false, needsApiKey: true, needsRegion: true, freeInfo: '2M chars/month free' },
-  { type: 'pons', name: 'PONS Dictionary', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/month free' }
+  { type: 'pons', name: 'PONS Dictionary', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/month free' },
+  { type: 'merriam-webster', name: 'Merriam-Webster', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/day free (English only)' },
+  { type: 'free-dictionary', name: 'Free Dictionary', needsUrl: false, needsApiKey: false, freeInfo: 'Completely free (English only)' },
+  { type: 'oxford', name: 'Oxford Dictionary', needsUrl: false, needsApiKey: true, needsAppId: true, freeInfo: '1000 queries/month free' }
 ];
 
 const LIBRETRANSLATE_PRESETS = [
@@ -79,7 +82,8 @@ export function SettingsContent() {
         apiKey: config.api_key,
         apiUrl: config.api_url,
         region: config.region,
-        email: config.email
+        email: config.email,
+        appId: config.app_id
       };
       
       await fetch('/api/providers', {
@@ -424,6 +428,48 @@ export function SettingsContent() {
                                       setEditingConfig(updatedEditing);
                                     }}
                                     disabled={isSaving}
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isSaving ? 'Saving...' : 'Save'}
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                            {(providerType as any).needsAppId && (
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                  App ID
+                                  {config.app_id && !editingConfig[providerType.type]?.app_id && (
+                                    <span className="ml-2 text-xs text-green-600 dark:text-green-400">✓ Saved</span>
+                                  )}
+                                </label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={editingConfig[providerType.type]?.app_id ?? config.app_id ?? ''}
+                                    onChange={(e) => {
+                                      setEditingConfig({
+                                        ...editingConfig,
+                                        [providerType.type]: {
+                                          ...config,
+                                          app_id: e.target.value
+                                        }
+                                      });
+                                    }}
+                                    placeholder="Enter your App ID"
+                                    className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    disabled={isSaving}
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      const newConfig = { 
+                                        ...config, 
+                                        app_id: editingConfig[providerType.type]?.app_id || config.app_id,
+                                        enabled: isEnabled 
+                                      };
+                                      saveProvider(providerType.type, newConfig);
+                                    }}
+                                    disabled={isSaving || !editingConfig[providerType.type]?.app_id}
                                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {isSaving ? 'Saving...' : 'Save'}
