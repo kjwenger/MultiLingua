@@ -6,7 +6,7 @@ export interface TranslationProvider {
 }
 
 export interface ProviderConfig {
-  type: 'libretranslate' | 'google' | 'deepl' | 'azure' | 'aws' | 'mymemory';
+  type: 'libretranslate' | 'google' | 'deepl' | 'azure' | 'aws' | 'mymemory' | 'pons';
   enabled: boolean;
   apiKey?: string;
   apiUrl?: string;

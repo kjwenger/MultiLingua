@@ -14,6 +14,7 @@ export default function HelpPage() {
     { id: 'setup-google', title: 'Google Translate Setup' },
     { id: 'setup-deepl', title: 'DeepL Setup' },
     { id: 'setup-azure', title: 'Azure Translator Setup' },
+    { id: 'setup-pons', title: 'PONS Dictionary Setup' },
     { id: 'usage', title: 'Using the App' },
     { id: 'api', title: 'API Reference' },
     { id: 'troubleshooting', title: 'Troubleshooting' },
@@ -61,6 +62,7 @@ export default function HelpPage() {
           {activeSection === 'setup-google' && <GoogleSetup />}
           {activeSection === 'setup-deepl' && <DeepLSetup />}
           {activeSection === 'setup-azure' && <AzureSetup />}
+          {activeSection === 'setup-pons' && <PonsSetup />}
           {activeSection === 'usage' && <Usage />}
           {activeSection === 'api' && <ApiReference />}
           {activeSection === 'troubleshooting' && <Troubleshooting />}
@@ -213,7 +215,7 @@ function Features() {
           </ul>
         </div>
 
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 md:col-span-2">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-2">🔷 Azure Translator</h3>
           <p className="text-sm mb-2">Microsoft&apos;s enterprise translation service</p>
           <ul className="text-sm list-disc pl-5 space-y-1">
@@ -221,6 +223,17 @@ function Features() {
             <li>Enterprise-grade reliability</li>
             <li>Global availability</li>
             <li>Flexible pricing tiers</li>
+          </ul>
+        </div>
+
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-2">📖 PONS Dictionary</h3>
+          <p className="text-sm mb-2">Professional dictionary lookups</p>
+          <ul className="text-sm list-disc pl-5 space-y-1">
+            <li>1,000 queries/month free</li>
+            <li>Rich alternatives &amp; synonyms</li>
+            <li>Best for single words</li>
+            <li>European languages focus</li>
           </ul>
         </div>
       </div>
@@ -1161,18 +1174,192 @@ function AzureSetup() {
   );
 }
 
+function PonsSetup() {
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">PONS Dictionary Setup</h1>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        <a
+          href="https://en.pons.com/p/online-dictionary/developers/api"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+        >
+          <span className="mr-2">📖</span>
+          PONS API Documentation
+        </a>
+      </div>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        PONS is a professional online dictionary service specializing in European languages.
+        Unlike machine translation services, PONS provides dictionary lookups with rich alternatives,
+        making it ideal for learning vocabulary or finding precise word translations.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What is PONS?</h2>
+      <p className="mb-4">
+        PONS (formerly known as PONS Dictionaries) is one of Europe&apos;s leading dictionary publishers,
+        offering high-quality bilingual dictionaries. Their API provides access to professional dictionary
+        entries with multiple translations, usage examples, and grammatical information.
+      </p>
+
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+        <h3 className="text-yellow-800 dark:text-yellow-200 mt-0 mb-2">⚠️ Important Note</h3>
+        <p className="mb-0">
+          PONS is a <strong>dictionary service</strong>, not a machine translation service. It works best
+          for single words and short phrases. For full sentence translation, consider using DeepL,
+          Google Translate, or Azure Translator instead.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Free Tier Details</h2>
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <h3 className="text-lg font-semibold mb-2">📖 PONS API Free</h3>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li><strong>1,000 requests per month</strong> at no cost</li>
+          <li>Access to all supported language pairs</li>
+          <li>Rich dictionary entries with alternatives</li>
+          <li>No credit card required</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Supported Language Pairs</h2>
+      <p className="mb-4">
+        PONS supports dictionary lookups between the following language pairs:
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇬🇧 English ↔ 🇩🇪 German</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇬🇧 English ↔ 🇫🇷 French</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇬🇧 English ↔ 🇪🇸 Spanish</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇬🇧 English ↔ 🇮🇹 Italian</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇩🇪 German ↔ 🇫🇷 French</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇩🇪 German ↔ 🇪🇸 Spanish</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇩🇪 German ↔ 🇮🇹 Italian</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">🇫🇷 French ↔ 🇪🇸 Spanish</div>
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 text-sm">And more...</div>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 1: Register for PONS API</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>
+          Visit the{' '}
+          <a href="https://en.pons.com/p/online-dictionary/developers/api" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+            PONS API page
+          </a>
+        </li>
+        <li>Click on <strong>&quot;Request API Access&quot;</strong> or the registration link</li>
+        <li>Fill out the registration form with your details</li>
+        <li>Describe your intended use case (e.g., &quot;Personal translation app&quot;)</li>
+        <li>Submit and wait for approval (usually within 1-2 business days)</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 2: Get Your API Key</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>Once approved, you&apos;ll receive an email with your API credentials</li>
+        <li>The email contains your <strong>API Secret</strong> (used as the API key)</li>
+        <li>Keep this key secure - it provides access to your PONS quota</li>
+      </ol>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">💡 Tip</h3>
+        <p className="mb-0">
+          Save your API key in a secure password manager. You&apos;ll need it to configure MultiLingua.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 3: Configure in MultiLingua</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>Open MultiLingua and go to <strong>Settings</strong></li>
+        <li>Scroll to the <strong>&quot;PONS Dictionary&quot;</strong> section</li>
+        <li>Enter your PONS API Secret in the <strong>API Key</strong> field</li>
+        <li>Click <strong>Save</strong></li>
+        <li>Click the radio button to <strong>enable</strong> PONS Dictionary</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">How PONS Differs from Other Providers</h2>
+      <div className="overflow-x-auto mb-6">
+        <table className="min-w-full border border-gray-200 dark:border-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Feature</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">PONS</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Other Providers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Type</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Dictionary lookup</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Machine translation</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Best for</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Single words, vocabulary</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Sentences, paragraphs</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Alternatives</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Many (dictionary entries)</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Few or none</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Context</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Word meanings in isolation</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Context-aware translation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Advantages of PONS</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Rich Alternatives:</strong> Get multiple translations with different nuances</li>
+        <li><strong>Professional Quality:</strong> Curated by lexicographers, not machine-generated</li>
+        <li><strong>Vocabulary Learning:</strong> Perfect for building vocabulary knowledge</li>
+        <li><strong>Free Tier:</strong> 1,000 queries/month is generous for personal use</li>
+        <li><strong>European Focus:</strong> Excellent for German, French, Spanish, Italian</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Limitations</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Single Words:</strong> Not suitable for full sentence translation</li>
+        <li><strong>Limited Languages:</strong> Fewer language pairs than Google or DeepL</li>
+        <li><strong>No Context:</strong> Doesn&apos;t understand sentence context</li>
+        <li><strong>Manual Approval:</strong> API access requires approval (not instant)</li>
+      </ul>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+        <h3 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">✨ Best Use Case</h3>
+        <p className="mb-0">
+          Use PONS when you need to translate individual words and want to see multiple possible
+          translations with different meanings. For sentences and paragraphs, switch to DeepL or
+          Google Translate for better results.
+        </p>
+      </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          See the <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for PONS-specific solutions.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function Usage() {
   return (
     <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
       <h1 className="text-3xl font-bold mb-6">Using MultiLingua</h1>
 
       <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-        Learn how to make the most of MultiLingua&apos;s translation features, from basic workflows 
+        Learn how to make the most of MultiLingua&apos;s translation features, from basic workflows
         to advanced tips and keyboard shortcuts.
       </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">Basic Translation Workflow</h2>
-      
+
       <h3 className="text-xl font-semibold mt-6 mb-3">1. Add a New Translation Entry</h3>
       <ol className="list-decimal pl-6 space-y-2 mb-6">
         <li>Click the <strong>&quot;Add New Translation&quot;</strong> button at the top of the page</li>
@@ -1838,6 +2025,57 @@ docker compose up -d</code></pre>
           <li>Wait until next month for quota reset</li>
           <li>Upgrade to Standard (S1) tier for pay-as-you-go</li>
           <li>Use an alternative provider temporarily</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">PONS Dictionary Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">PONS Authentication Error 403</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Authentication failed&quot; error</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Verify you entered the correct API Secret (not username)</li>
+          <li>Check that your API access has been approved by PONS</li>
+          <li>Ensure you copied the full API key without extra spaces</li>
+          <li>Try re-entering the API key in Settings</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">PONS No Results Found</h3>
+        <p className="mb-2"><strong>Problem:</strong> Translation returns empty</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>PONS is a dictionary - try single words instead of sentences</li>
+          <li>Check if the language pair is supported (e.g., EN-DE, DE-FR)</li>
+          <li>Try the base form of the word (infinitive, singular)</li>
+          <li>Some uncommon words may not be in the dictionary</li>
+          <li>Use another provider (DeepL, Google) for sentences</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">PONS Language Pair Not Supported</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;PONS does not support X -&gt; Y translation&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>PONS supports specific language pairs only</li>
+          <li>Supported: EN↔DE, EN↔FR, EN↔ES, EN↔IT, DE↔FR, DE↔ES, DE↔IT</li>
+          <li>For unsupported pairs, use DeepL, Google, or Azure</li>
+          <li>Consider translating via an intermediate language (e.g., IT→EN→FR)</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">PONS Daily Limit Reached Error 503</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Daily limit reached&quot; error</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Free tier: 1,000 requests per month</li>
+          <li>Wait until the quota resets (monthly)</li>
+          <li>Contact PONS to upgrade your plan if needed</li>
+          <li>Switch to another provider (MyMemory, DeepL) temporarily</li>
         </ul>
       </div>
 

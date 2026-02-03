@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { TranslationProvider } from './base';
+import { providerLogger } from '../logger';
 
 export class GoogleProvider implements TranslationProvider {
   name = 'Google Translate';
@@ -7,10 +8,13 @@ export class GoogleProvider implements TranslationProvider {
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    providerLogger.info('Google Translate initialized');
   }
 
   async translate(text: string, source: string, target: string): Promise<{ translatedText: string; alternatives?: string[] }> {
     try {
+      providerLogger.debug(`Google translating: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}" (${source} -> ${target})`);
+
       const response = await axios.post(
         'https://translation.googleapis.com/language/translate/v2',
         null,
@@ -26,12 +30,19 @@ export class GoogleProvider implements TranslationProvider {
         }
       );
 
+      const translatedText = response.data.data.translations[0]?.translatedText || '';
+      providerLogger.debug(`Google result: "${translatedText.substring(0, 50)}${translatedText.length > 50 ? '...' : ''}"`);
+
       return {
-        translatedText: response.data.data.translations[0]?.translatedText || '',
+        translatedText,
         alternatives: []
       };
-    } catch (error) {
-      console.error(`Google Translate error (${source} -> ${target}):`, error);
+    } catch (error: any) {
+      providerLogger.error(`Google Translate error (${source} -> ${target})`, {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       throw error;
     }
   }
@@ -42,6 +53,8 @@ export class GoogleProvider implements TranslationProvider {
 
   async testConnection(): Promise<boolean> {
     try {
+      providerLogger.debug('Testing Google Translate connection...');
+
       await axios.post(
         'https://translation.googleapis.com/language/translate/v2',
         null,
@@ -54,8 +67,14 @@ export class GoogleProvider implements TranslationProvider {
           timeout: 5000
         }
       );
+
+      providerLogger.info('Google Translate connection test: SUCCESS');
       return true;
-    } catch {
+    } catch (error: any) {
+      providerLogger.error('Google Translate connection test: FAILED', {
+        message: error.message,
+        status: error.response?.status
+      });
       return false;
     }
   }

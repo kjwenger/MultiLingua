@@ -4,6 +4,7 @@ import { MyMemoryProvider } from './mymemory';
 import { DeepLProvider } from './deepl';
 import { GoogleProvider } from './google';
 import { AzureProvider } from './azure';
+import { PonsProvider } from './pons';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -82,6 +83,14 @@ export class TranslationService {
             provider = new AzureProvider(config.apiKey, config.region);
           } else {
             providerLogger.debug('Azure skipped (no apiKey)');
+          }
+          break;
+        case 'pons':
+          if (config.apiKey) {
+            providerLogger.info('Creating PonsProvider');
+            provider = new PonsProvider(config.apiKey);
+          } else {
+            providerLogger.debug('PONS skipped (no apiKey)');
           }
           break;
       }
