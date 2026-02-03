@@ -7,6 +7,7 @@ import { ApiDocsButton } from '../components/ApiDocsButton';
 import { HelpButton } from '../components/HelpButton';
 import { playTextToSpeech } from '../lib/tts';
 import { logger } from '../lib/logger';
+import { APP_VERSION } from '../lib/version';
 
 interface Translation {
   id: number;
@@ -318,7 +319,7 @@ export default function Home() {
         <div className="bg-white dark:bg-gray-800 shadow-xl transition-colors duration-200">
           <div className="px-2 py-2 border-b border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation v{APP_VERSION}</h1>
               <div className="flex items-center space-x-2">
                 <HelpButton />
                 <ApiDocsButton />
