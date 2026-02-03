@@ -365,24 +365,11 @@ function LibreTranslateSetup() {
         <li><strong>Updates:</strong> Manual updates required for improved models</li>
       </ul>
 
-      <h2 className="text-2xl font-semibold mt-8 mb-4">Troubleshooting</h2>
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Container Not Starting</h3>
-        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-2"><code>docker compose ps
-docker compose logs libretranslate</code></pre>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Translations Timeout</h3>
-        <p className="mb-2">Wait for initial model download to complete. Check logs:</p>
-        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-0"><code>docker compose logs -f libretranslate | grep -i "download"</code></pre>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Reset/Clean Install</h3>
-        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-0"><code>docker compose down
-docker volume rm lt-local
-docker compose up -d</code></pre>
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          See the <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for LibreTranslate-specific solutions.
+        </p>
       </div>
     </div>
   );
@@ -919,28 +906,11 @@ function DeepLSetup() {
         </ul>
       </div>
 
-      <h2 className="text-2xl font-semibold mt-8 mb-4">Troubleshooting</h2>
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Authentication Error 403</h3>
-        <p className="mb-2"><strong>Problem:</strong> &quot;Authorization failed&quot; or &quot;Invalid authentication key&quot;</p>
-        <p className="mb-2"><strong>Solution:</strong></p>
-        <ul className="list-disc pl-6 space-y-1 mb-0">
-          <li>Verify you&apos;re using the correct API key from your DeepL account</li>
-          <li>Check if you&apos;re using Free or Pro API - they have different endpoints</li>
-          <li>Remove any extra spaces when copying/pasting the key</li>
-        </ul>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Quota Exceeded Error 456</h3>
-        <p className="mb-2"><strong>Problem:</strong> &quot;Quota exceeded&quot;</p>
-        <p className="mb-2"><strong>Solution:</strong></p>
-        <ul className="list-disc pl-6 space-y-1 mb-0">
-          <li>Check your usage in the DeepL Account dashboard</li>
-          <li>Wait until next month for Free tier reset</li>
-          <li>Upgrade to Pro for higher limits</li>
-          <li>Consider using an alternative provider temporarily</li>
-        </ul>
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          See the <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for DeepL-specific solutions.
+        </p>
       </div>
     </div>
   );
@@ -1181,46 +1151,307 @@ function AzureSetup() {
         </ul>
       </div>
 
-      <h2 className="text-2xl font-semibold mt-8 mb-4">Troubleshooting</h2>
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Authentication Error 401</h3>
-        <p className="mb-2"><strong>Problem:</strong> &quot;Access denied&quot; or &quot;Invalid credentials&quot;</p>
-        <p className="mb-2"><strong>Solution:</strong></p>
-        <ul className="list-disc pl-6 space-y-1 mb-0">
-          <li>Verify your API key is correct (no extra spaces)</li>
-          <li>Ensure the Translator resource is active in Azure Portal</li>
-          <li>Check that you&apos;ve selected the correct subscription</li>
-        </ul>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Invalid Region Error</h3>
-        <p className="mb-2"><strong>Problem:</strong> &quot;Invalid region&quot; or &quot;Resource not found&quot;</p>
-        <p className="mb-2"><strong>Solution:</strong></p>
-        <ul className="list-disc pl-6 space-y-1 mb-0">
-          <li>Region must match where you created the Translator resource</li>
-          <li>Check region in Azure Portal under &quot;Keys and Endpoint&quot;</li>
-          <li>Use lowercase region code (e.g., &quot;eastus&quot; not &quot;East US&quot;)</li>
-        </ul>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
-        <h3 className="text-lg font-semibold mt-0 mb-2">Quota Exceeded</h3>
-        <p className="mb-2"><strong>Problem:</strong> &quot;Quota exceeded&quot; on free tier</p>
-        <p className="mb-2"><strong>Solution:</strong></p>
-        <ul className="list-disc pl-6 space-y-1 mb-0">
-          <li>Check usage in Azure Portal Metrics</li>
-          <li>Wait until next month for quota reset</li>
-          <li>Upgrade to Standard (S1) tier for pay-as-you-go</li>
-          <li>Use an alternative provider temporarily</li>
-        </ul>
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          See the <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for Azure Translator-specific solutions.
+        </p>
       </div>
     </div>
   );
 }
 
 function Usage() {
-  return <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200"><h1>Using MultiLingua - Coming Soon</h1><p>Detailed usage instructions will be added.</p></div>;
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">Using MultiLingua</h1>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        Learn how to make the most of MultiLingua&apos;s translation features, from basic workflows 
+        to advanced tips and keyboard shortcuts.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Basic Translation Workflow</h2>
+      
+      <h3 className="text-xl font-semibold mt-6 mb-3">1. Add a New Translation Entry</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Click the <strong>&quot;Add New Translation&quot;</strong> button at the top of the page</li>
+        <li>A new empty row will be added to the translation table</li>
+        <li>The first input field will be automatically focused</li>
+        <li>Start typing in any language column</li>
+      </ol>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <h4 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">💡 Quick Tip</h4>
+        <p className="mb-0">
+          You can add text in any language column - you don&apos;t have to start with English!
+        </p>
+      </div>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">2. Translate Text</h3>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>Enter or paste your text in any language column</li>
+        <li>Click the <strong>🔄 (translate)</strong> button in that column&apos;s header or in the cell</li>
+        <li>MultiLingua will automatically translate to all other languages</li>
+        <li>The active translation provider will be shown (LibreTranslate, DeepL, Google, Azure, or MyMemory)</li>
+        <li>Translation alternatives (up to 10) will appear below the main translation</li>
+      </ol>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-6">
+        <h4 className="text-lg font-semibold mb-2">Translation Process:</h4>
+        <ol className="list-decimal pl-6 space-y-1 text-sm mb-0">
+          <li>Text is sent to the active provider (based on priority)</li>
+          <li>Provider returns primary translation + alternatives</li>
+          <li>All translations are automatically saved to the database</li>
+          <li>UI updates instantly with results</li>
+        </ol>
+      </div>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">3. View Alternative Translations</h3>
+      <p className="mb-4">
+        Alternative translations help you find the most appropriate translation for your context:
+      </p>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Location:</strong> Alternatives appear below the main translation in gray text</li>
+        <li><strong>Quantity:</strong> Up to 10 alternatives per translation</li>
+        <li><strong>Click to Use:</strong> Click any alternative to replace the current translation</li>
+        <li><strong>Context Matters:</strong> Different alternatives may be better for formal vs. casual contexts</li>
+      </ul>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">4. Listen to Pronunciation (Text-to-Speech)</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Hover over any translation cell</li>
+        <li>Click the <strong>🔊 (speaker)</strong> icon that appears</li>
+        <li>Your browser will speak the text using native pronunciation</li>
+        <li>Works for all languages: English, German, French, Italian, Spanish</li>
+      </ol>
+
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <h4 className="text-green-800 dark:text-green-200 mt-0 mb-2">🎧 TTS Features</h4>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Uses your browser&apos;s built-in text-to-speech engine</li>
+          <li>Automatic language detection for proper pronunciation</li>
+          <li>No additional setup or API keys required</li>
+          <li>Great for learning proper pronunciation</li>
+        </ul>
+      </div>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">5. Edit Translations Manually</h3>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Click any cell</strong> to edit its content directly</li>
+        <li><strong>Type or paste</strong> your custom translation</li>
+        <li><strong>Click outside</strong> the cell or press <kbd>Enter</kbd> to save</li>
+        <li><strong>Press <kbd>Esc</kbd></strong> to cancel editing</li>
+        <li><strong>Auto-save:</strong> Changes are saved immediately to the database</li>
+      </ul>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">6. Delete Translation Entries</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Find the entry you want to delete</li>
+        <li>Click the <strong>🗑️ (trash)</strong> icon in the Actions column</li>
+        <li>The entry will be deleted immediately</li>
+        <li><strong>⚠️ Warning:</strong> This action cannot be undone!</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Managing Translation Providers</h2>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Accessing Settings</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Click the <strong>⚙️ (gear)</strong> icon in the top-right corner</li>
+        <li>The Settings page will open in the same window</li>
+        <li>Scroll to find different provider sections</li>
+        <li>Click &quot;← Back&quot; to return to the main app</li>
+      </ol>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Configuring Providers</h3>
+      <p className="mb-4">Each provider has its own configuration section:</p>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li><strong>Toggle Switch:</strong> Enable or disable the provider</li>
+        <li><strong>API Credentials:</strong> Enter API keys, URLs, or other required settings</li>
+        <li><strong>Test Connection:</strong> Some providers show status indicators</li>
+        <li><strong>Save Settings:</strong> Click the button to apply changes</li>
+      </ol>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Provider Priority</h3>
+      <p className="mb-4">
+        MultiLingua automatically selects the first available provider in this order:
+      </p>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li><strong>LibreTranslate</strong> - If enabled and configured (self-hosted, free)</li>
+        <li><strong>MyMemory</strong> - If enabled (free tier, no API key)</li>
+        <li><strong>DeepL</strong> - If enabled and API key provided (best quality)</li>
+        <li><strong>Google Translate</strong> - If enabled and API key provided</li>
+        <li><strong>Azure Translator</strong> - If enabled and API key + region provided</li>
+      </ol>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+        <h4 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">🎯 Best Practice</h4>
+        <p className="mb-2">Enable multiple providers for automatic failover:</p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>If one provider is slow or down, MultiLingua switches to the next</li>
+          <li>Different providers excel at different language pairs</li>
+          <li>Compare translations from multiple sources for better accuracy</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Sorting and Organization</h2>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Alphabetical Sorting</h3>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li>Click the <strong>&quot;English ⇅&quot;</strong> header to sort by English column</li>
+        <li>Click again to reverse the sort order (A-Z → Z-A)</li>
+        <li>Sorting helps you find specific translations quickly</li>
+        <li>Sort order is maintained until you change it</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Keyboard Shortcuts</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-6">
+        <table className="min-w-full">
+          <thead>
+            <tr className="border-b border-gray-300 dark:border-gray-600">
+              <th className="text-left py-2 pr-4">Shortcut</th>
+              <th className="text-left py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody className="text-sm">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="py-2 pr-4"><kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">Tab</kbd></td>
+              <td className="py-2">Move to next input field</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="py-2 pr-4"><kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">Shift</kbd> + <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">Tab</kbd></td>
+              <td className="py-2">Move to previous input field</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="py-2 pr-4"><kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">Enter</kbd></td>
+              <td className="py-2">Save current cell and move down</td>
+            </tr>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="py-2 pr-4"><kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">Esc</kbd></td>
+              <td className="py-2">Cancel editing without saving</td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4"><kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">Ctrl</kbd> + <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">V</kbd></td>
+              <td className="py-2">Paste text into focused field</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Advanced Features</h2>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Viewing API Documentation</h3>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li>Click the <strong>&lt;/&gt; (code)</strong> icon in the top-right corner</li>
+        <li>Opens interactive Swagger/OpenAPI documentation</li>
+        <li>Test API endpoints directly from your browser</li>
+        <li>See request/response examples</li>
+        <li>Perfect for integrating MultiLingua into other applications</li>
+      </ul>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Dark Mode</h3>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li>Click the <strong>🌙/☀️ (theme)</strong> icon to toggle dark mode</li>
+        <li>Dark mode is easier on the eyes in low-light conditions</li>
+        <li>Preference is saved automatically</li>
+        <li>Follows your system&apos;s dark mode setting by default</li>
+      </ul>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Understanding the Provider Badge</h3>
+      <p className="mb-4">
+        Each translation shows which provider was used:
+      </p>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>LibreTranslate:</strong> Self-hosted, free, privacy-focused</li>
+        <li><strong>MyMemory:</strong> Free tier, good for common phrases</li>
+        <li><strong>DeepL:</strong> Best quality, especially for European languages</li>
+        <li><strong>Google:</strong> Fast, reliable, wide language support</li>
+        <li><strong>Azure:</strong> Enterprise-grade, high availability</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Tips & Tricks</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h4 className="text-lg font-semibold mb-2">💡 For Best Results</h4>
+          <ul className="text-sm list-disc pl-5 space-y-1">
+            <li>Use complete sentences for better context</li>
+            <li>Review alternative translations for nuances</li>
+            <li>DeepL typically produces the most natural results</li>
+            <li>Enable multiple providers for comparison</li>
+          </ul>
+        </div>
+
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h4 className="text-lg font-semibold mb-2">⚡ Speed Tips</h4>
+          <ul className="text-sm list-disc pl-5 space-y-1">
+            <li>Use keyboard shortcuts for faster navigation</li>
+            <li>LibreTranslate is slower on first request</li>
+            <li>Cloud providers (DeepL, Google) are faster</li>
+            <li>Batch similar translations together</li>
+          </ul>
+        </div>
+
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h4 className="text-lg font-semibold mb-2">🔒 Privacy</h4>
+          <ul className="text-sm list-disc pl-5 space-y-1">
+            <li>LibreTranslate keeps data on your server</li>
+            <li>Cloud providers send data to their servers</li>
+            <li>All translations stored in local SQLite database</li>
+            <li>No analytics or tracking in MultiLingua</li>
+          </ul>
+        </div>
+
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h4 className="text-lg font-semibold mb-2">💰 Cost Optimization</h4>
+          <ul className="text-sm list-disc pl-5 space-y-1">
+            <li>Use free providers (LibreTranslate, MyMemory) first</li>
+            <li>Monitor API usage in provider dashboards</li>
+            <li>DeepL Free: 500K chars/month</li>
+            <li>Azure Free: 2M chars/month</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Common Workflows</h2>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Building a Translation Database</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Add frequently used phrases one by one</li>
+        <li>Review and select best translations from alternatives</li>
+        <li>Edit translations manually for brand-specific terms</li>
+        <li>Export data via API for use in other applications</li>
+      </ol>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Learning Languages</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Enter phrases you want to learn in your native language</li>
+        <li>Translate to target language(s)</li>
+        <li>Use text-to-speech to hear proper pronunciation</li>
+        <li>Review alternative translations to understand nuances</li>
+        <li>Build a personal phrase book over time</li>
+      </ol>
+
+      <h3 className="text-xl font-semibold mt-6 mb-3">Content Localization</h3>
+      <ol className="list-decimal pl-6 space-y-2 mb-6">
+        <li>Add all UI strings, messages, and content</li>
+        <li>Translate using high-quality providers (DeepL recommended)</li>
+        <li>Review translations for cultural appropriateness</li>
+        <li>Export via API and integrate into your application</li>
+        <li>Update translations as content changes</li>
+      </ol>
+
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-8">
+        <h3 className="text-yellow-800 dark:text-yellow-200 mt-0 mb-2">📚 Need More Help?</h3>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Check the <Link href="/help" className="text-yellow-700 dark:text-yellow-300 hover:underline">other help sections</Link> for provider setup</li>
+          <li>Visit <Link href="/api-docs" className="text-yellow-700 dark:text-yellow-300 hover:underline">API Documentation</Link> for programmatic access</li>
+          <li>See <Link href="/help" onClick={() => setActiveSection('troubleshooting')} className="text-yellow-700 dark:text-yellow-300 hover:underline">Troubleshooting</Link> for common issues</li>
+        </ul>
+      </div>
+    </div>
+  );
 }
 
 function ApiReference() {
@@ -1408,5 +1639,343 @@ Content-Type: application/json
 }
 
 function Troubleshooting() {
-  return <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200"><h1>Troubleshooting - Coming Soon</h1><p>Troubleshooting guide will be added.</p></div>;
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">Troubleshooting</h1>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        Common issues and solutions for MultiLingua and all translation providers.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">General Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">No Translations Appearing</h3>
+        <p className="mb-2"><strong>Symptom:</strong> Translation fields remain empty after clicking translate</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Check browser console for errors (press F12)</li>
+          <li>Verify at least one provider is enabled in Settings (⚙️)</li>
+          <li>Check server logs: <code>docker compose logs multi-lingua</code></li>
+          <li>Try a different provider to isolate the issue</li>
+          <li>Ensure you have internet connectivity (for cloud providers)</li>
+          <li>Restart the application: <code>docker compose restart multi-lingua</code></li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Database Errors</h3>
+        <p className="mb-2"><strong>Symptom:</strong> &quot;Database locked&quot; or &quot;SQLITE_ERROR&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Restart the application: <code>docker compose restart multi-lingua</code></li>
+          <li>Check database volume exists: <code>docker volume ls | grep ml-data</code></li>
+          <li>Ensure proper file permissions on database file</li>
+          <li>If issue persists, backup data and recreate volume</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Slow Performance</h3>
+        <p className="mb-2"><strong>Symptom:</strong> Translations take a long time to complete</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>LibreTranslate can be slow on first request (model loading)</li>
+          <li>Consider using cloud providers (DeepL, Google, Azure) for better speed</li>
+          <li>Check your internet connection speed</li>
+          <li>Increase Docker container resources if running locally</li>
+          <li>Monitor LibreTranslate logs: <code>docker compose logs -f libretranslate</code></li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">LibreTranslate Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">LibreTranslate Not Working</h3>
+        <p className="mb-2"><strong>Symptom:</strong> Translations fail or timeout</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Check if LibreTranslate container is running: <code>docker compose ps</code></li>
+          <li>Wait for initial model download (can take 5-10 minutes on first start)</li>
+          <li>Check LibreTranslate logs: <code>docker compose logs libretranslate</code></li>
+          <li>Verify URL in settings: <code>http://libretranslate:5000</code> (from container) or <code>http://localhost:5432</code> (from host)</li>
+          <li>Restart LibreTranslate: <code>docker compose restart libretranslate</code></li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">LibreTranslate Container Not Starting</h3>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-2"><code>docker compose ps
+docker compose logs libretranslate</code></pre>
+        <p className="mb-2">If needed, reset and rebuild:</p>
+        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-0"><code>docker compose down
+docker volume rm lt-local
+docker compose up -d</code></pre>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">LibreTranslate Timeout</h3>
+        <p className="mb-2"><strong>Problem:</strong> Translations timeout or take too long</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Wait for initial model download to complete</li>
+          <li>Check download progress: <code>docker compose logs -f libretranslate | grep -i "download"</code></li>
+          <li>First translation after startup may take longer (model loading)</li>
+          <li>Subsequent translations should be faster</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Google Translate Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Google API Key Not Valid</h3>
+        <p className="mb-2"><strong>Symptom:</strong> &quot;API key not valid&quot; or &quot;403 Forbidden&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Verify API key is correct in Settings (no extra spaces)</li>
+          <li>Check that Cloud Translation API is enabled in Google Cloud Console</li>
+          <li>Ensure API key restrictions allow Translation API</li>
+          <li>Verify billing is enabled on your Google Cloud account</li>
+          <li>Check quota limits in Google Cloud Console</li>
+          <li>Wait a few minutes after creating new API key for it to activate</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Google Quota Exceeded</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Quota exceeded&quot; or &quot;429 Too Many Requests&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Check usage in Google Cloud Console → APIs & Services → Dashboard</li>
+          <li>Monitor your free tier usage ($10/month ≈ 500K characters)</li>
+          <li>Request quota increase in Google Cloud Console if needed</li>
+          <li>Switch to alternative provider temporarily</li>
+          <li>Consider upgrading to paid tier for higher limits</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">DeepL Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">DeepL Authentication Error 403</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Authorization failed&quot; or &quot;Invalid authentication key&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Verify you&apos;re using the correct API key from your DeepL account</li>
+          <li><strong>Critical:</strong> Check if you&apos;re using Free or Pro API - they have different endpoints:
+            <ul className="list-disc pl-6 mt-1">
+              <li>Free API: api-free.deepl.com</li>
+              <li>Pro API: api.deepl.com</li>
+            </ul>
+          </li>
+          <li>Remove any extra spaces when copying/pasting the key</li>
+          <li>Ensure API key hasn&apos;t expired (check DeepL account)</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">DeepL Quota Exceeded Error 456</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Quota exceeded&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Check your usage in DeepL Account dashboard → Usage</li>
+          <li>Free tier: 500,000 characters/month - wait until next month for reset</li>
+          <li>Monitor usage to avoid unexpected quota hits</li>
+          <li>Upgrade to Pro for higher limits if needed</li>
+          <li>Consider using an alternative provider temporarily</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Wrong DeepL Endpoint</h3>
+        <p className="mb-2"><strong>Problem:</strong> API works but you&apos;re charged/not getting free tier</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Verify which API type you signed up for (Free vs Pro)</li>
+          <li>Free API keys MUST use api-free.deepl.com endpoint</li>
+          <li>Pro API keys MUST use api.deepl.com endpoint</li>
+          <li>Using wrong endpoint will cause authentication errors</li>
+          <li>MultiLingua automatically selects endpoint based on your settings</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Azure Translator Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Azure Authentication Error 401</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Access denied&quot; or &quot;Invalid credentials&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Verify your API key is correct (no extra spaces)</li>
+          <li>Ensure the Translator resource is active in Azure Portal</li>
+          <li>Check that you&apos;ve selected the correct subscription</li>
+          <li>Verify the API key hasn&apos;t been regenerated or revoked</li>
+          <li>Try using the alternate key (KEY 2) from Azure Portal</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Azure Invalid Region Error</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Invalid region&quot; or &quot;Resource not found&quot;</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li><strong>Critical:</strong> Region must match where you created the Translator resource</li>
+          <li>Check region in Azure Portal → Your Resource → Keys and Endpoint</li>
+          <li>Use lowercase region code (e.g., &quot;eastus&quot; not &quot;East US&quot;)</li>
+          <li>Common regions: eastus, westus, westeurope, northeurope</li>
+          <li>Both API key AND region are required for Azure</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Azure Quota Exceeded</h3>
+        <p className="mb-2"><strong>Problem:</strong> &quot;Quota exceeded&quot; on free tier</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Check usage in Azure Portal → Your Resource → Metrics</li>
+          <li>Free tier (F0): 2 million characters/month</li>
+          <li>Wait until next month for quota reset</li>
+          <li>Upgrade to Standard (S1) tier for pay-as-you-go</li>
+          <li>Use an alternative provider temporarily</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Docker Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Containers Won&apos;t Start</h3>
+        <p className="mb-2"><strong>Diagnostic commands:</strong></p>
+        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-2"><code>{`# Check container status
+docker compose ps
+
+# View logs
+docker compose logs
+
+# View specific service logs
+docker compose logs multi-lingua
+docker compose logs libretranslate
+
+# Restart services
+docker compose restart
+
+# Full rebuild
+docker compose down
+docker compose up -d --build`}</code></pre>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Port Conflicts</h3>
+        <p className="mb-2"><strong>Problem:</strong> Ports 3456 or 5432 already in use</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ol className="list-decimal pl-6 space-y-1 mb-0">
+          <li>Check what&apos;s using the port: <code>sudo lsof -i :3456</code></li>
+          <li>Edit <code>docker-compose.yml</code></li>
+          <li>Change port mappings (e.g., <code>3457:3456</code> for MultiLingua)</li>
+          <li>Restart: <code>docker compose up -d</code></li>
+          <li>Update browser URL to use new port</li>
+        </ol>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Volume Permission Issues</h3>
+        <p className="mb-2"><strong>Problem:</strong> Database or LibreTranslate data not persisting</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-sm mb-0"><code>{`# Check volumes
+docker volume ls
+
+# Inspect volume
+docker volume inspect ml-data
+docker volume inspect lt-local
+
+# Recreate volumes if needed
+docker compose down
+docker volume rm ml-data lt-local
+docker volume create ml-data
+docker volume create lt-local
+docker compose up -d`}</code></pre>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Browser Issues</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">Text-to-Speech Not Working</h3>
+        <p className="mb-2"><strong>Symptom:</strong> Speaker icon doesn&apos;t produce sound</p>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Ensure browser sound is not muted</li>
+          <li>Check system volume settings</li>
+          <li>Try a different browser (Chrome, Firefox, Edge all support TTS)</li>
+          <li>Some browsers require user interaction before playing audio</li>
+          <li>Check browser console for errors (F12)</li>
+        </ul>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+        <h3 className="text-lg font-semibold mt-0 mb-2">UI Not Loading or Broken</h3>
+        <p className="mb-2"><strong>Solutions:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>Hard refresh: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> (or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on Mac)</li>
+          <li>Clear browser cache and cookies</li>
+          <li>Try incognito/private browsing mode</li>
+          <li>Check browser console for JavaScript errors (F12)</li>
+          <li>Ensure you&apos;re using a modern browser version</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Debug Mode</h2>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">🔍 Enable Detailed Logging</h3>
+        <p className="mb-2">For troubleshooting complex issues, enable debug logging:</p>
+        <ol className="list-decimal pl-6 space-y-2 mb-0">
+          <li>Create or edit <code>.env.local</code> file in the MultiLingua directory</li>
+          <li>Add these lines:
+            <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm mt-2 mb-2"><code>{`LOG_LEVEL=debug
+NEXT_PUBLIC_LOG_LEVEL=debug`}</code></pre>
+          </li>
+          <li>Restart the application: <code>docker compose restart multi-lingua</code></li>
+          <li>Check browser console (F12) for detailed client-side logs</li>
+          <li>Check server logs: <code>docker compose logs -f multi-lingua</code></li>
+          <li>Look for color-coded log messages with detailed information</li>
+        </ol>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Getting More Help</h2>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+        <h3 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">📞 Additional Resources</h3>
+        <ul className="list-disc pl-6 space-y-2 mb-0">
+          <li>Review the <Link href="/api-docs" className="text-purple-700 dark:text-purple-300 hover:underline">API documentation</Link> for technical details</li>
+          <li>Check container logs for detailed error messages</li>
+          <li>Visit the GitHub repository for known issues and updates</li>
+          <li>Open an issue on GitHub with:
+            <ul className="list-disc pl-6 mt-1">
+              <li>Error messages from logs</li>
+              <li>Steps to reproduce the problem</li>
+              <li>Your environment (Docker version, OS, browser)</li>
+              <li>Provider being used when error occurred</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Quick Diagnostic Checklist</h2>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+        <p className="mb-2"><strong>Before opening an issue, check:</strong></p>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li>☐ All containers running: <code>docker compose ps</code></li>
+          <li>☐ No errors in logs: <code>docker compose logs</code></li>
+          <li>☐ At least one provider enabled in Settings</li>
+          <li>☐ Internet connection working (for cloud providers)</li>
+          <li>☐ Browser console clear of errors (F12)</li>
+          <li>☐ API keys valid and not expired</li>
+          <li>☐ Quota limits not exceeded</li>
+          <li>☐ Correct region configured (for Azure)</li>
+          <li>☐ Correct endpoint for DeepL Free vs Pro</li>
+        </ul>
+      </div>
+    </div>
+  );
 }
