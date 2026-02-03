@@ -1,8 +1,10 @@
+import { APP_VERSION } from './version';
+
 export const openApiSpec = {
   openapi: '3.0.0',
   info: {
     title: 'Multi-Lingua Translation API',
-    version: '0.2.1',
+    version: APP_VERSION,
     description: 'API for multi-language translation with support for multiple providers (LibreTranslate, MyMemory, DeepL, Google, Azure)',
   },
   servers: [
@@ -240,11 +242,6 @@ export const openApiSpec = {
                         $ref: '#/components/schemas/ProviderConfig',
                       },
                     },
-                    fallbackOrder: {
-                      type: 'array',
-                      items: { type: 'string' },
-                      description: 'Order of providers (deprecated)',
-                    },
                   },
                 },
               },
@@ -292,79 +289,7 @@ export const openApiSpec = {
         },
       },
     },
-    '/api/settings': {
-      get: {
-        tags: ['Settings'],
-        summary: 'Get application settings',
-        description: 'Retrieves application settings including LibreTranslate URL',
-        responses: {
-          '200': {
-            description: 'Application settings',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    libretranslate_url: {
-                      type: 'string',
-                      example: 'http://localhost:5432',
-                    },
-                  },
-                },
-              },
-            },
-          },
-          '500': {
-            description: 'Failed to fetch settings',
-          },
-        },
-      },
-      post: {
-        tags: ['Settings'],
-        summary: 'Update application settings',
-        description: 'Updates application settings',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  libretranslate_url: {
-                    type: 'string',
-                    description: 'LibreTranslate API URL',
-                    example: 'http://localhost:5432',
-                  },
-                },
-                required: ['libretranslate_url'],
-              },
-            },
-          },
-        },
-        responses: {
-          '200': {
-            description: 'Settings saved successfully',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    success: { type: 'boolean' },
-                    libretranslate_url: { type: 'string' },
-                  },
-                },
-              },
-            },
-          },
-          '400': {
-            description: 'libretranslate_url is required',
-          },
-          '500': {
-            description: 'Failed to save settings',
-          },
-        },
-      },
-    },
+
   },
   components: {
     schemas: {
@@ -467,10 +392,6 @@ export const openApiSpec = {
     {
       name: 'Providers',
       description: 'Translation provider configuration',
-    },
-    {
-      name: 'Settings',
-      description: 'Application settings',
     },
   ],
 };

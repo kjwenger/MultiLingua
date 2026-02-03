@@ -67,16 +67,11 @@ export async function GET() {
         return;
       }
 
-      db.all('SELECT provider_type FROM provider_fallback ORDER BY priority ASC', (err2, fallback: any[]) => {
-        db.close();
-        
-        const fallbackOrder = fallback && !err2 ? fallback.map(f => f.provider_type) : ['libretranslate'];
-        
-        resolve(NextResponse.json({ 
-          providers: providers || [],
-          fallbackOrder
-        }));
-      });
+      db.close();
+      
+      resolve(NextResponse.json({ 
+        providers: providers || []
+      }));
     });
   });
 }
@@ -140,33 +135,4 @@ export async function POST(request: NextRequest) {
   });
 }
 
-export async function PUT(request: NextRequest) {
-  return new Promise(async (resolve) => {
-    const body = await request.json();
-    const { fallbackOrder } = body;
 
-    if (!Array.isArray(fallbackOrder)) {
-      resolve(NextResponse.json({ error: 'fallbackOrder must be an array' }, { status: 400 }));
-      return;
-    }
-
-    const db = getDb();
-    
-    db.run('DELETE FROM provider_fallback', (err) => {
-      if (err) {
-        db.close();
-        resolve(NextResponse.json({ error: 'Failed to update fallback order' }, { status: 500 }));
-        return;
-      }
-
-      const stmt = db.prepare('INSERT INTO provider_fallback (provider_type, priority) VALUES (?, ?)');
-      fallbackOrder.forEach((providerType, index) => {
-        stmt.run(providerType, index);
-      });
-      stmt.finalize();
-
-      db.close();
-      resolve(NextResponse.json({ success: true }));
-    });
-  });
-}

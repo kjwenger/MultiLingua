@@ -26,7 +26,6 @@ const LIBRETRANSLATE_PRESETS = [
 
 export function SettingsContent() {
   const [providers, setProviders] = useState<any[]>([]);
-  const [fallbackOrder, setFallbackOrder] = useState<string[]>([]);
   const [expandedProvider, setExpandedProvider] = useState<string | null>('libretranslate');
   const [isSaving, setIsSaving] = useState(false);
   const [libreTranslatePreset, setLibreTranslatePreset] = useState('ENV_DEFAULT');
@@ -47,7 +46,6 @@ export function SettingsContent() {
       const response = await fetch('/api/providers');
       const data = await response.json();
       setProviders(data.providers || []);
-      setFallbackOrder(data.fallbackOrder || ['libretranslate']);
       
       // Find the selected provider (the one that's enabled)
       const enabledProvider = data.providers?.find((p: any) => p.enabled === 1 || p.enabled === true);
