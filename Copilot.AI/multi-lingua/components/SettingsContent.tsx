@@ -71,12 +71,28 @@ export function SettingsContent() {
   const saveProvider = async (type: string, config: any) => {
     setIsSaving(true);
     try {
+      // Map frontend config keys to backend API keys
+      const payload = {
+        type,
+        enabled: config.enabled,
+        apiKey: config.api_key,
+        apiUrl: config.api_url,
+        region: config.region,
+        email: config.email
+      };
+      
       await fetch('/api/providers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, ...config })
+        body: JSON.stringify(payload)
       });
       await fetchProviders();
+      // Clear editing state for this provider after successful save and fetch
+      setEditingConfig(prev => {
+        const updated = { ...prev };
+        delete updated[type];
+        return updated;
+      });
     } catch (error) {
       console.error('Error saving provider:', error);
     } finally {
@@ -279,28 +295,52 @@ export function SettingsContent() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                   API URL
                                 </label>
-                                <input
-                                  type="text"
-                                  value={config.api_url || ''}
-                                  onChange={(e) => {
-                                    const newConfig = { ...config, api_url: e.target.value, enabled: isEnabled };
-                                    saveProvider(providerType.type, newConfig);
-                                  }}
-                                  placeholder="http://localhost:5432"
-                                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                  disabled={isSaving}
-                                />
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={editingConfig[providerType.type]?.api_url ?? config.api_url ?? ''}
+                                    onChange={(e) => {
+                                      setEditingConfig({
+                                        ...editingConfig,
+                                        [providerType.type]: {
+                                          ...config,
+                                          api_url: e.target.value
+                                        }
+                                      });
+                                    }}
+                                    placeholder="http://localhost:5432"
+                                    className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    disabled={isSaving}
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      const newConfig = { 
+                                        ...config, 
+                                        api_url: editingConfig[providerType.type]?.api_url || config.api_url,
+                                        enabled: isEnabled 
+                                      };
+                                      saveProvider(providerType.type, newConfig);
+                                    }}
+                                    disabled={isSaving || !editingConfig[providerType.type]?.api_url}
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isSaving ? 'Saving...' : 'Save'}
+                                  </button>
+                                </div>
                               </div>
                             )}
                             {providerType.needsApiKey && (
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                   API Key
+                                  {config.api_key && !editingConfig[providerType.type]?.api_key && (
+                                    <span className="ml-2 text-xs text-green-600 dark:text-green-400">✓ Saved</span>
+                                  )}
                                 </label>
                                 <div className="flex gap-2">
                                   <input
                                     type="password"
-                                    value={editingConfig[providerType.type]?.api_key ?? config.api_key ?? ''}
+                                    value={editingConfig[providerType.type]?.api_key ?? (config.api_key ? '••••••••••••••••' : '')}
                                     onChange={(e) => {
                                       setEditingConfig({
                                         ...editingConfig,
@@ -310,7 +350,19 @@ export function SettingsContent() {
                                         }
                                       });
                                     }}
-                                    placeholder="Enter your API key"
+                                    onFocus={(e) => {
+                                      // Clear the placeholder dots when focused if not editing
+                                      if (!editingConfig[providerType.type]?.api_key && config.api_key) {
+                                        setEditingConfig({
+                                          ...editingConfig,
+                                          [providerType.type]: {
+                                            ...config,
+                                            api_key: ''
+                                          }
+                                        });
+                                      }
+                                    }}
+                                    placeholder={config.api_key ? "Enter new API key to replace" : "Enter your API key"}
                                     className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                     disabled={isSaving}
                                   />
@@ -318,21 +370,22 @@ export function SettingsContent() {
                                     onClick={() => {
                                       const newConfig = { 
                                         ...config, 
-                                        api_key: editingConfig[providerType.type]?.api_key ?? config.api_key,
+                                        api_key: editingConfig[providerType.type]?.api_key || config.api_key,
                                         enabled: isEnabled 
                                       };
                                       saveProvider(providerType.type, newConfig);
-                                      // Clear editing state after save
-                                      const updatedEditing = { ...editingConfig };
-                                      delete updatedEditing[providerType.type];
-                                      setEditingConfig(updatedEditing);
                                     }}
-                                    disabled={isSaving || (!editingConfig[providerType.type]?.api_key && !config.api_key)}
+                                    disabled={isSaving || !editingConfig[providerType.type]?.api_key}
                                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {isSaving ? 'Saving...' : 'Save'}
                                   </button>
                                 </div>
+                                {config.api_key && !editingConfig[providerType.type]?.api_key && (
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    API key is configured. Enter a new value to update.
+                                  </p>
+                                )}
                               </div>
                             )}
                             {providerType.needsRegion && (
