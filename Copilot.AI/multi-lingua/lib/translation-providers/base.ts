@@ -11,4 +11,5 @@ export interface ProviderConfig {
   apiKey?: string;
   apiUrl?: string;
   region?: string;
+  email?: string;
 }

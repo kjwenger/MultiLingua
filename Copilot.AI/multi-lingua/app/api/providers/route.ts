@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { resetTranslationService } from '@/lib/translation-providers';
+import { apiLogger } from '@/lib/logger';
 
 function isDocker() {
   try {
@@ -32,9 +34,13 @@ function getDb(): sqlite3.Database {
       enabled INTEGER DEFAULT 1,
       api_key TEXT,
       api_url TEXT,
-      region TEXT
+      region TEXT,
+      email TEXT
     )
   `);
+
+  // Add email column if it doesn't exist (for existing databases)
+  db.run(`ALTER TABLE provider_configs ADD COLUMN email TEXT`, () => {});
 
   db.run(`
     CREATE TABLE IF NOT EXISTS provider_fallback (
@@ -75,7 +81,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   return new Promise(async (resolve) => {
     const body = await request.json();
-    const { type, enabled, apiKey, apiUrl, region } = body;
+    const { type, enabled, apiKey, apiUrl, region, email } = body;
 
     if (!type) {
       resolve(NextResponse.json({ error: 'Provider type is required' }, { status: 400 }));
@@ -83,22 +89,32 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb();
-    
+
+    apiLogger.info(`Saving config for ${type}: enabled=${enabled}, apiUrl=${apiUrl || 'none'}, email=${email || 'none'}`);
+
     db.run(`
-      INSERT INTO provider_configs (type, enabled, api_key, api_url, region) 
-      VALUES (?, ?, ?, ?, ?)
-      ON CONFLICT(type) DO UPDATE SET 
+      INSERT INTO provider_configs (type, enabled, api_key, api_url, region, email)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(type) DO UPDATE SET
         enabled = excluded.enabled,
         api_key = excluded.api_key,
         api_url = excluded.api_url,
-        region = excluded.region
-    `, [type, enabled ? 1 : 0, apiKey || null, apiUrl || null, region || null], (err) => {
+        region = excluded.region,
+        email = excluded.email
+    `, [type, enabled ? 1 : 0, apiKey || null, apiUrl || null, region || null, email || null], (err) => {
       db.close();
-      
+
       if (err) {
-        console.error('Error saving provider config:', err);
+        apiLogger.error('Error saving provider config', err);
         resolve(NextResponse.json({ error: 'Failed to save provider config' }, { status: 500 }));
       } else {
+        if (enabled) {
+          apiLogger.info(`Provider ${type} is now ENABLED`);
+        } else {
+          apiLogger.info(`Provider ${type} is now DISABLED`);
+        }
+        // Reset the cached TranslationService so it picks up the new config
+        resetTranslationService();
         resolve(NextResponse.json({ success: true }));
       }
     });

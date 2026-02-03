@@ -7,6 +7,7 @@ import { AzureProvider } from './azure';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { providerLogger } from '../logger';
 
 function isDocker() {
   try {
@@ -29,18 +30,17 @@ if (!fs.existsSync(dataDir)) {
 const dbPath = path.join(dataDir, 'translations.db');
 
 export class TranslationService {
-  private providers: Map<string, TranslationProvider> = new Map();
-  private fallbackOrder: string[] = [];
+  private provider: TranslationProvider | null = null;
 
   async initialize() {
-    console.log('=== TranslationService.initialize() START ===');
+    providerLogger.info('Initializing TranslationService...');
     const configs = await this.loadProviderConfigs();
-    console.log(`Loaded ${configs.length} provider configs:`, JSON.stringify(configs));
-    
+    providerLogger.debug(`Loaded ${configs.length} provider configs`, configs);
+
     for (const config of configs) {
-      console.log(`Checking config for ${config.type}: enabled=${config.enabled}, apiUrl=${config.apiUrl}`);
+      providerLogger.debug(`Checking ${config.type}: enabled=${config.enabled}, apiUrl=${config.apiUrl}`);
       if (!config.enabled) {
-        console.log(`  -> Skipping ${config.type} (not enabled)`);
+        providerLogger.debug(`Skipping ${config.type} (not enabled)`);
         continue;
       }
 
@@ -49,93 +49,94 @@ export class TranslationService {
       switch (config.type) {
         case 'libretranslate':
           if (config.apiUrl) {
-            console.log(`  -> Creating LibreTranslateProvider with URL: ${config.apiUrl}`);
+            providerLogger.info(`Creating LibreTranslateProvider with URL: ${config.apiUrl}`);
             provider = new LibreTranslateProvider(config.apiUrl, config.apiKey);
-            console.log(`  -> LibreTranslate provider created`);
           } else {
-            console.log(`  -> LibreTranslate skipped (no apiUrl)`);
+            providerLogger.debug('LibreTranslate skipped (no apiUrl)');
           }
           break;
         case 'mymemory':
-          console.log(`  -> Creating MyMemoryProvider`);
-          provider = new MyMemoryProvider();
+          const myMemoryEmail = config.email || process.env.MYMEMORY_EMAIL;
+          providerLogger.info(`Creating MyMemoryProvider with email: ${myMemoryEmail || '(none)'}`);
+          provider = new MyMemoryProvider(myMemoryEmail);
           break;
         case 'deepl':
           if (config.apiKey) {
-            console.log(`  -> Creating DeepLProvider`);
+            providerLogger.info('Creating DeepLProvider');
             provider = new DeepLProvider(config.apiKey, true);
           } else {
-            console.log(`  -> DeepL skipped (no apiKey)`);
+            providerLogger.debug('DeepL skipped (no apiKey)');
           }
           break;
         case 'google':
           if (config.apiKey) {
-            console.log(`  -> Creating GoogleProvider`);
+            providerLogger.info('Creating GoogleProvider');
             provider = new GoogleProvider(config.apiKey);
           } else {
-            console.log(`  -> Google skipped (no apiKey)`);
+            providerLogger.debug('Google skipped (no apiKey)');
           }
           break;
         case 'azure':
           if (config.apiKey) {
-            console.log(`  -> Creating AzureProvider`);
+            providerLogger.info('Creating AzureProvider');
             provider = new AzureProvider(config.apiKey, config.region);
           } else {
-            console.log(`  -> Azure skipped (no apiKey)`);
+            providerLogger.debug('Azure skipped (no apiKey)');
           }
           break;
       }
 
       if (provider) {
-        this.providers.set(config.type, provider);
-        console.log(`  -> Provider ${config.type} registered successfully`);
+        this.provider = provider;
+        providerLogger.info(`Active provider: ${config.type}`);
+        break; // Only one provider is used
       } else {
-        console.log(`  -> Provider ${config.type} NOT registered (null)`);
+        providerLogger.debug(`Provider ${config.type} not registered`);
       }
     }
 
-    console.log(`=== Total providers registered: ${this.providers.size} ===`);
-    console.log(`Provider types: ${Array.from(this.providers.keys()).join(', ')}`);
+    if (!this.provider) {
+      providerLogger.warn('No translation provider configured!');
+    }
   }
 
   private async loadProviderConfigs(): Promise<ProviderConfig[]> {
-    console.log('=== loadProviderConfigs() START ===');
+    providerLogger.debug('Loading provider configs from database');
     return new Promise((resolve) => {
       const db = new sqlite3.Database(dbPath);
-      console.log(`Database path: ${dbPath}`);
-      
+
       db.run(`
         CREATE TABLE IF NOT EXISTS provider_configs (
           type TEXT PRIMARY KEY,
           enabled INTEGER DEFAULT 1,
           api_key TEXT,
           api_url TEXT,
-          region TEXT
+          region TEXT,
+          email TEXT
         )
       `, (err) => {
-        if (err) console.error('Error creating provider_configs table:', err);
-        else console.log('provider_configs table ready');
+        if (err) providerLogger.error('Error creating provider_configs table', err);
       });
 
+      // Add email column if it doesn't exist (for existing databases)
+      db.run(`ALTER TABLE provider_configs ADD COLUMN email TEXT`, () => {});
+
       db.all('SELECT * FROM provider_configs', (err, rows: any[]) => {
-        console.log('Query result - err:', err, 'rows:', rows);
         if (err || !rows || rows.length === 0) {
           const defaultUrl = this.getDefaultLibreTranslateUrl();
-          console.log(`No configs found, creating default LibreTranslate with URL: ${defaultUrl}`);
+          providerLogger.info(`No configs found, creating default LibreTranslate with URL: ${defaultUrl}`);
           const defaultConfigs: ProviderConfig[] = [
             { type: 'libretranslate', enabled: true, apiUrl: defaultUrl },
             { type: 'mymemory', enabled: false }
           ];
-          
+
           // Insert default LibreTranslate config into database
           db.run(`
-            INSERT OR REPLACE INTO provider_configs (type, enabled, api_url) 
+            INSERT OR REPLACE INTO provider_configs (type, enabled, api_url)
             VALUES (?, ?, ?)
           `, ['libretranslate', 1, defaultUrl], (insertErr) => {
-            if (insertErr) console.error('Error inserting default config:', insertErr);
-            else console.log('Default LibreTranslate config inserted');
+            if (insertErr) providerLogger.error('Error inserting default config', insertErr);
             db.close();
-            console.log('Returning default configs:', JSON.stringify(defaultConfigs));
             resolve(defaultConfigs);
           });
         } else {
@@ -144,50 +145,23 @@ export class TranslationService {
             enabled: row.enabled === 1,
             apiKey: row.api_key,
             apiUrl: row.api_url,
-            region: row.region
+            region: row.region,
+            email: row.email
           }));
-          
+
           // Fix any libretranslate entries with null URL
           const libreConfig = configs.find(c => c.type === 'libretranslate');
           if (libreConfig && !libreConfig.apiUrl) {
             const defaultUrl = this.getDefaultLibreTranslateUrl();
-            console.log(`LibreTranslate has null URL, updating to: ${defaultUrl}`);
+            providerLogger.debug(`LibreTranslate has null URL, updating to: ${defaultUrl}`);
             libreConfig.apiUrl = defaultUrl;
             db.run(`UPDATE provider_configs SET api_url = ? WHERE type = ?`, [defaultUrl, 'libretranslate']);
           }
-          
-          console.log('Loaded configs from DB:', JSON.stringify(configs));
+
+          providerLogger.debug('Loaded configs from DB', configs);
           db.close();
           resolve(configs);
         }
-      });
-    });
-  }
-
-  private async loadFallbackOrder(): Promise<void> {
-    return new Promise((resolve) => {
-      const db = new sqlite3.Database(dbPath);
-      
-      db.run(`
-        CREATE TABLE IF NOT EXISTS provider_fallback (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          provider_type TEXT NOT NULL,
-          priority INTEGER NOT NULL
-        )
-      `);
-
-      db.all('SELECT provider_type FROM provider_fallback ORDER BY priority ASC', (err, rows: any[]) => {
-        if (!err && rows && rows.length > 0) {
-          this.fallbackOrder = rows.map(row => row.provider_type);
-        } else {
-          this.fallbackOrder = ['libretranslate', 'mymemory'];
-          
-          // Insert default fallback order into database
-          db.run('INSERT INTO provider_fallback (provider_type, priority) VALUES (?, ?)', ['libretranslate', 0]);
-          db.run('INSERT INTO provider_fallback (provider_type, priority) VALUES (?, ?)', ['mymemory', 1]);
-        }
-        db.close();
-        resolve();
       });
     });
   }
@@ -205,6 +179,10 @@ export class TranslationService {
     return 'http://localhost:5432';
   }
 
+  getActiveProviderName(): string {
+    return this.provider?.name || 'NONE';
+  }
+
   private async translateWithProvider(provider: TranslationProvider, text: string, source: string, target: string): Promise<{ translatedText: string; alternatives: string[] }> {
     try {
       const result = await provider.translate(text, source, target);
@@ -215,21 +193,15 @@ export class TranslationService {
   }
 
   async translate(text: string, source: string, target: string): Promise<{ translatedText: string; alternatives: string[] }> {
-    for (const providerType of this.fallbackOrder) {
-      const provider = this.providers.get(providerType);
-      if (!provider) continue;
-
-      try {
-        console.log(`Trying provider: ${provider.name}`);
-        const result = await this.translateWithProvider(provider, text, source, target);
-        console.log(`Success with ${provider.name}: "${result.translatedText}"`);
-        return result;
-      } catch (error) {
-        console.log(`${provider.name} failed, trying next provider...`);
-      }
+    if (!this.provider) {
+      providerLogger.error('No translation provider configured');
+      throw new Error('No translation provider configured');
     }
 
-    throw new Error('All translation providers failed');
+    providerLogger.debug(`Translating with ${this.provider.name}: "${text}" (${source} -> ${target})`);
+    const result = await this.translateWithProvider(this.provider, text, source, target);
+    providerLogger.debug(`Result: "${result.translatedText}"`);
+    return result;
   }
 
   async translateFromLanguage(text: string, sourceLanguage: 'en' | 'de' | 'fr' | 'it' | 'es'): Promise<{
@@ -271,4 +243,9 @@ export async function getTranslationService(): Promise<TranslationService> {
     await translationServiceInstance.initialize();
   }
   return translationServiceInstance;
+}
+
+export function resetTranslationService(): void {
+  providerLogger.info('Resetting cached instance - will reinitialize on next request');
+  translationServiceInstance = null;
 }

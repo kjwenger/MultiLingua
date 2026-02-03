@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 
 const PROVIDER_TYPES = [
   { type: 'libretranslate', name: 'LibreTranslate', needsUrl: true, needsApiKey: false, freeInfo: 'Self-hosted or public' },
-  { type: 'mymemory', name: 'MyMemory', needsUrl: false, needsApiKey: false, freeInfo: '10K words/day free' },
+  { type: 'mymemory', name: 'MyMemory', needsUrl: false, needsApiKey: false, needsEmail: true, freeInfo: '10K words/day (30K with email)' },
   { type: 'deepl', name: 'DeepL', needsUrl: false, needsApiKey: true, freeInfo: '500K chars/month free' },
   { type: 'google', name: 'Google Translate', needsUrl: false, needsApiKey: true, freeInfo: '500K chars/month free' },
   { type: 'azure', name: 'Azure Translator', needsUrl: false, needsApiKey: true, needsRegion: true, freeInfo: '2M chars/month free' }
@@ -322,6 +322,24 @@ export function SettingsContent() {
                                     saveProvider(providerType.type, newConfig);
                                   }}
                                   placeholder="global"
+                                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                  disabled={isSaving}
+                                />
+                              </div>
+                            )}
+                            {(providerType as any).needsEmail && (
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                  Email (optional, increases quota to 30K words/day)
+                                </label>
+                                <input
+                                  type="email"
+                                  value={config.email || ''}
+                                  onChange={(e) => {
+                                    const newConfig = { ...config, email: e.target.value, enabled: isEnabled };
+                                    saveProvider(providerType.type, newConfig);
+                                  }}
+                                  placeholder="your@email.com"
                                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                   disabled={isSaving}
                                 />

@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { SettingsButton } from '../components/SettingsButton';
+import { ApiDocsButton } from '../components/ApiDocsButton';
 import { playTextToSpeech } from '../lib/tts';
+import { logger } from '../lib/logger';
 
 interface Translation {
   id: number;
@@ -24,6 +26,15 @@ interface TranslationProposals {
   alternatives: string[];
 }
 
+interface TranslationResponse {
+  provider?: string;
+  english?: TranslationProposals;
+  german?: TranslationProposals;
+  french?: TranslationProposals;
+  italian?: TranslationProposals;
+  spanish?: TranslationProposals;
+}
+
 export default function Home() {
   const [translations, setTranslations] = useState<Translation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +49,7 @@ export default function Home() {
 
   const fetchTranslations = async () => {
     try {
+      logger.info('Fetching translations from API');
       setError(null);
       const response = await fetch('/api/translations', {
         method: 'GET',
@@ -49,9 +61,10 @@ export default function Home() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      logger.info(`Received ${Array.isArray(data) ? data.length : 0} translations`);
       setTranslations(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching translations:', error);
+      logger.error('Error fetching translations', error);
       setError('Failed to load translations');
       setTranslations([]);
     } finally {
@@ -74,8 +87,9 @@ export default function Home() {
     setTranslations(sorted);
   };
 
-  const translateText = async (text: string, sourceLanguage?: 'en' | 'de' | 'fr' | 'it' | 'es') => {
+  const translateText = async (text: string, sourceLanguage?: 'en' | 'de' | 'fr' | 'it' | 'es'): Promise<TranslationResponse | null> => {
     try {
+      logger.info(`Translating text from ${sourceLanguage || 'en'}`, { text });
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: {
@@ -84,10 +98,11 @@ export default function Home() {
         body: JSON.stringify({ text, sourceLanguage }),
       });
       
-      const data = await response.json();
+      const data: TranslationResponse = await response.json();
+      logger.info('Translation received', { provider: data.provider, data });
       return data;
     } catch (error) {
-      console.error('Translation error:', error);
+      logger.error('Translation error', error);
       return null;
     }
   };
@@ -108,6 +123,7 @@ export default function Home() {
     };
 
     setTranslatingIds(prev => new Set(prev).add(id));
+    logger.info(`Starting translation from ${language} for ID ${id}`, { sourceText });
 
     try {
       const translationResult = await translateText(sourceText, languageCodeMap[language] as any);
@@ -135,6 +151,7 @@ export default function Home() {
           updatedTranslation.spanish_proposals = JSON.stringify(translationResult.spanish.alternatives);
         }
 
+        logger.debug('Saving updated translation to database', { id, updatedTranslation });
         await fetch('/api/translations', {
           method: 'PUT',
           headers: {
@@ -146,9 +163,10 @@ export default function Home() {
         setTranslations(prev => prev.map(t => 
           t.id === id ? { ...t, ...updatedTranslation } : t
         ));
+        logger.info(`Translation completed for ID ${id}`);
       }
     } catch (error) {
-      console.error('Translation error:', error);
+      logger.error('Translation error', error);
     } finally {
       setTranslatingIds(prev => {
         const newSet = new Set(prev);
@@ -198,11 +216,12 @@ export default function Home() {
     }
 
     setTtsPlayingIds(prev => new Set(prev).add(ttsId));
+    logger.info(`Playing TTS for ${language}`, { id, text });
     
     try {
       await playTextToSpeech(text, language);
     } catch (error) {
-      console.error('TTS error:', error);
+      logger.error('TTS error', error);
     } finally {
       setTtsPlayingIds(prev => {
         const newSet = new Set(prev);
@@ -214,6 +233,7 @@ export default function Home() {
 
   const addNewRow = async () => {
     try {
+      logger.info('Adding new translation row');
       const response = await fetch('/api/translations', {
         method: 'POST',
         headers: {
@@ -235,21 +255,24 @@ export default function Home() {
       
       const result = await response.json();
       if (result.success) {
+        logger.info('New row added successfully');
         fetchTranslations();
       }
     } catch (error) {
-      console.error('Error adding new row:', error);
+      logger.error('Error adding new row', error);
     }
   };
 
   const deleteRow = async (id: number) => {
     try {
+      logger.info(`Deleting row with ID ${id}`);
       await fetch(`/api/translations?id=${id}`, {
         method: 'DELETE',
       });
       setTranslations(prev => prev.filter(t => t.id !== id));
+      logger.info(`Row ${id} deleted successfully`);
     } catch (error) {
-      console.error('Error deleting row:', error);
+      logger.error('Error deleting row', error);
     }
   };
 
@@ -296,6 +319,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation</h1>
               <div className="flex items-center space-x-2">
+                <ApiDocsButton />
                 <SettingsButton />
                 <ThemeToggle />
                 <button
