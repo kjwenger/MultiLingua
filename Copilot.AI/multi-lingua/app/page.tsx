@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { SettingsButton } from '../components/SettingsButton';
 import { ApiDocsButton } from '../components/ApiDocsButton';
+import { HelpButton } from '../components/HelpButton';
 import { playTextToSpeech } from '../lib/tts';
 import { logger } from '../lib/logger';
 
@@ -319,6 +320,7 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation</h1>
               <div className="flex items-center space-x-2">
+                <HelpButton />
                 <ApiDocsButton />
                 <SettingsButton />
                 <ThemeToggle />
