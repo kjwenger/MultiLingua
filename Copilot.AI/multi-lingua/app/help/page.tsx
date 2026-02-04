@@ -15,6 +15,9 @@ export default function HelpPage() {
     { id: 'setup-deepl', title: 'DeepL Setup' },
     { id: 'setup-azure', title: 'Azure Translator Setup' },
     { id: 'setup-pons', title: 'PONS Dictionary Setup' },
+    { id: 'setup-merriam-webster', title: 'Merriam-Webster Setup' },
+    { id: 'setup-free-dictionary', title: 'Free Dictionary Setup' },
+    { id: 'setup-oxford', title: 'Oxford Dictionary Setup' },
     { id: 'usage', title: 'Using the App' },
     { id: 'api', title: 'API Reference' },
     { id: 'troubleshooting', title: 'Troubleshooting' },
@@ -63,6 +66,9 @@ export default function HelpPage() {
           {activeSection === 'setup-deepl' && <DeepLSetup />}
           {activeSection === 'setup-azure' && <AzureSetup />}
           {activeSection === 'setup-pons' && <PonsSetup />}
+          {activeSection === 'setup-merriam-webster' && <MerriamWebsterSetup />}
+          {activeSection === 'setup-free-dictionary' && <FreeDictionarySetup />}
+          {activeSection === 'setup-oxford' && <OxfordSetup />}
           {activeSection === 'usage' && <Usage />}
           {activeSection === 'api' && <ApiReference />}
           {activeSection === 'troubleshooting' && <Troubleshooting />}
@@ -1342,6 +1348,511 @@ function PonsSetup() {
         <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
         <p className="mb-0">
           See the <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for PONS-specific solutions.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MerriamWebsterSetup() {
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">Merriam-Webster Dictionary Setup</h1>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        <a
+          href="https://dictionaryapi.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
+        >
+          <span className="mr-2">📕</span>
+          Merriam-Webster API Portal
+        </a>
+        <a
+          href="https://dictionaryapi.com/products/api-collegiate-dictionary"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 transition-colors"
+        >
+          <span className="mr-2">📖</span>
+          Collegiate Dictionary API Docs
+        </a>
+      </div>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        Merriam-Webster is America&apos;s most trusted dictionary, providing authoritative English
+        definitions since 1828. Their API offers access to the Collegiate Dictionary with detailed
+        definitions, pronunciations, and usage examples.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What is Merriam-Webster API?</h2>
+      <p className="mb-4">
+        The Merriam-Webster Dictionary API provides programmatic access to the same content found in
+        their renowned Collegiate Dictionary. It&apos;s ideal for looking up English word definitions,
+        including multiple meanings, parts of speech, and usage examples.
+      </p>
+
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+        <h3 className="text-yellow-800 dark:text-yellow-200 mt-0 mb-2">⚠️ English Only</h3>
+        <p className="mb-0">
+          Merriam-Webster is an <strong>English dictionary</strong> only. It provides definitions in English
+          for English words. For translation between languages, use other providers like DeepL, Google,
+          or PONS.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Free Tier Details</h2>
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <h3 className="text-lg font-semibold mb-2">📕 Merriam-Webster Free API</h3>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li><strong>1,000 queries per day</strong> at no cost</li>
+          <li>Access to the Collegiate Dictionary</li>
+          <li>Includes definitions, pronunciations, and examples</li>
+          <li>No credit card required</li>
+          <li>For non-commercial use</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 1: Create a Developer Account</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>
+          Visit the{' '}
+          <a href="https://dictionaryapi.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+            Merriam-Webster Developer Center
+          </a>
+        </li>
+        <li>Click <strong>&quot;Register&quot;</strong> or <strong>&quot;Get Started&quot;</strong></li>
+        <li>Fill out the registration form with your email and create a password</li>
+        <li>Verify your email address by clicking the link in the confirmation email</li>
+        <li>Log in to your new developer account</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 2: Request API Keys</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>After logging in, navigate to <strong>&quot;My Keys&quot;</strong> or <strong>&quot;Request API Key&quot;</strong></li>
+        <li>Select <strong>&quot;Collegiate Dictionary&quot;</strong> from the available products</li>
+        <li>Fill out the brief form describing your intended use (e.g., &quot;Personal vocabulary app&quot;)</li>
+        <li>Submit the request - keys are usually granted instantly for the free tier</li>
+        <li>Copy your <strong>API Key</strong> from the dashboard</li>
+      </ol>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">💡 Multiple Keys Available</h3>
+        <p className="mb-0">
+          Merriam-Webster offers separate API keys for different dictionary products (Collegiate,
+          Thesaurus, Medical, etc.). For MultiLingua, you need the <strong>Collegiate Dictionary</strong> key.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 3: Configure in MultiLingua</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>Open MultiLingua and go to <strong>Settings</strong></li>
+        <li>Scroll to the <strong>&quot;Merriam-Webster&quot;</strong> section</li>
+        <li>Click the expand arrow to show configuration options</li>
+        <li>Enter your Collegiate Dictionary API Key in the <strong>API Key</strong> field</li>
+        <li>Click <strong>Save</strong></li>
+        <li>Click the radio button to <strong>enable</strong> Merriam-Webster</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What You Get</h2>
+      <p className="mb-4">When you look up a word with Merriam-Webster, you&apos;ll receive:</p>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Definitions:</strong> Multiple meanings organized by part of speech</li>
+        <li><strong>Short Definitions:</strong> Concise explanations displayed in MultiLingua</li>
+        <li><strong>Alternatives:</strong> Additional meanings shown as alternative translations</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Advantages</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Authoritative:</strong> America&apos;s most trusted dictionary since 1828</li>
+        <li><strong>Comprehensive:</strong> Detailed definitions with multiple meanings</li>
+        <li><strong>Generous Free Tier:</strong> 1,000 queries per day is excellent for personal use</li>
+        <li><strong>Instant Access:</strong> No approval wait time, keys granted immediately</li>
+        <li><strong>Pronunciation:</strong> Includes phonetic spellings</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Limitations</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>English Only:</strong> No translations to other languages</li>
+        <li><strong>Single Words:</strong> Best for individual word lookups, not sentences</li>
+        <li><strong>American English:</strong> Primarily focuses on American English spellings and usage</li>
+        <li><strong>Non-Commercial Only:</strong> Free tier requires non-commercial use</li>
+      </ul>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+        <h3 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">✨ Best Use Case</h3>
+        <p className="mb-0">
+          Use Merriam-Webster when you need authoritative English definitions and want to understand
+          the full meaning of English words. For translations between languages, switch to DeepL,
+          Google, or PONS.
+        </p>
+      </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          See the <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for dictionary-specific solutions.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FreeDictionarySetup() {
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">Free Dictionary API Setup</h1>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        <a
+          href="https://dictionaryapi.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+        >
+          <span className="mr-2">📗</span>
+          Free Dictionary API Website
+        </a>
+        <a
+          href="https://github.com/meetDeveloper/freeDictionaryAPI"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 transition-colors"
+        >
+          <span className="mr-2">⭐</span>
+          GitHub Repository
+        </a>
+      </div>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        The Free Dictionary API is a completely free, open-source dictionary service that requires
+        no API key, no registration, and has no usage limits. It&apos;s the easiest way to get started
+        with dictionary lookups in MultiLingua.
+      </p>
+
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <h3 className="text-green-800 dark:text-green-200 mt-0 mb-2">🎉 No Setup Required!</h3>
+        <p className="mb-0">
+          Free Dictionary API requires <strong>no API key</strong> and <strong>no registration</strong>.
+          Simply enable it in Settings and start using it immediately!
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What is Free Dictionary API?</h2>
+      <p className="mb-4">
+        The Free Dictionary API is an open-source project that provides free access to English word
+        definitions, pronunciations, examples, and synonyms. It aggregates data from multiple sources
+        including Wiktionary and other open dictionaries.
+      </p>
+
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+        <h3 className="text-yellow-800 dark:text-yellow-200 mt-0 mb-2">⚠️ English Only</h3>
+        <p className="mb-0">
+          Free Dictionary API only supports <strong>English definitions</strong>. For translations between
+          languages, use other providers like DeepL, Google, or PONS.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Features</h2>
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <h3 className="text-lg font-semibold mb-2">📗 Free Dictionary API</h3>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li><strong>Completely free</strong> - no costs ever</li>
+          <li><strong>No API key required</strong> - just enable and use</li>
+          <li><strong>No registration</strong> - no account needed</li>
+          <li><strong>No rate limits</strong> - use as much as you need</li>
+          <li><strong>Open source</strong> - community maintained</li>
+        </ul>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">How to Enable</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>Open MultiLingua and go to <strong>Settings</strong></li>
+        <li>Scroll to the <strong>&quot;Free Dictionary&quot;</strong> section</li>
+        <li>Click the radio button to <strong>enable</strong> Free Dictionary</li>
+        <li>That&apos;s it! No API key needed - start translating immediately</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What You Get</h2>
+      <p className="mb-4">When you look up a word with Free Dictionary, you&apos;ll receive:</p>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Definitions:</strong> Multiple meanings with part of speech (noun, verb, etc.)</li>
+        <li><strong>Examples:</strong> Usage examples for many words</li>
+        <li><strong>Alternatives:</strong> Additional definitions shown as alternatives in MultiLingua</li>
+        <li><strong>Phonetics:</strong> Pronunciation information when available</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Advantages</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Zero Cost:</strong> Completely free forever</li>
+        <li><strong>No Registration:</strong> No account or API key needed</li>
+        <li><strong>No Limits:</strong> No daily or monthly quotas</li>
+        <li><strong>Instant Setup:</strong> Enable and start using immediately</li>
+        <li><strong>Open Source:</strong> Transparent, community-driven project</li>
+        <li><strong>Privacy:</strong> No tracking, no data collection</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Limitations</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>English Only:</strong> No translations to other languages</li>
+        <li><strong>Single Words:</strong> Best for individual word lookups</li>
+        <li><strong>Coverage:</strong> May not have obscure or technical terms</li>
+        <li><strong>No Official Support:</strong> Community-maintained project</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Comparison with Other Dictionary Providers</h2>
+      <div className="overflow-x-auto mb-6">
+        <table className="min-w-full border border-gray-200 dark:border-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Feature</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Free Dictionary</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Merriam-Webster</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Oxford</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Cost</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Free</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Free tier</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Free tier</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">API Key</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Not required</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Required</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Required</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Daily Limit</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Unlimited</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">1,000/day</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">1,000/month</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Authority</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Community</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Professional</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Professional</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+        <h3 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">✨ Best Use Case</h3>
+        <p className="mb-0">
+          Free Dictionary is perfect for casual English word lookups when you don&apos;t want to deal
+          with API keys or usage limits. For authoritative definitions, consider Merriam-Webster.
+          For translations, use DeepL or Google.
+        </p>
+      </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          Free Dictionary is an external service. If lookups fail, the service may be temporarily
+          unavailable. Try again later or switch to another provider.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function OxfordSetup() {
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">Oxford Dictionary API Setup</h1>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        <a
+          href="https://developer.oxforddictionaries.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-blue-800 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
+        >
+          <span className="mr-2">📘</span>
+          Oxford API Developer Portal
+        </a>
+        <a
+          href="https://developer.oxforddictionaries.com/documentation"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 transition-colors"
+        >
+          <span className="mr-2">📖</span>
+          API Documentation
+        </a>
+      </div>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        The Oxford Dictionaries API provides access to one of the world&apos;s most trusted language
+        resources. Published by Oxford University Press, it offers comprehensive English definitions
+        with unmatched authority and depth.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What is Oxford Dictionaries API?</h2>
+      <p className="mb-4">
+        The Oxford Dictionaries API provides programmatic access to Oxford&apos;s extensive language
+        data, including definitions, pronunciations, etymology, and usage examples. It&apos;s considered
+        one of the most authoritative sources for English language content.
+      </p>
+
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+        <h3 className="text-yellow-800 dark:text-yellow-200 mt-0 mb-2">⚠️ English Only (in MultiLingua)</h3>
+        <p className="mb-0">
+          While Oxford API supports multiple languages, MultiLingua currently uses it for
+          <strong> English definitions only</strong>. For translations between languages, use DeepL,
+          Google, or PONS.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Free Tier Details</h2>
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <h3 className="text-lg font-semibold mb-2">📘 Oxford API Free (Prototype)</h3>
+        <ul className="list-disc pl-6 space-y-1 mb-0">
+          <li><strong>1,000 requests per month</strong> at no cost</li>
+          <li>Access to the core dictionary data</li>
+          <li>Includes definitions and examples</li>
+          <li>No credit card required</li>
+          <li>For non-commercial prototyping</li>
+        </ul>
+      </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">💡 Two Credentials Required</h3>
+        <p className="mb-0">
+          Unlike most APIs, Oxford requires <strong>both an App ID and an App Key</strong>. You&apos;ll
+          need to configure both in MultiLingua Settings.
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 1: Create a Developer Account</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>
+          Visit the{' '}
+          <a href="https://developer.oxforddictionaries.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+            Oxford Dictionaries Developer Portal
+          </a>
+        </li>
+        <li>Click <strong>&quot;Get your API key&quot;</strong> or <strong>&quot;Sign up&quot;</strong></li>
+        <li>Create an account with your email address</li>
+        <li>Verify your email address</li>
+        <li>Log in to your developer account</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 2: Create an Application</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>In the developer dashboard, go to <strong>&quot;API Credentials&quot;</strong> or <strong>&quot;My Apps&quot;</strong></li>
+        <li>Click <strong>&quot;Create new app&quot;</strong> or <strong>&quot;Add Application&quot;</strong></li>
+        <li>Enter an application name (e.g., &quot;MultiLingua&quot;)</li>
+        <li>Select the <strong>free &quot;Prototype&quot;</strong> tier</li>
+        <li>Accept the terms and conditions</li>
+        <li>Click <strong>&quot;Create&quot;</strong></li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 3: Get Your Credentials</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>After creating the app, you&apos;ll see your credentials</li>
+        <li>Copy the <strong>Application ID</strong> (also called App ID)</li>
+        <li>Copy the <strong>Application Key</strong> (also called App Key or API Key)</li>
+        <li>Store both securely - you&apos;ll need them for MultiLingua</li>
+      </ol>
+
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-6">
+        <h3 className="text-lg font-semibold mb-2">Example Credentials</h3>
+        <p className="mb-2 font-mono text-sm">
+          <strong>App ID:</strong> a1b2c3d4
+        </p>
+        <p className="mb-0 font-mono text-sm">
+          <strong>App Key:</strong> abc123def456ghi789jkl012mno345pqr678
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Step 4: Configure in MultiLingua</h2>
+      <ol className="list-decimal pl-6 space-y-3 mb-6">
+        <li>Open MultiLingua and go to <strong>Settings</strong></li>
+        <li>Scroll to the <strong>&quot;Oxford Dictionary&quot;</strong> section</li>
+        <li>Click the expand arrow to show configuration options</li>
+        <li>Enter your <strong>App ID</strong> in the App ID field</li>
+        <li>Enter your <strong>App Key</strong> in the API Key field</li>
+        <li>Click <strong>Save</strong> for each field</li>
+        <li>Click the radio button to <strong>enable</strong> Oxford Dictionary</li>
+      </ol>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">What You Get</h2>
+      <p className="mb-4">When you look up a word with Oxford Dictionary, you&apos;ll receive:</p>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Definitions:</strong> Comprehensive meanings from Oxford&apos;s lexicographers</li>
+        <li><strong>Multiple Senses:</strong> Different meanings organized by usage</li>
+        <li><strong>Examples:</strong> Real-world usage examples</li>
+        <li><strong>Alternatives:</strong> Additional definitions shown in MultiLingua</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Advantages</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>World-Class Authority:</strong> Oxford University Press is the gold standard</li>
+        <li><strong>Comprehensive:</strong> Detailed definitions with nuanced meanings</li>
+        <li><strong>Quality Examples:</strong> Real usage examples from literature and media</li>
+        <li><strong>Etymology:</strong> Word origins and history (in full API)</li>
+        <li><strong>British & American:</strong> Covers both variants of English</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Limitations</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Low Free Quota:</strong> Only 1,000 requests per month (lowest of all providers)</li>
+        <li><strong>English Only:</strong> MultiLingua uses it for English definitions only</li>
+        <li><strong>Two Credentials:</strong> Requires both App ID and App Key</li>
+        <li><strong>Rate Limited:</strong> May need to upgrade for heavy use</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Pricing Tiers</h2>
+      <div className="overflow-x-auto mb-6">
+        <table className="min-w-full border border-gray-200 dark:border-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Tier</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Requests</th>
+              <th className="px-4 py-2 text-left border-b border-gray-200 dark:border-gray-700">Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Prototype</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">1,000/month</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Free</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Developer</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">10,000/month</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Paid</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Enterprise</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Custom</td>
+              <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">Contact sales</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 mb-6">
+        <h3 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">✨ Best Use Case</h3>
+        <p className="mb-0">
+          Use Oxford Dictionary when you need the most authoritative English definitions available.
+          Due to the low monthly quota, save it for important lookups. For casual use, consider
+          Free Dictionary or Merriam-Webster instead.
+        </p>
+      </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <h3 className="text-blue-800 dark:text-blue-200 mt-0 mb-2">❓ Having Issues?</h3>
+        <p className="mb-0">
+          Common issues: Make sure you&apos;ve entered <strong>both</strong> the App ID and App Key.
+          Check that your monthly quota hasn&apos;t been exceeded. See the{' '}
+          <Link href="/help" className="text-blue-600 dark:text-blue-400 hover:underline">Troubleshooting section</Link> for more help.
         </p>
       </div>
     </div>

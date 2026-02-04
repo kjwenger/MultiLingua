@@ -1,5 +1,7 @@
 # Multi-stage build for Next.js application
-ARG VERSION=0.1.0
+# VERSION is passed from docker-compose.yml or command line
+# Default is read from package.json by the build scripts
+ARG VERSION=0.0.0
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
