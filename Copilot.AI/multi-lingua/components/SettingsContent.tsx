@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ThemeToggle } from './ThemeToggle';
 import { useState, useEffect } from 'react';
+import { APP_VERSION } from '../lib/version';
 
 const PROVIDER_TYPES = [
   { type: 'libretranslate', name: 'LibreTranslate', needsUrl: true, needsApiKey: false, freeInfo: 'Self-hosted or public' },
@@ -31,14 +32,10 @@ export function SettingsContent() {
   const [libreTranslatePreset, setLibreTranslatePreset] = useState('ENV_DEFAULT');
   const [libreTranslateCustomUrl, setLibreTranslateCustomUrl] = useState('');
   const [selectedProvider, setSelectedProvider] = useState<string>('libretranslate');
-  const [appVersion, setAppVersion] = useState('0.2.0');
   const [editingConfig, setEditingConfig] = useState<Record<string, any>>({});
 
   useEffect(() => {
     fetchProviders();
-    // Load version from environment or package.json
-    const version = process.env.NEXT_PUBLIC_APP_VERSION || process.env.APP_VERSION || '0.2.0';
-    setAppVersion(version);
   }, []);
 
   const fetchProviders = async () => {
@@ -532,7 +529,7 @@ export function SettingsContent() {
                     <span className="font-medium">Application:</span> Multi-Lingua Translation
                   </p>
                   <p className="text-gray-700 dark:text-gray-300">
-                    <span className="font-medium">Version:</span> {appVersion}
+                    <span className="font-medium">Version:</span> {APP_VERSION}
                   </p>
                   <p className="text-gray-700 dark:text-gray-300">
                     <span className="font-medium">Description:</span> A translation app with multi-provider support
