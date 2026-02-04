@@ -12,6 +12,7 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { providerLogger } from '../logger';
+import { decode } from 'html-entities';
 
 function isDocker() {
   try {
@@ -263,8 +264,15 @@ export class TranslationService {
 
     providerLogger.debug(`Translating with ${this.provider.name}: "${text}" (${source} -> ${target})`);
     const result = await this.translateWithProvider(this.provider, text, source, target);
-    providerLogger.debug(`Result: "${result.translatedText}"`);
-    return result;
+
+    // Decode HTML entities from provider responses (e.g., &lt; -> <)
+    const decoded = {
+      translatedText: decode(result.translatedText),
+      alternatives: result.alternatives.map(alt => decode(alt))
+    };
+
+    providerLogger.debug(`Result: "${decoded.translatedText}"`);
+    return decoded;
   }
 
   async translateFromLanguage(text: string, sourceLanguage: 'en' | 'de' | 'fr' | 'it' | 'es'): Promise<{

@@ -1,6 +1,6 @@
 {
   "name": "multi-lingua",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3456",
@@ -13,6 +13,7 @@
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.7",
     "axios": "^1.11.0",
+    "html-entities": "^2.6.0",
     "next": "^15.5.0",
     "next-swagger-doc": "^0.4.1",
     "react": "^18.3.1",
