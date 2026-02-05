@@ -1,0 +1,331 @@
+# Docker Environment Configuration
+
+## Issue: "Failed to send verification email" in Docker
+
+### Root Cause
+When running in Docker Compose, the container doesn't automatically inherit `.env.local` from your host machine. Without `DEV_MODE=true`, the app tries to send real emails and fails because SMTP is not configured.
+
+### Solution
+All docker-compose files have been updated to include:
+```yaml
+environment:
+  - DEV_MODE=true
+  - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production-please}
+  - JWT_EXPIRY=24h
+  - APP_URL=${APP_URL:-http://localhost:3456}
+```
+
+## Updated Files
+
+1. ✅ `docker-compose.yml` - Local development with LibreTranslate
+2. ✅ `docker-compose-multi-lingua.yml` - Multi-Lingua only (external LibreTranslate)
+3. ✅ `portainer-stack.yml` - Portainer deployment
+
+## How to Apply Changes
+
+### Option 1: Rebuild and Restart (Recommended)
+```bash
+# Stop existing containers
+docker-compose down
+
+# Rebuild image with latest code
+docker-compose build --no-cache
+
+# Start with new environment
+docker-compose up -d
+
+# Check logs to verify DEV_MODE is active
+docker-compose logs -f multi-lingua
+```
+
+### Option 2: Update Running Container
+```bash
+# Stop the container
+docker-compose stop multi-lingua
+
+# Remove container (keeps data)
+docker-compose rm multi-lingua
+
+# Start with new environment
+docker-compose up -d multi-lingua
+
+# Verify
+docker-compose logs -f multi-lingua
+```
+
+## Verify DEV_MODE is Working
+
+### Check Container Environment
+```bash
+# See all environment variables
+docker exec multi-lingua env | grep DEV_MODE
+
+# Should output:
+# DEV_MODE=true
+```
+
+### Check Logs for Email Messages
+```bash
+# Follow logs in real-time
+docker-compose logs -f multi-lingua
+
+# When you register, you should see:
+# 📧 [DEV MODE] Email not sent, logging to console:
+# To: your@email.com
+# Subject: Welcome to Multi-Lingua - Verify Your Account
+# ...
+# 123456
+```
+
+### Test Registration
+1. Open browser to your Docker host (e.g., `http://localhost:3456`)
+2. Navigate to `/register`
+3. Fill in registration form
+4. Click "Create Account"
+5. **Check Docker logs** for verification code:
+   ```bash
+   docker-compose logs multi-lingua | grep "DEV MODE" -A 10
+   ```
+6. Enter the code from logs
+7. Registration should succeed!
+
+## Production Configuration
+
+For production deployment with real email:
+
+### 1. Create Environment File
+```bash
+# Create .env file in same directory as docker-compose.yml
+cat > .env << 'EOF'
+# Production Email Configuration
+DEV_MODE=false
+JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
+JWT_EXPIRY=24h
+APP_URL=https://your-domain.com
+
+# SMTP Settings
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=true
+SMTP_USER=noreply@your-domain.com
+SMTP_PASSWORD=your-smtp-app-password
+
+# Optional: Session Configuration
+SESSION_TIMEOUT_MINUTES=1440
+EOF
+```
+
+### 2. Update docker-compose.yml
+```yaml
+services:
+  multi-lingua:
+    environment:
+      - NODE_ENV=production
+      - PORT=3456
+      - HOSTNAME=0.0.0.0
+      - DOCKER_COMPOSE=true
+      - LIBRETRANSLATE_URL=${LIBRETRANSLATE_URL}
+      # Authentication
+      - DEV_MODE=${DEV_MODE}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY:-24h}
+      - APP_URL=${APP_URL}
+      # Email (only needed if DEV_MODE=false)
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+```
+
+### 3. Deploy
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+## Environment Variables Reference
+
+### Required (All Deployments)
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `DEV_MODE` | Enable dev mode (logs codes to console) | `true` | `true` or `false` |
+| `JWT_SECRET` | Secret key for JWT tokens | `change-this...` | Long random string |
+| `JWT_EXPIRY` | Token expiration time | `24h` | `24h`, `7d`, `30d` |
+| `APP_URL` | Application URL | `http://localhost:3456` | `https://multi-lingua.com` |
+
+### Required (Production Only - DEV_MODE=false)
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `SMTP_HOST` | SMTP server hostname | `smtp.gmail.com` |
+| `SMTP_PORT` | SMTP port | `587` |
+| `SMTP_SECURE` | Use TLS | `true` |
+| `SMTP_USER` | SMTP username | `noreply@domain.com` |
+| `SMTP_PASSWORD` | SMTP password/app password | `your-app-password` |
+
+### Optional
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `SESSION_TIMEOUT_MINUTES` | Session expiration | `1440` (24h) | `43200` (30d) |
+| `CODE_EXPIRY_MINUTES` | Verification code lifetime | `10` | `15` |
+| `MAX_CODE_ATTEMPTS` | Max code verification attempts | `3` | `5` |
+
+## Docker Compose Files Explained
+
+### docker-compose.yml
+**Use for:** Local development with bundled LibreTranslate
+```bash
+docker-compose up -d
+```
+- Starts LibreTranslate on port 5432→5000
+- Starts Multi-Lingua on port 3456
+- Both services in same network
+- DEV_MODE=true by default
+
+### docker-compose-multi-lingua.yml
+**Use for:** Deployment with external LibreTranslate
+```bash
+docker-compose -f docker-compose-multi-lingua.yml up -d
+```
+- Only starts Multi-Lingua
+- Uses external LibreTranslate (https://libretranslate.gertrun.synology.me)
+- DEV_MODE=true by default
+
+### portainer-stack.yml
+**Use for:** Portainer deployment
+- Deploy via Portainer UI
+- Uses registry image
+- DEV_MODE=true by default
+- Override with environment variables in Portainer
+
+## Troubleshooting
+
+### Still Getting Email Error?
+
+1. **Check environment is set:**
+   ```bash
+   docker exec multi-lingua env | grep -E "DEV_MODE|JWT_SECRET"
+   ```
+
+2. **Check if container needs rebuild:**
+   ```bash
+   docker-compose build --no-cache
+   docker-compose up -d
+   ```
+
+3. **Check logs for DEV MODE message:**
+   ```bash
+   docker-compose logs multi-lingua | tail -50
+   ```
+
+4. **Try registering and check logs in real-time:**
+   ```bash
+   # Terminal 1: Watch logs
+   docker-compose logs -f multi-lingua
+   
+   # Terminal 2: Test registration
+   # Open browser, register, watch Terminal 1 for code
+   ```
+
+### Container Not Starting?
+
+```bash
+# Check logs
+docker-compose logs multi-lingua
+
+# Check if database volume has permission issues
+docker exec multi-lingua ls -la /app/data/
+
+# If permission denied, fix permissions
+docker exec multi-lingua chmod -R 755 /app/data/
+```
+
+### Need to Reset Everything?
+
+```bash
+# Stop and remove containers
+docker-compose down
+
+# Remove volumes (WARNING: Deletes all data!)
+docker volume rm ml-data lt-local
+
+# Recreate volumes
+docker volume create ml-data
+docker volume create lt-local
+
+# Start fresh
+docker-compose up -d
+```
+
+## Quick Commands
+
+```bash
+# View all logs
+docker-compose logs -f
+
+# View Multi-Lingua logs only
+docker-compose logs -f multi-lingua
+
+# Check environment
+docker exec multi-lingua env
+
+# Restart service
+docker-compose restart multi-lingua
+
+# Rebuild and restart
+docker-compose up -d --build
+
+# Check if DEV_MODE is active
+docker-compose logs multi-lingua | grep "DEV MODE"
+
+# Watch for verification codes
+docker-compose logs -f multi-lingua | grep -A 5 "Welcome to Multi-Lingua"
+```
+
+## Best Practices
+
+1. **Development:** Always use `DEV_MODE=true`
+2. **Production:** Set `DEV_MODE=false` and configure SMTP
+3. **Secrets:** Use Docker secrets or environment files, never hardcode
+4. **Logs:** Monitor `docker-compose logs` for verification codes in dev mode
+5. **Backup:** Regularly backup `ml-data` volume (contains database)
+6. **Updates:** Rebuild image after pulling code changes
+7. **Testing:** Test in dev mode before switching to production
+
+## Example Workflows
+
+### Development Workflow
+```bash
+# 1. Start services
+docker-compose up -d
+
+# 2. Watch logs in separate terminal
+docker-compose logs -f multi-lingua
+
+# 3. Open browser
+http://localhost:3456/landing
+
+# 4. Register
+# 5. Get code from logs
+# 6. Complete registration
+```
+
+### Production Workflow
+```bash
+# 1. Create .env with SMTP settings
+vi .env
+
+# 2. Deploy
+docker-compose -f docker-compose-multi-lingua.yml up -d
+
+# 3. Check logs
+docker-compose -f docker-compose-multi-lingua.yml logs -f
+
+# 4. Test with real email
+# Emails should arrive in inbox
+```
+
+---
+
+**Remember:** In dev mode, verification codes are in Docker logs, not your email!
+Use `docker-compose logs -f multi-lingua` to see them.
