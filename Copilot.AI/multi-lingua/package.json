@@ -1,6 +1,6 @@
 {
   "name": "multi-lingua",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3456",
@@ -13,9 +13,12 @@
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.7",
     "axios": "^1.11.0",
+    "bcryptjs": "^3.0.3",
     "html-entities": "^2.6.0",
+    "jsonwebtoken": "^9.0.3",
     "next": "^15.5.0",
     "next-swagger-doc": "^0.4.1",
+    "nodemailer": "^8.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sqlite3": "^5.1.7",
@@ -23,6 +26,9 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.9",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.34.0",
     "eslint-config-next": "^15.4.6",

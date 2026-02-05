@@ -32,6 +32,10 @@ services:
       - HOSTNAME=0.0.0.0
       - DOCKER_COMPOSE=true
       - LIBRETRANSLATE_URL=http://libretranslate:5000
+      - DEV_MODE=true
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production-please}
+      - JWT_EXPIRY=24h
+      - APP_URL=${APP_URL:-http://localhost:3456}
     volumes:
       # Persist the SQLite database
       - ml-data:/app/data

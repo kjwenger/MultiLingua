@@ -4,6 +4,7 @@ A modern Next.js application that provides real-time translation services using 
 
 ## Features
 
+### Core Features
 - **Real-time Translation**: Automatic translation using LibreTranslate API
 - **Multiple Language Support**: Translates to French, Italian, and Spanish
 - **Translation Proposals**: Up to 5 translation alternatives for each language
@@ -11,6 +12,15 @@ A modern Next.js application that provides real-time translation services using 
 - **Persistent Storage**: SQLite database for storing translations
 - **Sortable Table**: Sort translations by English column
 - **Modern UI**: Clean, responsive design with Tailwind CSS
+
+### User Management & Authentication
+- **Email-Based Authentication**: Passwordless login with one-time codes
+- **Role-Based Access Control**: Admin and User roles
+- **User Registration**: Self-service account creation with email verification
+- **Session Management**: Configurable session timeouts with "Remember Me" option
+- **Admin Dashboard**: User management interface for admins
+- **Activity Logging**: Track user actions and system events
+- **Secure Sessions**: JWT-based tokens with HTTP-only cookies
 
 ## Prerequisites
 
@@ -48,6 +58,29 @@ For development or if you want to build locally:
 ```bash
 # Clone the repository and navigate to the project
 cd multi-lingua
+
+# Create external volumes for persistence
+docker volume create lt-local
+docker volume create ml-data
+
+# Start services (includes rebuild)
+docker-compose up -d --build
+
+# The app will be available at http://localhost:3456
+# LibreTranslate will be available at http://localhost:5432
+
+# 🔥 IMPORTANT: Watch logs for verification codes (dev mode)
+docker-compose logs -f multi-lingua
+
+# When you register, look for codes in the logs:
+# 📧 [DEV MODE] Email not sent, logging to console:
+# 123456  <-- Your verification code
+```
+
+**Note for Docker Users:**
+- Verification codes appear in Docker logs (dev mode is enabled by default)
+- Use `docker-compose logs -f multi-lingua` to see codes during registration/login
+- See `DOCKER-ENV.md` for production email configuration
 
 # Start both services using Docker Compose (builds locally)
 docker-compose up -d
@@ -94,7 +127,20 @@ docker-compose up --build
 
 5. Open your browser and visit `http://localhost:3456`
 
+6. **First-Time Setup**: On first access, you'll be prompted to create an admin account
+   - Click "Register" or navigate to `/register`
+   - Enter your email and full name
+   - Check your email (or console in dev mode) for the verification code
+   - Complete registration - you'll be logged in as the first admin user
+
 ## Usage
+
+### For All Users
+
+1. **Login**: Navigate to `/login` and enter your email to receive a login code
+2. **Translation**: View and manage translations in the main interface
+
+### For Admin Users
 
 1. **Add New Translation**: Click the "Add New Translation" button to create a new row
 2. **Enter English Text**: Type any English word or phrase in the first column
@@ -103,8 +149,37 @@ docker-compose up --build
 5. **Edit Translations**: Manually edit any translation field
 6. **Sort**: Click on the English column header to sort alphabetically
 7. **Delete**: Use the delete button to remove unwanted translations
+8. **User Management**: Access `/admin/users` to manage users, roles, and permissions
+9. **Settings**: Configure translation providers and system settings
+10. **Activity Logs**: View user activity and system events
+
+### User Roles
+
+- **Admin Users**:
+  - Full access to all features
+  - Can manage translations
+  - Can access Settings, API Docs, and User Management
+  - Can create, edit, and delete users
+  - Can configure system settings
+
+- **Regular Users**:
+  - View translations only
+  - Limited toolbar (Help button only)
+  - Cannot modify system configuration
 
 ## API Endpoints
+
+### Authentication APIs
+
+- `POST /api/auth/register` - Request registration with verification code
+- `POST /api/auth/verify-registration` - Verify code and create account
+- `POST /api/auth/login` - Request login code
+- `POST /api/auth/verify-login` - Verify code and create session
+- `POST /api/auth/logout` - Invalidate current session
+- `GET /api/auth/me` - Get current user information
+- `POST /api/auth/refresh` - Refresh session token
+
+### Translation APIs
 
 - `GET /api/translations` - Fetch all translations
 - `POST /api/translations` - Add new translation
@@ -112,17 +187,34 @@ docker-compose up --build
 - `DELETE /api/translations?id={id}` - Delete translation
 - `POST /api/translate` - Translate text to all languages
 
+### Admin APIs (Admin Only)
+
+- `GET /api/admin/users` - List all users with pagination and filters
+- `POST /api/admin/users` - Create a new user
+- `PUT /api/admin/users/:id` - Update user information
+- `DELETE /api/admin/users/:id` - Delete user (soft delete)
+- `GET /api/admin/activity-log` - View user activity logs
+- `GET /api/admin/config` - Get system configuration
+- `PUT /api/admin/config` - Update system configuration
+- `GET /api/admin/init` - Check initialization status
+- `POST /api/admin/init` - Initialize first admin account
+
 ## Database Schema
 
-The app uses SQLite with the following schema:
+The app uses SQLite with the following schemas:
+
+### Translations Table
 
 ```sql
 CREATE TABLE translations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   english TEXT NOT NULL,
+  german TEXT,
   french TEXT,
   italian TEXT,
   spanish TEXT,
+  english_proposals TEXT,
+  german_proposals TEXT,
   french_proposals TEXT,
   italian_proposals TEXT,
   spanish_proposals TEXT,
@@ -131,13 +223,79 @@ CREATE TABLE translations (
 );
 ```
 
+### User Management Tables
+
+```sql
+-- Users
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('admin', 'user')),
+  preferred_language TEXT DEFAULT 'en',
+  is_active BOOLEAN DEFAULT 1,
+  email_verified BOOLEAN DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  last_login DATETIME,
+  created_by INTEGER
+);
+
+-- Sessions
+CREATE TABLE sessions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  token TEXT UNIQUE NOT NULL,
+  device_info TEXT,
+  ip_address TEXT,
+  expires_at DATETIME NOT NULL,
+  last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Authentication Codes
+CREATE TABLE auth_codes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  email TEXT NOT NULL,
+  code TEXT NOT NULL,
+  code_type TEXT NOT NULL CHECK(code_type IN ('registration', 'login')),
+  attempts INTEGER DEFAULT 0,
+  max_attempts INTEGER DEFAULT 3,
+  expires_at DATETIME NOT NULL,
+  used BOOLEAN DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- System Configuration
+CREATE TABLE system_config (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  config_key TEXT UNIQUE NOT NULL,
+  config_value TEXT NOT NULL,
+  description TEXT,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_by INTEGER
+);
+
+-- Activity Logs
+CREATE TABLE user_activity_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  action TEXT NOT NULL,
+  details TEXT,
+  ip_address TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ## Technologies Used
 
-- **Next.js 14**: React framework with App Router
+- **Next.js 15**: React framework with App Router
 - **TypeScript**: Type-safe JavaScript
 - **Tailwind CSS**: Utility-first CSS framework
 - **SQLite3**: Lightweight database
-- **Axios**: HTTP client for API requests
+- **JWT**: JSON Web Tokens for authentication
+- **Nodemailer**: Email sending for verification codes
 - **LibreTranslate**: Open-source translation API
 
 ## Configuration
@@ -146,9 +304,25 @@ The app is configured to connect to LibreTranslate. You can customize the connec
 
 ### Environment Variables
 
-- `LIBRETRANSLATE_URL`: Custom LibreTranslate server URL (default: auto-detected based on environment)
+#### Core Configuration
+- `DEV_MODE`: Set to `true` for development (logs codes to console instead of sending email)
 - `NODE_ENV`: Set to `production` for production builds
 - `PORT`: Port for the Next.js app (default: 3456)
+
+#### Authentication
+- `JWT_SECRET`: Secret key for signing JWT tokens (required, use a long random string)
+- `JWT_EXPIRY`: Token expiration time (default: 24h)
+- `APP_URL`: Application URL for email links (default: http://localhost:3456)
+
+#### Email (SMTP)
+- `SMTP_HOST`: SMTP server hostname
+- `SMTP_PORT`: SMTP server port (default: 587)
+- `SMTP_SECURE`: Use TLS (true/false)
+- `SMTP_USER`: SMTP username
+- `SMTP_PASSWORD`: SMTP password
+
+#### Translation
+- `LIBRETRANSLATE_URL`: Custom LibreTranslate server URL (default: auto-detected based on environment)
 
 ### LibreTranslate Connection
 
