@@ -3,12 +3,17 @@ import { TranslationProvider } from './base';
 import { providerLogger } from '../logger';
 
 // PONS language code mapping (PONS uses two-letter codes combined, e.g., "deen" for German-English)
+// Generate all possible language pair combinations
 const PONS_LANG_PAIRS: Record<string, Record<string, string>> = {
   en: { de: 'deen', fr: 'enfr', es: 'enes', it: 'enit', pl: 'enpl', pt: 'enpt', ru: 'enru', zh: 'enzh' },
   de: { en: 'deen', fr: 'defr', es: 'dees', it: 'deit', pl: 'depl', pt: 'dept', ru: 'deru', zh: 'dezh' },
-  fr: { en: 'enfr', de: 'defr', es: 'esfr', it: 'frit' },
-  es: { en: 'enes', de: 'dees', fr: 'esfr' },
-  it: { en: 'enit', de: 'deit', fr: 'frit' }
+  fr: { en: 'enfr', de: 'defr', es: 'esfr', it: 'frit', pl: 'frpl', pt: 'frpt', ru: 'frru', zh: 'frzh' },
+  es: { en: 'enes', de: 'dees', fr: 'esfr', it: 'esit', pl: 'espl', pt: 'espt', ru: 'esru', zh: 'eszh' },
+  it: { en: 'enit', de: 'deit', fr: 'frit', es: 'esit', pl: 'itpl', pt: 'itpt', ru: 'itru', zh: 'itzh' },
+  pl: { en: 'enpl', de: 'depl', fr: 'frpl', es: 'espl', it: 'itpl', pt: 'plpt', ru: 'plru', zh: 'plzh' },
+  pt: { en: 'enpt', de: 'dept', fr: 'frpt', es: 'espt', it: 'itpt', pl: 'plpt', ru: 'ptru', zh: 'ptzh' },
+  ru: { en: 'enru', de: 'deru', fr: 'frru', es: 'esru', it: 'itru', pl: 'plru', pt: 'ptru', zh: 'ruzh' },
+  zh: { en: 'enzh', de: 'dezh', fr: 'frzh', es: 'eszh', it: 'itzh', pl: 'plzh', pt: 'ptzh', ru: 'ruzh' }
 };
 
 interface PonsRom {
