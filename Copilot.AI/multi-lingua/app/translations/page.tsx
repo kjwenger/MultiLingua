@@ -16,6 +16,7 @@ import { APP_VERSION } from '@/lib/version';
 
 interface Translation {
   id: number;
+  user_id: number | null;
   english: string;
   german: string;
   french: string;
@@ -71,6 +72,7 @@ export default function TranslationsPage() {
       setError(null);
       const response = await fetch('/api/translations', {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -172,6 +174,7 @@ export default function TranslationsPage() {
         logger.debug('Saving updated translation to database', { id, updatedTranslation });
         await fetch('/api/translations', {
           method: 'PUT',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -203,6 +206,7 @@ export default function TranslationsPage() {
     // Update the database with just the English text
     await fetch('/api/translations', {
       method: 'PUT',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -219,6 +223,7 @@ export default function TranslationsPage() {
     // Update database
     await fetch('/api/translations', {
       method: 'PUT',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -254,6 +259,7 @@ export default function TranslationsPage() {
       logger.info('Adding new translation row');
       const response = await fetch('/api/translations', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -286,11 +292,40 @@ export default function TranslationsPage() {
       logger.info(`Deleting row with ID ${id}`);
       await fetch(`/api/translations?id=${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       setTranslations(prev => prev.filter(t => t.id !== id));
       logger.info(`Row ${id} deleted successfully`);
     } catch (error) {
       logger.error('Error deleting row', error);
+    }
+  };
+
+  const toggleShare = async (id: number, currentUserId: number | null) => {
+    try {
+      const share = currentUserId !== null; // If it has a user_id, share it (set to null)
+      logger.info(`Toggling share for row ${id}: ${share ? 'sharing' : 'unsharing'}`);
+      const response = await fetch('/api/translations', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, share }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setTranslations(prev => prev.map(t =>
+          t.id === id ? { ...t, user_id: result.user_id } : t
+        ));
+        logger.info(`Row ${id} ${share ? 'shared' : 'unshared'} successfully`);
+      } else {
+        const error = await response.json();
+        logger.error(`Failed to toggle share: ${error.error}`);
+      }
+    } catch (error) {
+      logger.error('Error toggling share', error);
     }
   };
 
@@ -348,7 +383,7 @@ export default function TranslationsPage() {
                 {user?.role === 'admin' && <UserManagementButton />}
                 {user?.role === 'admin' && <ThemeToggle />}
                 {user && <LogoutButton />}
-                {user?.role === 'admin' && (
+                {user && (
                   <button
                     onClick={addNewRow}
                     className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-bold py-1 px-3 rounded transition-colors duration-200"
@@ -771,15 +806,47 @@ export default function TranslationsPage() {
                     </td>
                     
                     <td className="px-1 py-1 align-top">
-                      <button
-                        onClick={() => deleteRow(translation.id)}
-                        className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
-                        title="Delete translation"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      {/* Show delete button only for own translations or admins on shared */}
+                      {(translation.user_id != null && translation.user_id == user?.id) || (translation.user_id === null && user?.role === 'admin') ? (
+                        <button
+                          onClick={() => deleteRow(translation.id)}
+                          className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                          title="Delete translation"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      ) : null}
+                      {/* Share/unshare toggle - clickable for admins, view-only for users on own translations */}
+                      {(user?.role === 'admin' || (translation.user_id != null && translation.user_id == user?.id)) && (
+                        <button
+                          onClick={() => user?.role === 'admin' && toggleShare(translation.id, translation.user_id)}
+                          disabled={user?.role !== 'admin'}
+                          className={`p-1 transition-colors duration-200 ${
+                            translation.user_id === null
+                              ? 'text-green-600 dark:text-green-400' + (user?.role === 'admin' ? ' hover:text-green-700 dark:hover:text-green-300' : '')
+                              : 'text-gray-500 dark:text-gray-400' + (user?.role === 'admin' ? ' hover:text-gray-700 dark:hover:text-gray-300' : '')
+                          } ${user?.role !== 'admin' ? 'cursor-default opacity-60' : 'cursor-pointer'}`}
+                          title={
+                            user?.role === 'admin'
+                              ? (translation.user_id === null ? 'Unshare (make private)' : 'Share (make public)')
+                              : (translation.user_id === null ? 'Shared with everyone' : 'Private (only you can see this)')
+                          }
+                        >
+                          {translation.user_id === null ? (
+                            /* Shared icon - globe */
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          ) : (
+                            /* Private icon - lock */
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          )}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

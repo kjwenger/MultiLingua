@@ -26,6 +26,7 @@ const dbPath = path.join(dataDir, 'translations.db');
 
 export interface Translation {
   id: number;
+  user_id: number | null;
   english: string;
   german: string;
   french: string;
@@ -74,6 +75,16 @@ export class Database {
         console.log('Database initialized successfully');
         this.addGermanColumn();
         this.addEnglishProposalsColumn();
+        this.addUserIdColumn();
+      }
+    });
+  }
+
+  private addUserIdColumn() {
+    // Add user_id column - NULL means shared translation (accessible to all)
+    this.db.run('ALTER TABLE translations ADD COLUMN user_id INTEGER REFERENCES users(id)', (err: Error | null) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding user_id column:', err);
       }
     });
   }
@@ -99,13 +110,32 @@ export class Database {
     });
   }
 
-  public getAllTranslations(): Promise<Translation[]> {
+  public getAllTranslations(userId?: number): Promise<Translation[]> {
     return new Promise((resolve, reject) => {
-      this.db.all('SELECT * FROM translations ORDER BY english ASC', (err: Error | null, rows: Translation[]) => {
+      // If userId provided, get user's own translations + shared translations (user_id IS NULL)
+      // If no userId, get only shared translations
+      const query = userId
+        ? 'SELECT * FROM translations WHERE user_id = ? OR user_id IS NULL ORDER BY english ASC'
+        : 'SELECT * FROM translations WHERE user_id IS NULL ORDER BY english ASC';
+      const params = userId ? [userId] : [];
+
+      this.db.all(query, params, (err: Error | null, rows: Translation[]) => {
         if (err) {
           reject(err);
         } else {
           resolve(rows || []);
+        }
+      });
+    });
+  }
+
+  public getTranslationById(id: number): Promise<Translation | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get('SELECT * FROM translations WHERE id = ?', [id], (err: Error | null, row: Translation) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row || null);
         }
       });
     });
@@ -122,14 +152,15 @@ export class Database {
     french_proposals?: string;
     italian_proposals?: string;
     spanish_proposals?: string;
+    user_id?: number | null;
   }): Promise<number> {
     return new Promise((resolve, reject) => {
       const query = `
-        INSERT INTO translations 
-        (english, german, french, italian, spanish, english_proposals, german_proposals, french_proposals, italian_proposals, spanish_proposals)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO translations
+        (english, german, french, italian, spanish, english_proposals, german_proposals, french_proposals, italian_proposals, spanish_proposals, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      
+
       this.db.run(query, [
         data.english,
         data.german || '',
@@ -140,7 +171,8 @@ export class Database {
         data.german_proposals || '',
         data.french_proposals || '',
         data.italian_proposals || '',
-        data.spanish_proposals || ''
+        data.spanish_proposals || '',
+        data.user_id ?? null
       ], function(this: sqlite3.RunResult, err: Error | null) {
         if (err) {
           reject(err);
@@ -162,45 +194,59 @@ export class Database {
     french_proposals?: string;
     italian_proposals?: string;
     spanish_proposals?: string;
-  }): Promise<void> {
+    user_id?: number | null;
+  }, userId?: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const fields: string[] = [];
       const values: any[] = [];
-      
+
       Object.entries(data).forEach(([key, value]: [string, any]) => {
         if (value !== undefined) {
           fields.push(`${key} = ?`);
           values.push(value);
         }
       });
-      
+
       if (fields.length === 0) {
-        resolve();
+        resolve(true);
         return;
       }
-      
+
       fields.push('updated_at = CURRENT_TIMESTAMP');
       values.push(id);
-      
-      const query = `UPDATE translations SET ${fields.join(', ')} WHERE id = ?`;
-      
-      this.db.run(query, values, (err: Error | null) => {
+
+      // If userId provided, only allow updating own translations or shared ones
+      const query = userId
+        ? `UPDATE translations SET ${fields.join(', ')} WHERE id = ? AND (user_id = ? OR user_id IS NULL)`
+        : `UPDATE translations SET ${fields.join(', ')} WHERE id = ?`;
+
+      if (userId) {
+        values.push(userId);
+      }
+
+      this.db.run(query, values, function(this: sqlite3.RunResult, err: Error | null) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(this.changes > 0);
         }
       });
     });
   }
 
-  public deleteTranslation(id: number): Promise<void> {
+  public deleteTranslation(id: number, userId?: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.db.run('DELETE FROM translations WHERE id = ?', [id], (err: Error | null) => {
+      // If userId provided, only allow deleting own translations (not shared ones)
+      const query = userId
+        ? 'DELETE FROM translations WHERE id = ? AND user_id = ?'
+        : 'DELETE FROM translations WHERE id = ?';
+      const params = userId ? [id, userId] : [id];
+
+      this.db.run(query, params, function(this: sqlite3.RunResult, err: Error | null) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(this.changes > 0);
         }
       });
     });
