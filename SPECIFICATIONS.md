@@ -57,6 +57,11 @@ Every implementation must provide the following screens. Visual styling may adap
 platform conventions (Material Design on Android, Human Interface Guidelines on iOS,
 etc.) but the information architecture must match.
 
+All screens must be **responsive**: usable on both desktop/tablet (≥ 768px) and
+mobile (< 768px) viewports. See section 3.5.1 for the detailed responsive layout
+of the translations screen. Other screens (Settings, Admin Users) should stack
+their content vertically on narrow screens.
+
 ### 3.1 Screen Map
 
 ```
@@ -108,7 +113,11 @@ etc.) but the information architecture must match.
 
 This is the core screen of the app.
 
-#### 3.5.1 Table Layout
+#### 3.5.1 Responsive Layout
+
+Implementations must adapt the translations screen to the available screen width.
+
+**Desktop / Wide Screen (≥ 768px) — Table Layout**
 
 | Column    | Editable | Notes                                    |
 |-----------|----------|------------------------------------------|
@@ -123,6 +132,44 @@ This is the core screen of the app.
 - Each row is a **translation entry**.
 - Editing any cell and triggering translate fills the other four language columns.
 - Columns are **sortable** by clicking the header.
+
+**Mobile / Narrow Screen (< 768px) — List + Detail Layout**
+
+On narrow screens the full table does not fit. Instead, use a two-level layout:
+
+**List View** — shows all translation entries as cards/rows. Each card displays
+every non-empty language with its flag to the left:
+
+```
+┌──────────────────────────────────┐
+│  🇬🇧 hello                       │
+│  🇩🇪 hallo                       │
+│  🇫🇷 bonjour                     │
+│  🇮🇹 ciao                        │
+│  🇪🇸 hola                        │
+│                    [🔄] [🔊] [🗑] │
+└──────────────────────────────────┘
+```
+
+- Each language line shows: **flag emoji** + **translation text**.
+- Empty languages are omitted from the card.
+- Action buttons (Translate, TTS, Delete) appear at the bottom of each card.
+- The list is scrollable, searchable, and sortable.
+
+**Detail View** — tapping a card opens a full-screen detail/edit view:
+
+- Each language is displayed as a labeled, editable field with its flag.
+- Translation proposals are accessible per language (dropdown, bottom sheet, or
+  expandable list).
+- Translate, TTS, and Delete actions are available.
+- Changes auto-save; a back gesture/button returns to the list.
+
+**Breakpoint Reference:**
+
+| Breakpoint | Layout           | Notes                              |
+|------------|------------------|------------------------------------|
+| < 768px    | List + Detail    | Cards with flags, tap to edit      |
+| ≥ 768px    | Full table       | Inline editing, all columns visible|
 
 #### 3.5.2 Translation Proposals
 
