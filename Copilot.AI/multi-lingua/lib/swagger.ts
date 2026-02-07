@@ -5,7 +5,7 @@ export const openApiSpec = {
   info: {
     title: 'Multi-Lingua Translation API',
     version: APP_VERSION,
-    description: 'API for multi-language translation with support for multiple providers (LibreTranslate, MyMemory, DeepL, Google, Azure)',
+    description: 'API for multi-language translation with support for multiple providers (LibreTranslate, MyMemory, DeepL, Google, Azure, PONS, Free Dictionary)',
   },
   servers: [
     {
@@ -189,6 +189,7 @@ export const openApiSpec = {
         tags: ['Translations Database'],
         summary: 'Delete a translation',
         description: 'Removes a translation entry from the database',
+        security: [{ bearerAuth: [] }],
         parameters: [
           {
             name: 'id',
@@ -217,9 +218,52 @@ export const openApiSpec = {
           '400': {
             description: 'ID is required',
           },
+          '401': { description: 'Not authenticated' },
           '500': {
             description: 'Failed to delete translation',
           },
+        },
+      },
+      patch: {
+        tags: ['Translations Database'],
+        summary: 'Toggle share status of a translation',
+        description: 'Admin-only endpoint to share (set user_id to null) or unshare (set user_id to admin) a translation',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer', description: 'Translation ID' },
+                  share: { type: 'boolean', description: 'true to share (public), false to unshare (private)' },
+                },
+                required: ['id', 'share'],
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Share status updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    user_id: { type: 'integer', nullable: true, description: 'null if shared, user ID if private' },
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'ID is required' },
+          '401': { description: 'Not authenticated' },
+          '403': { description: 'Admin access required' },
+          '404': { description: 'Translation not found' },
+          '500': { description: 'Failed to toggle share status' },
         },
       },
     },
@@ -938,6 +982,7 @@ export const openApiSpec = {
         type: 'object',
         properties: {
           id: { type: 'integer' },
+          user_id: { type: 'integer', nullable: true, description: 'Owner user ID (null if shared)' },
           english: { type: 'string' },
           german: { type: 'string' },
           french: { type: 'string' },
@@ -973,7 +1018,7 @@ export const openApiSpec = {
         properties: {
           type: {
             type: 'string',
-            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure'],
+            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure', 'pons', 'free-dictionary'],
           },
           enabled: {
             type: 'integer',
@@ -991,7 +1036,7 @@ export const openApiSpec = {
         properties: {
           type: {
             type: 'string',
-            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure'],
+            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure', 'pons', 'free-dictionary'],
             description: 'Provider type',
           },
           enabled: {

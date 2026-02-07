@@ -15,9 +15,9 @@ export default function HelpPage() {
     { id: 'setup-deepl', title: 'DeepL Setup' },
     { id: 'setup-azure', title: 'Azure Translator Setup' },
     { id: 'setup-pons', title: 'PONS Dictionary Setup' },
-    { id: 'setup-merriam-webster', title: 'Merriam-Webster Setup' },
+    // { id: 'setup-merriam-webster', title: 'Merriam-Webster Setup' },
     { id: 'setup-free-dictionary', title: 'Free Dictionary Setup' },
-    { id: 'setup-oxford', title: 'Oxford Dictionary Setup' },
+    // { id: 'setup-oxford', title: 'Oxford Dictionary Setup' },
     { id: 'usage', title: 'Using the App' },
     { id: 'api', title: 'API Reference' },
     { id: 'troubleshooting', title: 'Troubleshooting' },
@@ -66,9 +66,9 @@ export default function HelpPage() {
           {activeSection === 'setup-deepl' && <DeepLSetup />}
           {activeSection === 'setup-azure' && <AzureSetup />}
           {activeSection === 'setup-pons' && <PonsSetup />}
-          {activeSection === 'setup-merriam-webster' && <MerriamWebsterSetup />}
+          {/* {activeSection === 'setup-merriam-webster' && <MerriamWebsterSetup />} */}
           {activeSection === 'setup-free-dictionary' && <FreeDictionarySetup />}
-          {activeSection === 'setup-oxford' && <OxfordSetup />}
+          {/* {activeSection === 'setup-oxford' && <OxfordSetup />} */}
           {activeSection === 'usage' && <Usage />}
           {activeSection === 'api' && <ApiReference />}
           {activeSection === 'troubleshooting' && <Troubleshooting />}
