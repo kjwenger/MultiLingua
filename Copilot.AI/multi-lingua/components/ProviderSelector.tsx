@@ -9,9 +9,9 @@ const PROVIDERS = [
   { id: 'deepl', label: 'DL', name: 'DeepL' },
   { id: 'azure', label: 'AZ', name: 'Azure' },
   { id: 'pons', label: 'PN', name: 'PONS' },
-  { id: 'merriam-webster', label: 'MW', name: 'Merriam-Webster' },
+  // { id: 'merriam-webster', label: 'MW', name: 'Merriam-Webster' },
   { id: 'free-dictionary', label: 'FD', name: 'Free Dictionary' },
-  { id: 'oxford', label: 'OX', name: 'Oxford' },
+  // { id: 'oxford', label: 'OX', name: 'Oxford' },
 ];
 
 export function ProviderSelector() {

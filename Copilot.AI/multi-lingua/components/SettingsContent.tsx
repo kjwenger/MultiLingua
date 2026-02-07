@@ -12,9 +12,9 @@ const PROVIDER_TYPES = [
   { type: 'google', name: 'Google Translate', needsUrl: false, needsApiKey: true, freeInfo: '500K chars/month free' },
   { type: 'azure', name: 'Azure Translator', needsUrl: false, needsApiKey: true, needsRegion: true, freeInfo: '2M chars/month free' },
   { type: 'pons', name: 'PONS Dictionary', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/month free' },
-  { type: 'merriam-webster', name: 'Merriam-Webster', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/day free (English only)' },
+  // { type: 'merriam-webster', name: 'Merriam-Webster', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/day free (English only)' },
   { type: 'free-dictionary', name: 'Free Dictionary', needsUrl: false, needsApiKey: false, freeInfo: 'Completely free (English only)' },
-  { type: 'oxford', name: 'Oxford Dictionary', needsUrl: false, needsApiKey: true, needsAppId: true, freeInfo: '1000 queries/month free' }
+  // { type: 'oxford', name: 'Oxford Dictionary', needsUrl: false, needsApiKey: true, needsAppId: true, freeInfo: '1000 queries/month free' }
 ];
 
 const LIBRETRANSLATE_PRESETS = [
