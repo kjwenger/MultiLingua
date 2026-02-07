@@ -489,19 +489,19 @@ export default function TranslationsPage() {
                     className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
                     onClick={handleSort}
                   >
-                    English {sortOrder === 'asc' ? '↑' : '↓'}
+                    🇬🇧 English {sortOrder === 'asc' ? '↑' : '↓'}
                   </th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    German
+                    🇩🇪 German
                   </th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    French
+                    🇫🇷 French
                   </th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Italian
+                    🇮🇹 Italian
                   </th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Spanish
+                    🇪🇸 Spanish
                   </th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   </th>
