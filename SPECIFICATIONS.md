@@ -1,6 +1,6 @@
 # MultiLingua - Cross-Platform Specifications
 
-> **Version:** 1.0.0
+> **Version:** 0.3.0
 > **Last Updated:** 2026-02-07
 > **Purpose:** Common specification for building MultiLingua across all platform trials
 
@@ -837,7 +837,7 @@ Recommended test frameworks per platform:
 
 - All implementations share the same **major.minor** version to indicate feature
   parity. The patch version is platform-specific.
-- Current target: **v1.0.0** — full feature parity across all platforms.
+- Current target: **v0.3.0** — full feature parity across all platforms.
 - Version displayed in Settings screen footer.
 
 ---
