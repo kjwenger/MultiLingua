@@ -97,7 +97,7 @@ export function ProviderSelector() {
   };
 
   return (
-    <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2">
+    <div className="flex items-center gap-1 flex-wrap">
       {PROVIDERS.map((provider) => {
         const isActive = activeProvider === provider.id;
         
@@ -107,15 +107,15 @@ export function ProviderSelector() {
             onClick={() => handleProviderChange(provider.id)}
             title={provider.name}
             className={`
-              relative w-10 h-10 rounded font-bold text-xs
+              relative inline-flex items-center justify-center p-2 rounded-lg border font-bold text-xs
               transition-all duration-200
               ${isActive
-                ? 'bg-blue-600 text-white dark:bg-blue-500 shadow-md scale-105'
-                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-blue-600 text-white dark:bg-blue-500 border-blue-600 dark:border-blue-500 shadow-md'
+                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               }
             `}
           >
-            {provider.label}
+            <span className="w-5 h-5 inline-flex items-center justify-center">{provider.label}</span>
             {isActive && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></span>
             )}

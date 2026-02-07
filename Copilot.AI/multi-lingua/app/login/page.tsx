@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthProvider';
 import { logger } from '@/lib/logger';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -70,10 +72,8 @@ export default function LoginPage() {
 
       if (response.ok) {
         logger.info('Login successful', { email });
-        // Redirect to translations page
-        setTimeout(() => {
-          window.location.href = '/translations';
-        }, 100);
+        await refreshUser();
+        router.push('/translations');
       } else {
         setError(data.error || 'Invalid verification code');
         setLoading(false);

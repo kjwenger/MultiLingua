@@ -9,6 +9,8 @@ import { HelpButton } from '@/components/HelpButton';
 import { UserManagementButton } from '@/components/UserManagementButton';
 import { LogoutButton } from '@/components/LogoutButton';
 import { ProviderSelector } from '@/components/ProviderSelector';
+import { TranslationCard } from '@/components/TranslationCard';
+import { TranslationDetailModal } from '@/components/TranslationDetailModal';
 import { useAuth } from '@/components/AuthProvider';
 import { playTextToSpeech } from '@/lib/tts';
 import { logger } from '@/lib/logger';
@@ -52,6 +54,8 @@ export default function TranslationsPage() {
   const [translatingIds, setTranslatingIds] = useState<Set<number>>(new Set());
   const [ttsPlayingIds, setTtsPlayingIds] = useState<Set<string>>(new Set());
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isMobile, setIsMobile] = useState(false);
+  const [selectedTranslationId, setSelectedTranslationId] = useState<number | null>(null);
 
   // Redirect to landing if not authenticated
   useEffect(() => {
@@ -59,6 +63,25 @@ export default function TranslationsPage() {
       router.push('/landing');
     }
   }, [authLoading, user, router]);
+
+  // Detect mobile viewport using matchMedia (reliable for orientation changes)
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches);
+      logger.info('Viewport changed', { isMobile: e.matches });
+    };
+    handleChange(mql);
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, []);
+
+  // Close detail view when switching to desktop
+  useEffect(() => {
+    if (!isMobile) {
+      setSelectedTranslationId(null);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     if (user) {
@@ -373,8 +396,34 @@ export default function TranslationsPage() {
       <div className="w-full max-w-none mx-auto">
         <div className="bg-white dark:bg-gray-800 shadow-xl transition-colors duration-200">
           <div className="px-2 py-2 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Multi-Lingua Translation v{APP_VERSION}</h1>
+            {isMobile ? (
+              <div className="space-y-2">
+                {user?.role === 'admin' && <ProviderSelector />}
+                <div className="flex items-center flex-wrap gap-1">
+                  <HelpButton />
+                  {user?.role === 'admin' && <ApiDocsButton />}
+                  {user?.role === 'admin' && <SettingsButton />}
+                  {user?.role === 'admin' && <UserManagementButton />}
+                  {user?.role === 'admin' && <ThemeToggle />}
+                  {user && <LogoutButton />}
+                  {user && (
+                    <button
+                      onClick={addNewRow}
+                      className="relative inline-flex items-center justify-center p-2 rounded-lg border transition-colors duration-200
+                                bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500
+                                hover:bg-blue-700 dark:hover:bg-blue-600
+                                text-white"
+                      aria-label="Add new translation"
+                      title="Add new translation"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
               <div className="flex items-center space-x-2">
                 {user?.role === 'admin' && <ProviderSelector />}
                 <HelpButton />
@@ -386,15 +435,44 @@ export default function TranslationsPage() {
                 {user && (
                   <button
                     onClick={addNewRow}
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-bold py-1 px-3 rounded transition-colors duration-200"
+                    className="relative inline-flex items-center justify-center p-2 rounded-lg border transition-colors duration-200
+                              bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500
+                              hover:bg-blue-700 dark:hover:bg-blue-600
+                              text-white"
+                    aria-label="Add new translation"
+                    title="Add new translation"
                   >
-                    Add New Translation
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
                   </button>
                 )}
               </div>
-            </div>
+            )}
           </div>
 
+          {/* Mobile List View (< 768px) */}
+          {isMobile ? (
+            <div>
+              {translations.map((translation) => (
+                <TranslationCard
+                  key={translation.id}
+                  translation={translation}
+                  onClick={() => setSelectedTranslationId(translation.id)}
+                  onDelete={() => deleteRow(translation.id)}
+                  onShare={() => toggleShare(translation.id, translation.user_id)}
+                  isShared={translation.user_id === null}
+                  canDelete={(translation.user_id != null && translation.user_id == user?.id) || (translation.user_id === null && user?.role === 'admin')}
+                  canShare={user?.role === 'admin' || (translation.user_id != null && translation.user_id == user?.id)}
+                />
+              ))}
+              {translations.length === 0 && (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  No translations yet. Add your first one!
+                </div>
+              )}
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700" style={{ minWidth: '650px' }}>
               <colgroup>
@@ -853,14 +931,36 @@ export default function TranslationsPage() {
               </tbody>
             </table>
           </div>
+          )}
           
-          {translations.length === 0 && (
+          {!isMobile && translations.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-500 dark:text-gray-400">No translations yet. Add your first one!</p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Detail Modal for Mobile */}
+      {isMobile && selectedTranslationId !== null && (() => {
+        const selectedTranslation = translations.find(t => t.id === selectedTranslationId);
+        if (!selectedTranslation) return null;
+        
+        return (
+          <TranslationDetailModal
+            translation={selectedTranslation}
+            onClose={() => setSelectedTranslationId(null)}
+            onChange={(field, value) => handleTranslationChange(selectedTranslationId, field, value)}
+            onTranslate={(language) => handleTranslateFromLanguage(selectedTranslationId, language)}
+            onTTS={(language, text) => handleTTS(selectedTranslationId, language, text)}
+            translating={translatingIds.has(selectedTranslationId)}
+            ttsPlaying={Object.fromEntries(
+              Array.from(ttsPlayingIds).map(id => [id, true])
+            )}
+            getProposals={getProposals}
+          />
+        );
+      })()}
     </div>
   );
 }

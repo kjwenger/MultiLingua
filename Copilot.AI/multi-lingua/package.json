@@ -1,6 +1,6 @@
 {
   "name": "multi-lingua",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3456",
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@types/node": "^24.0.7",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.7",
