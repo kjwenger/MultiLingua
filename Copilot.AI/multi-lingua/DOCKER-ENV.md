@@ -106,7 +106,7 @@ APP_URL=https://your-domain.com
 # SMTP Settings
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_SECURE=true
+SMTP_SECURE=false
 SMTP_USER=noreply@your-domain.com
 SMTP_PASSWORD=your-smtp-app-password
 
@@ -176,10 +176,12 @@ APP_URL=https://your-domain.com
 
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_SECURE=true
+SMTP_SECURE=false
 SMTP_USER=your-account@gmail.com
 SMTP_PASSWORD=xxxx-xxxx-xxxx-xxxx
 ```
+
+> **Note on SMTP_SECURE:** Port 587 uses STARTTLS (starts plain, upgrades to TLS). Set `SMTP_SECURE=false` for port 587 — nodemailer will still encrypt via STARTTLS automatically. Only use `SMTP_SECURE=true` with port 465 (implicit TLS). Using `SMTP_SECURE=true` with port 587 causes `wrong version number` SSL errors.
 
 The `from` address on sent emails will be `SMTP_USER` (see `lib/email-service.ts` line 51).
 
@@ -192,7 +194,7 @@ Example env vars for a Synology mail server:
 ```env
 SMTP_HOST=gertrun.synology.me
 SMTP_PORT=587
-SMTP_SECURE=true
+SMTP_SECURE=false
 SMTP_USER=multilingua@gertrun.synology.me
 SMTP_PASSWORD=your-mail-account-password
 ```
@@ -231,7 +233,7 @@ This avoids hardcoding secrets in files committed to the repository.
 |----------|-------------|---------|
 | `SMTP_HOST` | SMTP server hostname | `smtp.gmail.com` |
 | `SMTP_PORT` | SMTP port | `587` |
-| `SMTP_SECURE` | Use TLS | `true` |
+| `SMTP_SECURE` | Use implicit TLS (true for port 465, false for port 587/STARTTLS) | `false` |
 | `SMTP_USER` | SMTP username | `noreply@domain.com` |
 | `SMTP_PASSWORD` | SMTP password/app password | `your-app-password` |
 
