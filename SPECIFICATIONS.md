@@ -892,22 +892,82 @@ are available for the active provider when adding/enabling languages.
 
 ### 6.2 Supported Providers
 
-| Provider         | ID                 | API Key Required | Default URL                         |
-|------------------|--------------------|------------------|-------------------------------------|
-| LibreTranslate   | `libretranslate`   | No               | `http://localhost:5000`             |
-| DeepL            | `deepl`            | Yes              | `https://api-free.deepl.com/v2`    |
-| Google Translate | `google`           | Yes              | Google Cloud Translation API        |
-| Azure Translator | `azure`            | Yes              | Azure Cognitive Services            |
-| MyMemory         | `mymemory`         | No               | `https://api.mymemory.translated.net`|
-| PONS             | `pons`             | No               | `https://api.pons.com`             |
-| Merriam-Webster  | `merriam-webster`  | Yes              | `https://dictionaryapi.com`        |
-| Oxford           | `oxford`           | Yes              | `https://od-api.oxforddictionaries.com` |
-| Free Dictionary  | `free-dictionary`  | No               | `https://api.dictionaryapi.dev`    |
-| Tatoeba          | `tatoeba`          | No               | `https://api.tatoeba.org`          |
+#### 6.2.1 Translation Providers (active)
+
+| Provider         | ID                 | API Key Required | Default URL                          | Type        |
+|------------------|--------------------|------------------|--------------------------------------|-------------|
+| LibreTranslate   | `libretranslate`   | No               | `http://localhost:5000`              | Translation |
+| DeepL            | `deepl`            | Yes              | `https://api-free.deepl.com/v2`     | Translation |
+| Google Translate | `google`           | Yes              | Google Cloud Translation API         | Translation |
+| Azure Translator | `azure`            | Yes              | Azure Cognitive Services             | Translation |
+| MyMemory         | `mymemory`         | No               | `https://api.mymemory.translated.net`| Translation |
+| PONS             | `pons`             | No               | `https://api.pons.com`              | Dictionary  |
+| Tatoeba          | `tatoeba`          | No               | `https://api.tatoeba.org`           | Examples    |
+
+#### 6.2.2 Dictionary Providers (inactive — commented out)
+
+The following providers were explored but are **not suitable as translation
+providers**. They are monolingual dictionaries (definitions only) or have
+restrictive licensing. Their code remains in the codebase, commented out, for
+potential future use (e.g., a dedicated "dictionary mode").
+
+| Provider         | ID                 | Reason Inactive                                         |
+|------------------|--------------------|----------------------------------------------------------|
+| Free Dictionary  | `free-dictionary`  | English-only monolingual dictionary — no translation     |
+| Merriam-Webster  | `merriam-webster`  | English-only monolingual dictionary — no translation     |
+| Oxford           | `oxford`           | English-centric dictionary; expensive API, limited pairs |
 
 - **Default provider:** LibreTranslate (self-hosted, no API key needed).
 - Only **one** provider is active at a time.
 - Provider selection is a **system-wide** setting (applies to all users).
+
+### 6.3 Provider Language Coverage
+
+Each active provider supports a different set of languages. The table below
+summarizes coverage relevant to v0.5.0 configurable languages.
+
+| Provider         | Language Count | Notes                                                    |
+|------------------|---------------|----------------------------------------------------------|
+| LibreTranslate   | ~50           | Self-hosted; exact count depends on model version        |
+| MyMemory         | ~120          | Largest coverage; free tier has daily limits              |
+| DeepL            | 33            | High quality; 33 core languages (some with variants)     |
+| Google Translate | 150+          | Broadest coverage; requires API key                      |
+| Azure Translator | 130+          | Broad coverage; requires API key                         |
+| PONS             | 9             | Dictionary pairs: DE, EN, FR, ES, IT, PL, PT, RU, ZH    |
+| Tatoeba          | 400+          | Example sentences; no API restriction on languages        |
+
+#### 6.3.1 Strict Intersection (all five translation providers)
+
+The following **36 languages** are supported by LibreTranslate, MyMemory, DeepL,
+Google Translate, and Azure Translator. These are the "safe" candidates for
+v0.5.0 configurable languages — any of them will work regardless of which main
+translation provider the admin selects.
+
+| Code | Language    | Code | Language    | Code | Language    |
+|------|-------------|------|-------------|------|-------------|
+| `ar` | Arabic      | `hu` | Hungarian   | `pl` | Polish      |
+| `bg` | Bulgarian   | `id` | Indonesian  | `pt` | Portuguese  |
+| `cs` | Czech       | `it` | Italian     | `ro` | Romanian    |
+| `da` | Danish      | `ja` | Japanese    | `ru` | Russian     |
+| `de` | German      | `ko` | Korean      | `sk` | Slovak      |
+| `el` | Greek       | `lt` | Lithuanian  | `sl` | Slovenian   |
+| `en` | English     | `lv` | Latvian     | `sv` | Swedish     |
+| `es` | Spanish     | `nb` | Norwegian   | `tr` | Turkish     |
+| `et` | Estonian    | `nl` | Dutch       | `uk` | Ukrainian   |
+| `fi` | Finnish     | `fa` | Persian     | `vi` | Vietnamese  |
+| `fr` | French      | `ga` | Irish       | `zh` | Chinese     |
+| `hi` | Hindi       | `he` | Hebrew      | `th` | Thai        |
+
+> **Note — PONS** has a genuinely restricted language set (9 languages). When
+> PONS is active, the admin UI should only offer those 9 languages.
+>
+> **Note — Tatoeba** has no API-side language restriction — its database contains
+> sentences in 400+ languages and the API accepts any ISO 639-3 code. The current
+> v0.4.1 implementation only maps 5 languages (EN, DE, FR, IT, ES) in its
+> `LANG_MAP`, but this is an **implementation limitation, not a provider
+> limitation**. For v0.5.0, `LANG_MAP` must be expanded to cover at least all 36
+> intersection languages. Tatoeba's `supportedLanguages()` should reflect the
+> full set the API can serve, not the current hardcoded subset.
 
 ---
 
@@ -1221,13 +1281,16 @@ ones. No schema or API contract changes are required.
 
 **Implementation checklist:**
 
-- [ ] `lib/translation-providers/tatoeba.ts` — provider module
-- [ ] ISO 639-1 → 639-3 language code mapping
-- [ ] Short-sentence search for primary translations
-- [ ] Longer-sentence search for example-based proposals
-- [ ] Add to provider registry and Settings UI
-- [ ] Handle empty results gracefully (Tatoeba may not have coverage for all words)
-- [ ] Respect Tatoeba's rate limits and add reasonable caching
+- [x] `lib/translation-providers/tatoeba.ts` — provider module
+- [x] ISO 639-1 → 639-3 language code mapping
+- [x] Short-sentence search for primary translations
+- [x] Longer-sentence search for example-based proposals
+- [x] Add to provider registry and Settings UI
+- [x] Handle empty results gracefully (Tatoeba may not have coverage for all words)
+- [x] Respect Tatoeba's rate limits and add reasonable caching
+- [x] Promise-based cache for correlated proposals across language columns
+- [x] Source-language example sentences (proposals in the source column)
+- [x] Help page documentation and Swagger API spec updated
 
 ### 16.2 v0.5.0 — Configurable Languages
 
@@ -1247,11 +1310,27 @@ by the active translation provider.
 - `GET /api/languages` and `POST/PUT /api/admin/languages` endpoints.
 - UI dynamically renders columns/cards based on the enabled language set.
 - TTS locales resolved dynamically from the `Language` entity.
+- `supportedLanguages()` on each provider (see Section 6.1) to constrain
+  the admin UI to languages the active provider actually supports.
 
 **Minimum constraints:**
 - At least **2 languages** must be enabled at all times.
 - The five original languages (EN, DE, FR, IT, ES) are seeded by default.
 - Maximum language count is bounded only by what the translation provider supports.
+
+**Candidate languages:** The 36 languages in the strict provider intersection
+(Section 6.3.1) are guaranteed to work with any of the five main translation
+providers (LibreTranslate, MyMemory, DeepL, Google, Azure). When PONS or Tatoeba
+is the active provider, the available set is smaller and the admin UI must reflect
+that via `supportedLanguages()`.
+
+**Implementation notes:**
+- The `Language` table should store ISO 639-1 codes, display names, flag emojis,
+  and an `enabled` flag.
+- On provider switch, warn the admin if any currently-enabled languages are not
+  supported by the newly selected provider.
+- The UI language selector should group languages: seeded defaults first, then
+  alphabetical.
 
 #### 16.2.1 Migration Strategy (v0.4.0 → v0.5.0)
 
