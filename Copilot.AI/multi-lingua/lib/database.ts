@@ -68,15 +68,17 @@ export class Database {
       )
     `;
 
-    this.db.run(createTableQuery, (err: Error | null) => {
-      if (err) {
-        console.error('Error creating table:', err);
-      } else {
-        console.log('Database initialized successfully');
-        this.addGermanColumn();
-        this.addEnglishProposalsColumn();
-        this.addUserIdColumn();
-      }
+    this.db.serialize(() => {
+      this.db.run(createTableQuery, (err: Error | null) => {
+        if (err) {
+          console.error('Error creating table:', err);
+        } else {
+          console.log('Database initialized successfully');
+        }
+      });
+      this.addGermanColumn();
+      this.addEnglishProposalsColumn();
+      this.addUserIdColumn();
     });
   }
 

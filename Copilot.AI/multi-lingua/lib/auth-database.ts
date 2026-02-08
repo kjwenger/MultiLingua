@@ -151,15 +151,17 @@ export class AuthDatabase {
       `CREATE INDEX IF NOT EXISTS idx_system_config_key ON system_config(config_key)`
     ];
 
-    queries.forEach((query) => {
-      this.db.run(query, (err: Error | null) => {
-        if (err) {
-          console.error('Error creating auth table:', err);
-        }
+    this.db.serialize(() => {
+      queries.forEach((query) => {
+        this.db.run(query, (err: Error | null) => {
+          if (err) {
+            console.error('Error creating auth table:', err);
+          }
+        });
       });
-    });
 
-    this.insertDefaultConfig();
+      this.insertDefaultConfig();
+    });
   }
 
   private insertDefaultConfig() {
