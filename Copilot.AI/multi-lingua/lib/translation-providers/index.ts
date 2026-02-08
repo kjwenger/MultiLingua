@@ -8,6 +8,7 @@ import { PonsProvider } from './pons';
 import { MerriamWebsterProvider } from './merriam-webster';
 import { FreeDictionaryProvider } from './free-dictionary';
 import { OxfordProvider } from './oxford';
+import { TatoebaProvider } from './tatoeba';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
@@ -140,6 +141,10 @@ export class TranslationService {
           providerLogger.debug('Oxford skipped (no apiKey or appId)');
         }
         break;
+      case 'tatoeba':
+        providerLogger.info('Creating TatoebaProvider (no API key required)');
+        provider = new TatoebaProvider();
+        break;
     }
 
     return provider;
@@ -268,7 +273,7 @@ export class TranslationService {
     // Decode HTML entities from provider responses (e.g., &lt; -> <)
     const decoded = {
       translatedText: decode(result.translatedText),
-      alternatives: result.alternatives.map(alt => decode(alt))
+      alternatives: (result.alternatives || []).map(alt => decode(alt))
     };
 
     providerLogger.debug(`Result: "${decoded.translatedText}"`);
@@ -301,6 +306,22 @@ export class TranslationService {
     translations.forEach(({ key, result }) => {
       results[key] = result;
     });
+
+    // Source-language proposals (e.g. Tatoeba example sentences).
+    // Wrapped in try/catch so providers that reject same-language translation don't break anything.
+    try {
+      const sourceResult = await this.translate(text, sourceLanguage, sourceLanguage);
+      if (sourceResult.alternatives && sourceResult.alternatives.length > 0) {
+        const langKeyMap: Record<string, string> = { en: 'english', de: 'german', fr: 'french', it: 'italian', es: 'spanish' };
+        // Keep the original text — only add the alternatives
+        results[langKeyMap[sourceLanguage]] = {
+          translatedText: text,
+          alternatives: sourceResult.alternatives,
+        };
+      }
+    } catch {
+      // Provider doesn't support same-language — skip silently
+    }
 
     return results;
   }

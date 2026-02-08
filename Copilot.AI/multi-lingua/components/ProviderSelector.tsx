@@ -12,6 +12,7 @@ const PROVIDERS = [
   // { id: 'merriam-webster', name: 'Merriam-Webster' },
   { id: 'free-dictionary', name: 'Free Dictionary' },
   // { id: 'oxford', name: 'Oxford' },
+  { id: 'tatoeba', name: 'Tatoeba' },
 ];
 
 const ProviderIcon = ({ id }: { id: string }) => {
@@ -65,6 +66,37 @@ const ProviderIcon = ({ id }: { id: string }) => {
       return (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
           <path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z" />
+        </svg>
+      );
+    case 'tatoeba':
+      // Tatoeba logo: network of connected circles (constellation graph)
+      return (
+        <svg className="w-5 h-5" viewBox="0 0 72 72" fill="currentColor" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.5">
+          <line x1="33" y1="39" x2="22" y2="21.6" />
+          <line x1="22" y1="21.6" x2="19.4" y2="7" />
+          <line x1="22" y1="21.6" x2="35.7" y2="7" />
+          <line x1="33" y1="39" x2="47" y2="20.3" />
+          <line x1="33" y1="39" x2="60.4" y2="33.4" />
+          <line x1="60.4" y1="33.4" x2="65.4" y2="18.2" />
+          <line x1="33" y1="39" x2="59.7" y2="56.5" />
+          <line x1="33" y1="39" x2="41.8" y2="54.6" />
+          <line x1="33" y1="39" x2="32.7" y2="63.2" />
+          <line x1="33" y1="39" x2="12.3" y2="41.5" />
+          <line x1="12.3" y1="41.5" x2="18.7" y2="59.5" />
+          <line x1="12.3" y1="41.5" x2="6.8" y2="55.2" />
+          <circle cx="33" cy="39" r="8.2" stroke="none" />
+          <circle cx="22" cy="21.6" r="7.5" stroke="none" />
+          <circle cx="12.3" cy="41.5" r="6.7" stroke="none" />
+          <circle cx="6.8" cy="55.2" r="4.2" stroke="none" />
+          <circle cx="18.7" cy="59.5" r="5.4" stroke="none" />
+          <circle cx="32.7" cy="63.2" r="5.8" stroke="none" />
+          <circle cx="41.8" cy="54.6" r="4" stroke="none" />
+          <circle cx="19.4" cy="7" r="4.7" stroke="none" />
+          <circle cx="35.7" cy="7" r="4.8" stroke="none" />
+          <circle cx="60.4" cy="33.4" r="6.8" stroke="none" />
+          <circle cx="65.4" cy="18.2" r="4.5" stroke="none" />
+          <circle cx="59.7" cy="56.5" r="10" stroke="none" />
+          <circle cx="47" cy="20.3" r="9.7" stroke="none" />
         </svg>
       );
     default:

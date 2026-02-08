@@ -15,6 +15,7 @@ const PROVIDER_TYPES = [
   // { type: 'merriam-webster', name: 'Merriam-Webster', needsUrl: false, needsApiKey: true, freeInfo: '1000 queries/day free (English only)' },
   { type: 'free-dictionary', name: 'Free Dictionary', needsUrl: false, needsApiKey: false, freeInfo: 'Completely free (English only)' },
   // { type: 'oxford', name: 'Oxford Dictionary', needsUrl: false, needsApiKey: true, needsAppId: true, freeInfo: '1000 queries/month free' }
+  { type: 'tatoeba', name: 'Tatoeba', needsUrl: false, needsApiKey: false, freeInfo: 'Completely free — community sentence examples (CC-licensed)' },
 ];
 
 const LIBRETRANSLATE_PRESETS = [
