@@ -16,8 +16,9 @@ export default function HelpPage() {
     { id: 'setup-azure', title: 'Azure Translator Setup' },
     { id: 'setup-pons', title: 'PONS Dictionary Setup' },
     // { id: 'setup-merriam-webster', title: 'Merriam-Webster Setup' },
-    { id: 'setup-free-dictionary', title: 'Free Dictionary Setup' },
+    // { id: 'setup-free-dictionary', title: 'Free Dictionary Setup' },
     // { id: 'setup-oxford', title: 'Oxford Dictionary Setup' },
+    { id: 'setup-tatoeba', title: 'Tatoeba Setup' },
     { id: 'usage', title: 'Using the App' },
     { id: 'api', title: 'API Reference' },
     { id: 'troubleshooting', title: 'Troubleshooting' },
@@ -67,8 +68,9 @@ export default function HelpPage() {
           {activeSection === 'setup-azure' && <AzureSetup />}
           {activeSection === 'setup-pons' && <PonsSetup />}
           {/* {activeSection === 'setup-merriam-webster' && <MerriamWebsterSetup />} */}
-          {activeSection === 'setup-free-dictionary' && <FreeDictionarySetup />}
+          {/* {activeSection === 'setup-free-dictionary' && <FreeDictionarySetup />} */}
           {/* {activeSection === 'setup-oxford' && <OxfordSetup />} */}
+          {activeSection === 'setup-tatoeba' && <TatoebaSetup />}
           {activeSection === 'usage' && <Usage />}
           {activeSection === 'api' && <ApiReference />}
           {activeSection === 'troubleshooting' && <Troubleshooting />}
@@ -1655,6 +1657,98 @@ function FreeDictionarySetup() {
         <p className="mb-0">
           Free Dictionary is an external service. If lookups fail, the service may be temporarily
           unavailable. Try again later or switch to another provider.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function TatoebaSetup() {
+  return (
+    <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200">
+      <h1 className="text-3xl font-bold mb-6">Tatoeba Setup</h1>
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        <a
+          href="https://tatoeba.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+        >
+          <span className="mr-2">🌐</span>
+          Tatoeba Website
+        </a>
+        <a
+          href="https://api.tatoeba.org/openapi-unstable.json"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 transition-colors"
+        >
+          <span className="mr-2">📖</span>
+          API Specification
+        </a>
+      </div>
+
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        Tatoeba is a free, community-curated database of sentences and their translations
+        across 400+ languages. Unlike machine-translation providers, Tatoeba returns
+        <strong> human-written example sentences</strong> showing real-world usage.
+        All data is CC-licensed.
+      </p>
+
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+        <h3 className="text-green-800 dark:text-green-200 mt-0 mb-2">🎉 No Setup Required!</h3>
+        <p className="mb-0">
+          Tatoeba requires <strong>no API key</strong> and <strong>no registration</strong>.
+          Simply enable it in Settings and start using it immediately!
+        </p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">How It Works</h2>
+      <p className="mb-4">When you translate a word or phrase with Tatoeba:</p>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Primary translation:</strong> The shortest sentence containing your text is found, and its translations are used</li>
+        <li><strong>Example sentences:</strong> Longer sentences with the word in context appear as alternatives in all language columns</li>
+        <li><strong>Correlated proposals:</strong> Proposal [N] across all columns comes from the same Tatoeba sentence, so they match</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Supported Languages</h2>
+      <p className="mb-4">Currently supports the five core MultiLingua languages:</p>
+      <ul className="list-disc pl-6 space-y-1 mb-6">
+        <li>🇬🇧 English (en)</li>
+        <li>🇩🇪 German (de)</li>
+        <li>🇫🇷 French (fr)</li>
+        <li>🇮🇹 Italian (it)</li>
+        <li>🇪🇸 Spanish (es)</li>
+      </ul>
+      <p className="mb-4 text-gray-600 dark:text-gray-400">
+        Tatoeba&apos;s database covers 400+ languages. Additional languages can be added as MultiLingua
+        expands its language set in v0.5.0.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Advantages</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Zero Cost:</strong> Completely free, no API key needed</li>
+        <li><strong>Human-Written:</strong> Real sentences written by native speakers, not machine-generated</li>
+        <li><strong>Context:</strong> See words used in real sentences, ideal for language learning</li>
+        <li><strong>CC-Licensed:</strong> Open data you can use freely</li>
+        <li><strong>Audio Available:</strong> Many sentences have community-recorded pronunciations (future feature)</li>
+      </ul>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">Limitations</h2>
+      <ul className="list-disc pl-6 space-y-2 mb-6">
+        <li><strong>Coverage:</strong> Not every word has sentences in all languages</li>
+        <li><strong>Not Machine Translation:</strong> Cannot translate arbitrary text &mdash; only finds existing sentence matches</li>
+        <li><strong>Short Texts:</strong> Works best with single words or short phrases</li>
+        <li><strong>Correlated Results:</strong> Requires translations in all target languages, which may limit the number of results</li>
+      </ul>
+
+      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+        <h3 className="text-purple-800 dark:text-purple-200 mt-0 mb-2">✨ Best Use Case</h3>
+        <p className="mb-0">
+          Tatoeba is ideal for language learners who want to see how a word is used in real
+          sentences across multiple languages. Combine it with a machine-translation provider
+          for the best of both worlds.
         </p>
       </div>
     </div>

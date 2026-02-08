@@ -10,7 +10,7 @@ const PROVIDERS = [
   { id: 'azure', name: 'Azure' },
   { id: 'pons', name: 'PONS' },
   // { id: 'merriam-webster', name: 'Merriam-Webster' },
-  { id: 'free-dictionary', name: 'Free Dictionary' },
+  // { id: 'free-dictionary', name: 'Free Dictionary' },
   // { id: 'oxford', name: 'Oxford' },
   { id: 'tatoeba', name: 'Tatoeba' },
 ];

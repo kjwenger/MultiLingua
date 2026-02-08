@@ -1018,7 +1018,7 @@ export const openApiSpec = {
         properties: {
           type: {
             type: 'string',
-            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure', 'pons', 'free-dictionary'],
+            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure', 'pons', 'tatoeba'],
           },
           enabled: {
             type: 'integer',
@@ -1036,7 +1036,7 @@ export const openApiSpec = {
         properties: {
           type: {
             type: 'string',
-            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure', 'pons', 'free-dictionary'],
+            enum: ['libretranslate', 'mymemory', 'deepl', 'google', 'azure', 'pons', 'tatoeba'],
             description: 'Provider type',
           },
           enabled: {

@@ -6,7 +6,7 @@ import { GoogleProvider } from './google';
 import { AzureProvider } from './azure';
 import { PonsProvider } from './pons';
 import { MerriamWebsterProvider } from './merriam-webster';
-import { FreeDictionaryProvider } from './free-dictionary';
+// import { FreeDictionaryProvider } from './free-dictionary';
 import { OxfordProvider } from './oxford';
 import { TatoebaProvider } from './tatoeba';
 import sqlite3 from 'sqlite3';
@@ -129,10 +129,10 @@ export class TranslationService {
           providerLogger.debug('Merriam-Webster skipped (no apiKey)');
         }
         break;
-      case 'free-dictionary':
-        providerLogger.info('Creating FreeDictionaryProvider (no API key required)');
-        provider = new FreeDictionaryProvider();
-        break;
+      // case 'free-dictionary':
+      //   providerLogger.info('Creating FreeDictionaryProvider (no API key required)');
+      //   provider = new FreeDictionaryProvider();
+      //   break;
       case 'oxford':
         if (config.apiKey && config.appId) {
           providerLogger.info('Creating OxfordProvider');
