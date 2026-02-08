@@ -17,7 +17,7 @@ equivalent and can share the same backend API.
 
 ### 1.1 Platform Trials
 
-| Trial              | Technology                          | Directory Convention         |
+| Trial               | Technology                          | Directory Convention         |
 |---------------------|-------------------------------------|------------------------------|
 | Next.js PWA         | Next.js 15, React 18, TypeScript    | `multi-lingua/`              |
 | Android Native      | Kotlin, Jetpack Compose / XML       | `MultiLinguaDroid/`          |
@@ -160,12 +160,12 @@ every non-empty language with its flag to the left:
 
 ```
 ┌──────────────────────────────────┐
-│  🇬🇧 hello                       │
-│  🇩🇪 hallo                       │
-│  🇫🇷 bonjour                     │
-│  🇮🇹 ciao                        │
-│  🇪🇸 hola                        │
-│                    [🔄] [🔊] [🗑] │
+│  🇬🇧 hello                        │
+│  🇩🇪 hallo                        │
+│  🇫🇷 bonjour                      │
+│  🇮🇹 ciao                         │
+│  🇪🇸 hola                         │
+│                   [🔄] [🔊] [🗑] │
 └──────────────────────────────────┘
 ```
 
@@ -903,6 +903,7 @@ are available for the active provider when adding/enabling languages.
 | Merriam-Webster  | `merriam-webster`  | Yes              | `https://dictionaryapi.com`        |
 | Oxford           | `oxford`           | Yes              | `https://od-api.oxforddictionaries.com` |
 | Free Dictionary  | `free-dictionary`  | No               | `https://api.dictionaryapi.dev`    |
+| Tatoeba          | `tatoeba`          | No               | `https://api.tatoeba.org`          |
 
 - **Default provider:** LibreTranslate (self-hosted, no API key needed).
 - Only **one** provider is active at a time.
@@ -1120,7 +1121,8 @@ Recommended test frameworks per platform:
 - All implementations share the same **major.minor** version to indicate feature
   parity. The patch version is platform-specific.
 - Current target: **v0.4.0** — full feature parity across all platforms.
-- Next planned: **v0.5.0** — configurable languages (see Section 16 for roadmap).
+- Next planned: **v0.4.1** — Tatoeba example sentence provider (see Section 16.1).
+- After that: **v0.5.0** — configurable languages (see Section 16.2).
 - Version displayed in Settings screen footer.
 - A minor version bump (e.g., 0.4 → 0.5) indicates **new features** and may
   include breaking changes to the schema or API contract. Migration steps are
@@ -1152,10 +1154,82 @@ current state and future direction are visible in one document.
 | Version | Theme                  | Status    | Summary                                     |
 |---------|------------------------|-----------|---------------------------------------------|
 | 0.4.0   | Fixed Five             | **Current** | Five hardcoded languages, full feature parity, PWA, responsive UI |
+| 0.4.1   | Tatoeba Examples       | Planned   | Tatoeba as translation provider — human-curated example sentences as proposals |
 | 0.5.0   | Configurable Languages | Planned   | Dynamic language support, normalized schema, language management |
 | 0.6.0   | *(TBD)*                | Future    | —                                           |
 
-### 16.1 v0.5.0 — Configurable Languages
+### 16.1 v0.4.1 — Tatoeba Example Sentences
+
+**Goal:** Add [Tatoeba](https://tatoeba.org) as a translation provider. Tatoeba is a
+free, community-curated database of sentences and their translations across 400+
+languages. Unlike machine-translation providers, Tatoeba returns **human-written
+example sentences** showing real-world usage.
+
+**API:** `https://api.tatoeba.org` (read-only, no authentication, CC-licensed data).
+See [OpenAPI spec](https://api.tatoeba.org/openapi-unstable.json).
+
+**Language code mapping:** Tatoeba uses ISO 639-3 (3-letter codes). The provider must
+map MultiLingua's ISO 639-1 codes:
+
+| MultiLingua | Tatoeba |
+|-------------|---------|
+| `en`        | `eng`   |
+| `de`        | `deu`   |
+| `fr`        | `fra`   |
+| `it`        | `ita`   |
+| `es`        | `spa`   |
+
+**Translation strategy:**
+
+When the user translates a source text (e.g., "house" in English), the Tatoeba
+provider:
+
+1. **Primary translation:** Search for short sentences (`word_count=-3`,
+   `sort=words`) in the source language containing the text, requiring translations
+   in all target languages (`trans:1:lang=deu&trans:2:lang=fra&...`). Extract the
+   target-language text from the **shortest matching sentence** as the primary
+   translation for each language.
+
+2. **Alternative proposals:** Search for longer sentences (`word_count=-10`,
+   `sort=relevance`, `limit=10`) containing the source text. Return the
+   target-language sentence translations as proposals. This gives the user
+   **contextual example sentences** rather than just synonym lists.
+
+**Example flow:**
+
+User types "house" in the English column and clicks Translate.
+
+The provider searches Tatoeba: `GET /unstable/sentences?lang=eng&q=house&word_count=-3&sort=words&limit=1&showtrans:lang=deu,fra,ita,spa`
+
+Shortest match: *"A house!"* → translations: *"Ein Haus!"*, *"Maison !"*, *"Una casa!"*, *"¡Una casa!"*
+
+Primary translations extracted: `Haus`, `Maison`, `casa`, `casa`
+
+Then a second query for examples: `GET /unstable/sentences?lang=eng&q=house&word_count=-10&sort=relevance&limit=10&showtrans:lang=deu,fra,ita,spa`
+
+Proposals populated with sentence pairs:
+- EN: "The house collapsed." → DE: "Das Haus ist eingestürzt."
+- EN: "Watch this house." → FR: "Surveille cette maison."
+- etc.
+
+**Audio bonus:** Many Tatoeba sentences have community-recorded audio
+(`GET /unstable/audio/{id}/file`). A future enhancement could offer Tatoeba audio
+as an alternative to the browser's TTS engine.
+
+**No breaking changes.** Tatoeba is added as a new provider entry alongside existing
+ones. No schema or API contract changes are required.
+
+**Implementation checklist:**
+
+- [ ] `lib/translation-providers/tatoeba.ts` — provider module
+- [ ] ISO 639-1 → 639-3 language code mapping
+- [ ] Short-sentence search for primary translations
+- [ ] Longer-sentence search for example-based proposals
+- [ ] Add to provider registry and Settings UI
+- [ ] Handle empty results gracefully (Tatoeba may not have coverage for all words)
+- [ ] Respect Tatoeba's rate limits and add reasonable caching
+
+### 16.2 v0.5.0 — Configurable Languages
 
 **Goal:** Replace the hardcoded five-language model with a dynamic, admin-managed
 language set. Users and admins can add, enable, or disable any language supported
@@ -1179,7 +1253,7 @@ by the active translation provider.
 - The five original languages (EN, DE, FR, IT, ES) are seeded by default.
 - Maximum language count is bounded only by what the translation provider supports.
 
-#### 16.1.1 Migration Strategy (v0.4.0 → v0.5.0)
+#### 16.2.1 Migration Strategy (v0.4.0 → v0.5.0)
 
 Implementations must provide a one-time migration that:
 
@@ -1270,6 +1344,15 @@ A checklist for each platform implementation:
 - [ ] Unit tests
 - [ ] UI / widget tests
 - [ ] Integration tests
+
+### v0.4.1 Additions
+
+- [ ] Tatoeba translation provider (`lib/translation-providers/tatoeba.ts`)
+- [ ] ISO 639-1 → 639-3 language code mapping
+- [ ] Short-sentence search for primary word translations
+- [ ] Example-sentence search for contextual proposals
+- [ ] Graceful handling of missing Tatoeba coverage
+- [ ] Caching to respect Tatoeba rate limits
 
 ### v0.5.0 Additions
 
