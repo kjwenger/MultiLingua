@@ -144,6 +144,78 @@ docker-compose down
 docker-compose up -d
 ```
 
+## Email Provider Options
+
+The app uses standard **nodemailer** with SMTP to send OTP verification codes. Any SMTP-compatible provider works. Here are free options suitable for a personal/small deployment.
+
+### Free SMTP Providers
+
+| Provider | Free Tier | SMTP Host | Port | Notes |
+|---|---|---|---|---|
+| **Gmail** (App Password) | 500/day | `smtp.gmail.com` | 587 | Easiest setup, requires 2FA + App Password |
+| **Outlook/Hotmail** | 300/day | `smtp-mail.outlook.com` | 587 | Microsoft account required |
+| **Brevo** (ex-Sendinblue) | 300/day | `smtp-relay.brevo.com` | 587 | Dedicated transactional email service |
+| **Mailjet** | 200/day | `in-v3.mailjet.com` | 587 | API key as user, secret key as password |
+| **Zoho Mail** (free plan) | 50/day | `smtp.zoho.com` | 587 | Free plan limited to 5 users |
+
+For OTP codes on a personal app, any of these is more than enough.
+
+### Recommended: Gmail App Password
+
+The simplest option. Steps:
+
+1. Use (or create) a Gmail account
+2. Enable 2-Factor Authentication on the account
+3. Go to [App Passwords](https://myaccount.google.com/apppasswords) and generate one
+4. Set the following environment variables (e.g. in Portainer stack or `.env` file):
+
+```env
+DEV_MODE=false
+JWT_SECRET=<generate-a-long-random-string>
+APP_URL=https://your-domain.com
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=true
+SMTP_USER=your-account@gmail.com
+SMTP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+```
+
+The `from` address on sent emails will be `SMTP_USER` (see `lib/email-service.ts` line 51).
+
+### Synology NAS as SMTP Server
+
+Synology DSM offers a built-in **Mail Server** package (or **MailPlus Server** on Plus/XS models). If installed and configured, the NAS becomes its own SMTP relay.
+
+Example env vars for a Synology mail server:
+
+```env
+SMTP_HOST=gertrun.synology.me
+SMTP_PORT=587
+SMTP_SECURE=true
+SMTP_USER=multilingua@gertrun.synology.me
+SMTP_PASSWORD=your-mail-account-password
+```
+
+**Caveats with self-hosted SMTP:**
+
+- Emails from a residential IP are very likely to land in **spam** or be rejected entirely by major providers (Gmail, Outlook, etc.)
+- Proper DNS records are required: **SPF**, **DKIM**, and **DMARC**
+- Many ISPs block outbound port 25; port 587 with STARTTLS is usually fine
+- For a home NAS app used by a handful of people, it *can* work if recipients whitelist the sender address, but it is fragile
+- A better Synology approach: configure the Synology Mail Server to **relay through Gmail** (or another provider), combining local control with Gmail's deliverability
+
+### Portainer Deployment
+
+When deploying via Portainer on your Synology (`portainer-stack.yml`), set the SMTP variables directly in the Portainer stack environment UI:
+
+1. Open Portainer > Stacks > your Multi-Lingua stack
+2. Go to **Environment variables**
+3. Add the variables listed above (`DEV_MODE=false`, `SMTP_HOST`, etc.)
+4. Redeploy the stack
+
+This avoids hardcoding secrets in files committed to the repository.
+
 ## Environment Variables Reference
 
 ### Required (All Deployments)
