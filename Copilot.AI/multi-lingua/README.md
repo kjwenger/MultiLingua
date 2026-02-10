@@ -2,6 +2,41 @@
 
 A modern Next.js application that provides real-time translation services using LibreTranslate. The app features a table-based interface where users can input English text and receive translations in French, Italian, and Spanish with multiple translation proposals.
 
+## Table of Contents
+
+- [Features](#features)
+  - [Core Features](#core-features)
+  - [User Management & Authentication](#user-management--authentication)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+  - [Option 1: Docker (Recommended)](#option-1-docker-recommended)
+    - [Quick Start with Published Images](#quick-start-with-published-images)
+    - [Local Development Setup](#local-development-setup)
+  - [Option 2: Local Development](#option-2-local-development)
+- [Usage](#usage)
+  - [For All Users](#for-all-users)
+  - [For Admin Users](#for-admin-users)
+  - [User Roles](#user-roles)
+- [API Endpoints](#api-endpoints)
+  - [Authentication APIs](#authentication-apis)
+  - [Translation APIs](#translation-apis)
+  - [Admin APIs (Admin Only)](#admin-apis-admin-only)
+- [Database Schema](#database-schema)
+  - [Translations Table](#translations-table)
+  - [User Management Tables](#user-management-tables)
+- [Technologies Used](#technologies-used)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [LibreTranslate Connection](#libretranslate-connection)
+- [Development](#development)
+- [Docker](#docker)
+  - [Building the Docker Image](#building-the-docker-image)
+  - [Using Docker Compose (Recommended)](#using-docker-compose-recommended)
+  - [Persistence & Volume Configuration](#persistence--volume-configuration)
+  - [Port Configuration](#port-configuration)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 ## Features
 
 ### Core Features

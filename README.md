@@ -2,6 +2,36 @@
 
 A collection of multi-language translation applications demonstrating various AI-assisted development approaches and platform implementations. This project showcases how different AI assistants (GitHub Copilot, Claude AI, and Google Gemini) can be leveraged to create similar applications across multiple platforms and technology stacks.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Supported Languages](#supported-languages)
+- [Project Structure](#project-structure)
+- [Subprojects](#subprojects)
+  - [1. Web Application (Next.js)](#1-web-application-nextjs)
+  - [2. Android Application (Copilot Version)](#2-android-application-copilot-version)
+  - [3. Android Application (Claude Version)](#3-android-application-claude-version)
+  - [4. React Native Application](#4-react-native-application)
+  - [5. Gemini LLM Integration](#5-gemini-llm-integration)
+- [Common Features Across Implementations](#common-features-across-implementations)
+- [LibreTranslate Setup](#libretranslate-setup)
+  - [Using Docker](#using-docker)
+  - [Using Docker Compose](#using-docker-compose-from-web-app-directory)
+- [Network Configuration](#network-configuration)
+  - [For Web Application](#for-web-application)
+  - [For Android Applications](#for-android-applications)
+- [Technology Comparison](#technology-comparison)
+- [AI Assistant Comparison](#ai-assistant-comparison)
+  - [GitHub Copilot](#github-copilot)
+  - [Claude AI](#claude-ai)
+  - [Google Gemini](#google-gemini)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Use Cases](#use-cases)
+- [Contributing](#contributing)
+- [License](#license)
+- [Project Context](#project-context)
+
 ## Overview
 
 MultiLingua is a suite of translation applications that integrate with LibreTranslate, an open-source translation API. The project explores different architectural patterns, UI frameworks, and development workflows while maintaining a consistent core functionality: translating text between multiple languages with alternative translation proposals.
@@ -167,17 +197,17 @@ This starts both the Next.js app and LibreTranslate with proper networking and p
 
 ## Technology Comparison
 
-| Aspect | Next.js Web | Copilot Android | Claude Android | React Native |
-|--------|-------------|-----------------|----------------|--------------|
-| **Platform** | Web | Android | Android | iOS/Android |
-| **Language** | TypeScript | Kotlin | Kotlin | JavaScript/TypeScript |
-| **UI Framework** | React + Tailwind | Material 3 | Material 3 | React Native |
-| **Storage** | SQLite | SharedPreferences | Room | TBD |
-| **Architecture** | Next.js API Routes | MVVM | MVVM | React |
-| **Networking** | Axios | Retrofit | Retrofit | Fetch/Axios |
-| **Languages** | En/Fr/It/Es | En/Fr/It/Es | En/De/Fr/It/Es | TBD |
-| **Async** | Promises | Coroutines | Coroutines | Promises |
-| **Special Features** | Docker ready | Theme toggle | TTS + Settings | Cross-platform |
+| Aspect               | Next.js Web        | Copilot Android   | Claude Android | React Native          |
+|----------------------|--------------------|-------------------|----------------|-----------------------|
+| **Platform**         | Web                | Android           | Android        | iOS/Android           |
+| **Language**         | TypeScript         | Kotlin            | Kotlin         | JavaScript/TypeScript |
+| **UI Framework**     | React + Tailwind   | Material 3        | Material 3     | React Native          |
+| **Storage**          | SQLite             | SharedPreferences | Room           | TBD                   |
+| **Architecture**     | Next.js API Routes | MVVM              | MVVM           | React                 |
+| **Networking**       | Axios              | Retrofit          | Retrofit       | Fetch/Axios           |
+| **Languages**        | En/Fr/It/Es        | En/Fr/It/Es       | En/De/Fr/It/Es | TBD                   |
+| **Async**            | Promises           | Coroutines        | Coroutines     | Promises              |
+| **Special Features** | Docker ready       | Theme toggle      | TTS + Settings | Cross-platform        |
 
 ## AI Assistant Comparison
 
