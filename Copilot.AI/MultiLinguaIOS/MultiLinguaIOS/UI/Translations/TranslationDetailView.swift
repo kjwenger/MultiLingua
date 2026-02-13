@@ -32,23 +32,28 @@ struct TranslationDetailView: View {
                 }
             }
 
-            languageSection(flag: "🇬🇧", label: "English", text: $translation.english,
+            languageSection(flag: "🇬🇧", label: "English", langCode: "en",
+                            text: $translation.english,
                             proposals: translation.englishProposals, locale: "en-US") { selected in
                 translation.english = selected
             }
-            languageSection(flag: "🇩🇪", label: "German", text: $translation.german,
+            languageSection(flag: "🇩🇪", label: "German", langCode: "de",
+                            text: $translation.german,
                             proposals: translation.germanProposals, locale: "de-DE") { selected in
                 translation.german = selected
             }
-            languageSection(flag: "🇫🇷", label: "French", text: $translation.french,
+            languageSection(flag: "🇫🇷", label: "French", langCode: "fr",
+                            text: $translation.french,
                             proposals: translation.frenchProposals, locale: "fr-FR") { selected in
                 translation.french = selected
             }
-            languageSection(flag: "🇮🇹", label: "Italian", text: $translation.italian,
+            languageSection(flag: "🇮🇹", label: "Italian", langCode: "it",
+                            text: $translation.italian,
                             proposals: translation.italianProposals, locale: "it-IT") { selected in
                 translation.italian = selected
             }
-            languageSection(flag: "🇪🇸", label: "Spanish", text: $translation.spanish,
+            languageSection(flag: "🇪🇸", label: "Spanish", langCode: "es",
+                            text: $translation.spanish,
                             proposals: translation.spanishProposals, locale: "es-ES") { selected in
                 translation.spanish = selected
             }
@@ -71,13 +76,6 @@ struct TranslationDetailView: View {
             ToolbarItem(placement: .primaryAction) {
                 if isTranslating || isSaving {
                     ProgressView()
-                } else {
-                    Button {
-                        Task { await translateEntry() }
-                    } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                    }
-                    .disabled(sourceText.isEmpty)
                 }
             }
         }
@@ -94,7 +92,8 @@ struct TranslationDetailView: View {
     // MARK: - Language Section
 
     @ViewBuilder
-    private func languageSection(flag: String, label: String, text: Binding<String>,
+    private func languageSection(flag: String, label: String, langCode: String,
+                                  text: Binding<String>,
                                   proposals: [String], locale: String,
                                   onSelectProposal: @escaping (String) -> Void) -> some View {
         Section {
@@ -103,6 +102,13 @@ struct TranslationDetailView: View {
                     .font(.title2)
                 TextField(label, text: text, axis: .vertical)
                     .lineLimit(1...4)
+                Button {
+                    Task { await translateFrom(text: text.wrappedValue, langCode: langCode) }
+                } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                }
+                .buttonStyle(.borderless)
+                .disabled(text.wrappedValue.isEmpty || isTranslating)
                 Button {
                     speak(text: text.wrappedValue, locale: locale)
                 } label: {
@@ -131,33 +137,13 @@ struct TranslationDetailView: View {
         }
     }
 
-    // MARK: - Source detection
-
-    private var sourceText: String {
-        if !translation.english.isEmpty { return translation.english }
-        if !translation.german.isEmpty { return translation.german }
-        if !translation.french.isEmpty { return translation.french }
-        if !translation.italian.isEmpty { return translation.italian }
-        if !translation.spanish.isEmpty { return translation.spanish }
-        return ""
-    }
-
-    private var sourceLanguage: String {
-        if !translation.english.isEmpty { return "en" }
-        if !translation.german.isEmpty { return "de" }
-        if !translation.french.isEmpty { return "fr" }
-        if !translation.italian.isEmpty { return "it" }
-        if !translation.spanish.isEmpty { return "es" }
-        return "en"
-    }
-
     // MARK: - Actions
 
-    private func translateEntry() async {
+    private func translateFrom(text: String, langCode: String) async {
         isTranslating = true
         errorMessage = nil
         do {
-            let result = try await appState.apiClient.translate(text: sourceText, sourceLanguage: sourceLanguage)
+            let result = try await appState.apiClient.translate(text: text, sourceLanguage: langCode)
             if let en = result["english"] { translation.english = en.translation; translation.englishProposals = en.alternatives }
             if let de = result["german"] { translation.german = de.translation; translation.germanProposals = de.alternatives }
             if let fr = result["french"] { translation.french = fr.translation; translation.frenchProposals = fr.alternatives }
