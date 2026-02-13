@@ -17,6 +17,7 @@
 		825F48B1E78F4B6D8C8AEC63 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683DDB2CB99C64EC51C41842 /* HelpView.swift */; };
 		864F401D7829EA58CAD353A3 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5748BA358B446BFE1FB6AB /* KeychainManager.swift */; };
 		95F982944B34D68716ECF169 /* TranslationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573A1256FB033EB834AB2908 /* TranslationsView.swift */; };
+		D1A2B3C4E5F60718293A4B5C /* TranslationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A2B3C4E5F60718293A4B5D /* TranslationDetailView.swift */; };
 		A04827507E17C27528754DB3 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A387E04AF9714A29876E8109 /* Config.swift */; };
 		C25692E01246116492592939 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043743E9E6EA3FB815D326B9 /* APIClient.swift */; };
 		CFA5C901FEDF4DD67A0F01BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A9C0E1807A102A9E8E3BF5C /* Assets.xcassets */; };
@@ -47,6 +48,7 @@
 		46705C9A2B1BCA3C5F4CC341 /* LandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingView.swift; sourceTree = "<group>"; };
 		509D57605BEF67FBEBF43BC4 /* MultiLinguaIOSTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MultiLinguaIOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		573A1256FB033EB834AB2908 /* TranslationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationsView.swift; sourceTree = "<group>"; };
+		D1A2B3C4E5F60718293A4B5D /* TranslationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationDetailView.swift; sourceTree = "<group>"; };
 		59379DA26CBA8307397A674F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5B6729C6F2D71FA6FCB2C7EF /* TranslationEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationEntry.swift; sourceTree = "<group>"; };
 		5D5748BA358B446BFE1FB6AB /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 		269D637BA35C59D0E340410D /* Translations */ = {
 			isa = PBXGroup;
 			children = (
+				D1A2B3C4E5F60718293A4B5D /* TranslationDetailView.swift */,
 				573A1256FB033EB834AB2908 /* TranslationsView.swift */,
 			);
 			path = Translations;
@@ -332,6 +335,7 @@
 				EFDC3D2D8FA9474EFA79993D /* RegisterView.swift in Sources */,
 				01BAE738A6AD91A1B33E592A /* SettingsView.swift in Sources */,
 				0A137F26BD5D1402B8B2EEE2 /* TranslationEntry.swift in Sources */,
+				D1A2B3C4E5F60718293A4B5C /* TranslationDetailView.swift in Sources */,
 				95F982944B34D68716ECF169 /* TranslationsView.swift in Sources */,
 				2DD9241A446929A2AD861D1C /* User.swift in Sources */,
 			);

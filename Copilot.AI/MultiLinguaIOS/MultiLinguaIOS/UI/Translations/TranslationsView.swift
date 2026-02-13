@@ -48,8 +48,22 @@ struct TranslationsView: View {
                     .padding()
                 } else {
                     List {
-                        ForEach(filteredTranslations) { translation in
-                            TranslationCard(translation: translation)
+                        ForEach(Array(filteredTranslations.enumerated()), id: \.element.id) { index, translation in
+                            NavigationLink {
+                                TranslationDetailView(
+                                    translation: translation,
+                                    onUpdate: { updated in
+                                        if let i = translations.firstIndex(where: { $0.id == updated.id }) {
+                                            translations[i] = updated
+                                        }
+                                    },
+                                    onDelete: {
+                                        translations.removeAll { $0.id == translation.id }
+                                    }
+                                )
+                            } label: {
+                                TranslationCard(translation: translation)
+                            }
                         }
                     }
                     .refreshable {
@@ -142,26 +156,6 @@ struct TranslationCard: View {
             if !translation.spanish.isEmpty {
                 LanguageRow(flag: "🇪🇸", text: translation.spanish)
             }
-            
-            HStack {
-                Spacer()
-                Button {
-                    // TODO: Translate
-                } label: {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                }
-                Button {
-                    // TODO: TTS
-                } label: {
-                    Image(systemName: "speaker.wave.2")
-                }
-                Button(role: .destructive) {
-                    // TODO: Delete
-                } label: {
-                    Image(systemName: "trash")
-                }
-            }
-            .buttonStyle(.borderless)
         }
         .padding(.vertical, 4)
     }

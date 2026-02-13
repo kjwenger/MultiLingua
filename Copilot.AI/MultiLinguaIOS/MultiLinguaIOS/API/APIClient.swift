@@ -102,6 +102,24 @@ class APIClient: ObservableObject {
         struct EmptyResponse: Codable {}
         let _: EmptyResponse = try await delete("/api/translations/\(id)")
     }
+
+    // MARK: - Translate
+
+    func translate(text: String, sourceLanguage: String) async throws -> [String: TranslateResult] {
+        struct TranslateRequest: Codable {
+            let text: String
+            let sourceLanguage: String
+        }
+        let body = TranslateRequest(text: text, sourceLanguage: sourceLanguage)
+        let response: TranslateResponse = try await post("/api/translate", body: body)
+        var results: [String: TranslateResult] = [:]
+        if let v = response.english { results["english"] = v }
+        if let v = response.german { results["german"] = v }
+        if let v = response.french { results["french"] = v }
+        if let v = response.italian { results["italian"] = v }
+        if let v = response.spanish { results["spanish"] = v }
+        return results
+    }
     
     // MARK: - Generic HTTP Methods
     
@@ -218,4 +236,18 @@ struct TranslationsResponse: Codable {
 
 struct ErrorResponse: Codable {
     let error: String
+}
+
+struct TranslateResult: Codable {
+    let translation: String
+    let alternatives: [String]
+}
+
+struct TranslateResponse: Codable {
+    let provider: String?
+    let english: TranslateResult?
+    let german: TranslateResult?
+    let french: TranslateResult?
+    let italian: TranslateResult?
+    let spanish: TranslateResult?
 }

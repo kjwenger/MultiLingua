@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TranslationEntry: Codable, Identifiable {
+struct TranslationEntry: Codable, Identifiable, Equatable {
     let id: Int
     let userId: Int?
     var english: String
