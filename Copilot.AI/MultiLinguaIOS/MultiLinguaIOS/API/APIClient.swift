@@ -169,13 +169,14 @@ class APIClient: ObservableObject {
             }
             
             let decoder = JSONDecoder()
-            // Backend returns dates like "2025-11-06 20:26:03", not ISO8601
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
-            decoder.dateDecodingStrategy = .formatted(formatter)
-            return try decoder.decode(T.self, from: data)
+            do {
+                return try decoder.decode(T.self, from: data)
+            } catch let decodingError {
+                let responseString = String(data: data, encoding: .utf8) ?? "<binary>"
+                print("❌ [API] Decoding error: \(decodingError)")
+                print("❌ [API] Response body: \(responseString.prefix(500))")
+                throw APIError.decodingError
+            }
         } catch let error as APIError {
             throw error
         } catch {
