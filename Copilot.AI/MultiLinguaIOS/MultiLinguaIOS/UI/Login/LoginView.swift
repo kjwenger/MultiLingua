@@ -11,7 +11,7 @@ struct LoginView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
     
-    @State private var email = ""
+    @State private var email = Config.testEmail ?? ""
     @State private var code = ""
     @State private var rememberMe = false
     @State private var step: LoginStep = .email

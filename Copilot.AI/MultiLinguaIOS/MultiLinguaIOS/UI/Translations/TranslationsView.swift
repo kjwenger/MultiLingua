@@ -83,7 +83,11 @@ struct TranslationsView: View {
                 }
             }
             .sheet(isPresented: $showingAddSheet) {
-                AddTranslationView()
+                NavigationStack {
+                    TranslationDetailView { saved in
+                        translations.insert(saved, at: 0)
+                    }
+                }
             }
             .task {
                 await loadTranslations()
@@ -171,42 +175,6 @@ struct LanguageRow: View {
                 .font(.title3)
             Text(text)
                 .font(.body)
-        }
-    }
-}
-
-struct AddTranslationView: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var english = ""
-    @State private var german = ""
-    @State private var french = ""
-    @State private var italian = ""
-    @State private var spanish = ""
-    
-    var body: some View {
-        NavigationStack {
-            Form {
-                TextField("🇬🇧 English", text: $english)
-                TextField("🇩🇪 German", text: $german)
-                TextField("🇫🇷 French", text: $french)
-                TextField("🇮🇹 Italian", text: $italian)
-                TextField("🇪🇸 Spanish", text: $spanish)
-            }
-            .navigationTitle("Add Translation")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        // TODO: Save translation
-                        dismiss()
-                    }
-                }
-            }
         }
     }
 }

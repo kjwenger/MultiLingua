@@ -12,7 +12,7 @@ struct RegisterView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var fullName = ""
-    @State private var email = ""
+    @State private var email = Config.testEmail ?? ""
     @State private var code = ""
     @State private var step: RegisterStep = .info
     @State private var isLoading = false

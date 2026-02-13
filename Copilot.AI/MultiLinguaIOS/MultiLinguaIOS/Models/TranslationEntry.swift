@@ -36,6 +36,26 @@ struct TranslationEntry: Codable, Identifiable, Equatable {
         case updatedAt = "updated_at"
     }
 
+    /// Manual init for building entries locally (e.g. for update requests)
+    init(id: Int, english: String, german: String, french: String, italian: String, spanish: String,
+         englishProposals: [String], germanProposals: [String], frenchProposals: [String],
+         italianProposals: [String], spanishProposals: [String]) {
+        self.id = id
+        self.userId = nil
+        self.english = english
+        self.german = german
+        self.french = french
+        self.italian = italian
+        self.spanish = spanish
+        self.englishProposals = englishProposals
+        self.germanProposals = germanProposals
+        self.frenchProposals = frenchProposals
+        self.italianProposals = italianProposals
+        self.spanishProposals = spanishProposals
+        self.createdAt = ""
+        self.updatedAt = ""
+    }
+
     // Backend sends proposals as JSON strings, not arrays
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

@@ -12,7 +12,20 @@ struct TranslationDetailView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
-    @State var translation: TranslationEntry
+    let isNew: Bool
+    @State var english: String
+    @State var german: String
+    @State var french: String
+    @State var italian: String
+    @State var spanish: String
+    @State var englishProposals: [String]
+    @State var germanProposals: [String]
+    @State var frenchProposals: [String]
+    @State var italianProposals: [String]
+    @State var spanishProposals: [String]
+
+    private let entryId: Int?
+    var onSave: ((TranslationEntry) -> Void)?
     var onUpdate: ((TranslationEntry) -> Void)?
     var onDelete: (() -> Void)?
 
@@ -21,6 +34,43 @@ struct TranslationDetailView: View {
     @State private var showDeleteConfirmation = false
     @State private var errorMessage: String?
     @State private var speechSynthesizer = AVSpeechSynthesizer()
+
+    /// Create mode
+    init(onSave: @escaping (TranslationEntry) -> Void) {
+        self.isNew = true
+        self.entryId = nil
+        self._english = State(initialValue: "")
+        self._german = State(initialValue: "")
+        self._french = State(initialValue: "")
+        self._italian = State(initialValue: "")
+        self._spanish = State(initialValue: "")
+        self._englishProposals = State(initialValue: [])
+        self._germanProposals = State(initialValue: [])
+        self._frenchProposals = State(initialValue: [])
+        self._italianProposals = State(initialValue: [])
+        self._spanishProposals = State(initialValue: [])
+        self.onSave = onSave
+    }
+
+    /// Edit mode
+    init(translation: TranslationEntry,
+         onUpdate: ((TranslationEntry) -> Void)? = nil,
+         onDelete: (() -> Void)? = nil) {
+        self.isNew = false
+        self.entryId = translation.id
+        self._english = State(initialValue: translation.english)
+        self._german = State(initialValue: translation.german)
+        self._french = State(initialValue: translation.french)
+        self._italian = State(initialValue: translation.italian)
+        self._spanish = State(initialValue: translation.spanish)
+        self._englishProposals = State(initialValue: translation.englishProposals)
+        self._germanProposals = State(initialValue: translation.germanProposals)
+        self._frenchProposals = State(initialValue: translation.frenchProposals)
+        self._italianProposals = State(initialValue: translation.italianProposals)
+        self._spanishProposals = State(initialValue: translation.spanishProposals)
+        self.onUpdate = onUpdate
+        self.onDelete = onDelete
+    }
 
     var body: some View {
         Form {
@@ -32,50 +82,65 @@ struct TranslationDetailView: View {
                 }
             }
 
-            languageSection(flag: "🇬🇧", label: "English", langCode: "en",
-                            text: $translation.english,
-                            proposals: translation.englishProposals, locale: "en-US") { selected in
-                translation.english = selected
-            }
-            languageSection(flag: "🇩🇪", label: "German", langCode: "de",
-                            text: $translation.german,
-                            proposals: translation.germanProposals, locale: "de-DE") { selected in
-                translation.german = selected
-            }
-            languageSection(flag: "🇫🇷", label: "French", langCode: "fr",
-                            text: $translation.french,
-                            proposals: translation.frenchProposals, locale: "fr-FR") { selected in
-                translation.french = selected
-            }
-            languageSection(flag: "🇮🇹", label: "Italian", langCode: "it",
-                            text: $translation.italian,
-                            proposals: translation.italianProposals, locale: "it-IT") { selected in
-                translation.italian = selected
-            }
-            languageSection(flag: "🇪🇸", label: "Spanish", langCode: "es",
-                            text: $translation.spanish,
-                            proposals: translation.spanishProposals, locale: "es-ES") { selected in
-                translation.spanish = selected
+            Section {
+                languageRow(flag: "🇬🇧", label: "English", langCode: "en",
+                            text: $english, proposals: englishProposals, locale: "en-US") { selected in
+                    english = selected
+                }
+                languageRow(flag: "🇩🇪", label: "German", langCode: "de",
+                            text: $german, proposals: germanProposals, locale: "de-DE") { selected in
+                    german = selected
+                }
+                languageRow(flag: "🇫🇷", label: "French", langCode: "fr",
+                            text: $french, proposals: frenchProposals, locale: "fr-FR") { selected in
+                    french = selected
+                }
+                languageRow(flag: "🇮🇹", label: "Italian", langCode: "it",
+                            text: $italian, proposals: italianProposals, locale: "it-IT") { selected in
+                    italian = selected
+                }
+                languageRow(flag: "🇪🇸", label: "Spanish", langCode: "es",
+                            text: $spanish, proposals: spanishProposals, locale: "es-ES") { selected in
+                    spanish = selected
+                }
             }
 
-            Section {
-                Button(role: .destructive) {
-                    showDeleteConfirmation = true
-                } label: {
-                    HStack {
-                        Image(systemName: "trash")
-                        Text("Delete Translation")
+            if !isNew {
+                Section {
+                    Button(role: .destructive) {
+                        showDeleteConfirmation = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("Delete Translation")
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
         }
-        .navigationTitle("Edit Translation")
+        .navigationTitle(isNew ? "Add Translation" : "Edit Translation")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                if isTranslating || isSaving {
-                    ProgressView()
+            if isNew {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    if isSaving {
+                        ProgressView()
+                    } else {
+                        Button("Save") {
+                            Task { await createEntry() }
+                        }
+                        .disabled(!hasContent)
+                    }
+                }
+            } else {
+                ToolbarItem(placement: .primaryAction) {
+                    if isTranslating || isSaving {
+                        ProgressView()
+                    }
                 }
             }
         }
@@ -84,57 +149,72 @@ struct TranslationDetailView: View {
                 Task { await deleteEntry() }
             }
         }
-        .onChange(of: translation) { _ in
-            Task { await autoSave() }
+        .onChange(of: english) { _ in Task { await autoSave() } }
+        .onChange(of: german) { _ in Task { await autoSave() } }
+        .onChange(of: french) { _ in Task { await autoSave() } }
+        .onChange(of: italian) { _ in Task { await autoSave() } }
+        .onChange(of: spanish) { _ in Task { await autoSave() } }
+    }
+
+    // MARK: - Language Row
+
+    @ViewBuilder
+    private func languageRow(flag: String, label: String, langCode: String,
+                              text: Binding<String>,
+                              proposals: [String], locale: String,
+                              onSelectProposal: @escaping (String) -> Void) -> some View {
+        HStack(alignment: .top) {
+            Text(flag)
+                .font(.title2)
+            TextField(label, text: text, axis: .vertical)
+                .lineLimit(1...4)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button {
+                Task { await translateFrom(text: text.wrappedValue, langCode: langCode) }
+            } label: {
+                Image(systemName: "arrow.triangle.2.circlepath")
+            }
+            .buttonStyle(.borderless)
+            .disabled(text.wrappedValue.isEmpty || isTranslating)
+            Button {
+                speak(text: text.wrappedValue, locale: locale)
+            } label: {
+                Image(systemName: "speaker.wave.2")
+            }
+            .buttonStyle(.borderless)
+            .disabled(text.wrappedValue.isEmpty)
+        }
+
+        if !proposals.isEmpty {
+            DisclosureGroup("Suggestions for \(flag)") {
+                ForEach(proposals, id: \.self) { proposal in
+                    Button {
+                        onSelectProposal(proposal)
+                    } label: {
+                        Text(proposal)
+                            .foregroundStyle(.primary)
+                    }
+                }
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
         }
     }
 
-    // MARK: - Language Section
+    // MARK: - Helpers
 
-    @ViewBuilder
-    private func languageSection(flag: String, label: String, langCode: String,
-                                  text: Binding<String>,
-                                  proposals: [String], locale: String,
-                                  onSelectProposal: @escaping (String) -> Void) -> some View {
-        Section {
-            HStack {
-                Text(flag)
-                    .font(.title2)
-                TextField(label, text: text, axis: .vertical)
-                    .lineLimit(1...4)
-                Button {
-                    Task { await translateFrom(text: text.wrappedValue, langCode: langCode) }
-                } label: {
-                    Image(systemName: "arrow.triangle.2.circlepath")
-                }
-                .buttonStyle(.borderless)
-                .disabled(text.wrappedValue.isEmpty || isTranslating)
-                Button {
-                    speak(text: text.wrappedValue, locale: locale)
-                } label: {
-                    Image(systemName: "speaker.wave.2")
-                }
-                .buttonStyle(.borderless)
-                .disabled(text.wrappedValue.isEmpty)
-            }
+    private var hasContent: Bool {
+        !english.isEmpty || !german.isEmpty || !french.isEmpty || !italian.isEmpty || !spanish.isEmpty
+    }
 
-            if !proposals.isEmpty {
-                DisclosureGroup("Suggestions") {
-                    ForEach(proposals, id: \.self) { proposal in
-                        Button {
-                            onSelectProposal(proposal)
-                        } label: {
-                            Text(proposal)
-                                .foregroundStyle(.primary)
-                        }
-                    }
-                }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            }
-        } header: {
-            Text("\(flag) \(label)")
-        }
+    private func buildEntry() -> TranslationEntry? {
+        guard let id = entryId else { return nil }
+        return TranslationEntry(id: id, english: english, german: german, french: french,
+                                italian: italian, spanish: spanish,
+                                englishProposals: englishProposals, germanProposals: germanProposals,
+                                frenchProposals: frenchProposals, italianProposals: italianProposals,
+                                spanishProposals: spanishProposals)
     }
 
     // MARK: - Actions
@@ -144,32 +224,59 @@ struct TranslationDetailView: View {
         errorMessage = nil
         do {
             let result = try await appState.apiClient.translate(text: text, sourceLanguage: langCode)
-            if let en = result["english"] { translation.english = en.translation; translation.englishProposals = en.alternatives }
-            if let de = result["german"] { translation.german = de.translation; translation.germanProposals = de.alternatives }
-            if let fr = result["french"] { translation.french = fr.translation; translation.frenchProposals = fr.alternatives }
-            if let it = result["italian"] { translation.italian = it.translation; translation.italianProposals = it.alternatives }
-            if let es = result["spanish"] { translation.spanish = es.translation; translation.spanishProposals = es.alternatives }
+            if let en = result["english"] { english = en.translation; englishProposals = en.alternatives }
+            if let de = result["german"] { german = de.translation; germanProposals = de.alternatives }
+            if let fr = result["french"] { french = fr.translation; frenchProposals = fr.alternatives }
+            if let it = result["italian"] { italian = it.translation; italianProposals = it.alternatives }
+            if let es = result["spanish"] { spanish = es.translation; spanishProposals = es.alternatives }
         } catch {
             errorMessage = "Translation failed"
         }
         isTranslating = false
     }
 
+    private func createEntry() async {
+        isSaving = true
+        errorMessage = nil
+        do {
+            let req = NewTranslationRequest(
+                english: english, german: german, french: french, italian: italian, spanish: spanish,
+                englishProposals: englishProposals, germanProposals: germanProposals,
+                frenchProposals: frenchProposals, italianProposals: italianProposals,
+                spanishProposals: spanishProposals
+            )
+            let response = try await appState.apiClient.createNewTranslation(req)
+            let entry = TranslationEntry(
+                id: response.id, english: english, german: german, french: french,
+                italian: italian, spanish: spanish,
+                englishProposals: englishProposals, germanProposals: germanProposals,
+                frenchProposals: frenchProposals, italianProposals: italianProposals,
+                spanishProposals: spanishProposals
+            )
+            onSave?(entry)
+            dismiss()
+        } catch {
+            errorMessage = "Failed to save translation"
+        }
+        isSaving = false
+    }
+
     private func autoSave() async {
-        guard !isSaving, !isTranslating else { return }
+        guard !isNew, !isSaving, !isTranslating, let entry = buildEntry() else { return }
         isSaving = true
         do {
-            let updated = try await appState.apiClient.updateTranslation(translation)
-            onUpdate?(updated)
+            try await appState.apiClient.updateTranslation(entry)
+            onUpdate?(entry)
         } catch {
-            // silent — best-effort auto-save
+            // silent
         }
         isSaving = false
     }
 
     private func deleteEntry() async {
+        guard let id = entryId else { return }
         do {
-            try await appState.apiClient.deleteTranslation(id: translation.id)
+            try await appState.apiClient.deleteTranslation(id: id)
             onDelete?()
             dismiss()
         } catch {

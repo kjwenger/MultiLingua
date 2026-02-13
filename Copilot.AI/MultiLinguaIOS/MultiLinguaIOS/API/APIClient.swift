@@ -93,14 +93,24 @@ class APIClient: ObservableObject {
     func createTranslation(_ translation: TranslationEntry) async throws -> TranslationEntry {
         try await post("/api/translations", body: translation)
     }
+
+    func createNewTranslation(_ entry: NewTranslationRequest) async throws -> CreateTranslationResponse {
+        try await post("/api/translations", body: entry)
+    }
     
-    func updateTranslation(_ translation: TranslationEntry) async throws -> TranslationEntry {
-        try await put("/api/translations/\(translation.id)", body: translation)
+    struct SuccessResponse: Codable {
+        let success: Bool
+    }
+
+    func updateTranslation(_ translation: TranslationEntry) async throws {
+        let _: SuccessResponse = try await put("/api/translations", body: translation)
     }
     
     func deleteTranslation(id: Int) async throws {
-        struct EmptyResponse: Codable {}
-        let _: EmptyResponse = try await delete("/api/translations/\(id)")
+        struct DeleteResponse: Codable {
+            let success: Bool?
+        }
+        let _: DeleteResponse = try await delete("/api/translations?id=\(id)")
     }
 
     // MARK: - Translate
@@ -236,6 +246,33 @@ struct TranslationsResponse: Codable {
 
 struct ErrorResponse: Codable {
     let error: String
+}
+
+struct CreateTranslationResponse: Codable {
+    let id: Int
+    let success: Bool
+}
+
+struct NewTranslationRequest: Codable {
+    let english: String
+    let german: String
+    let french: String
+    let italian: String
+    let spanish: String
+    let englishProposals: [String]
+    let germanProposals: [String]
+    let frenchProposals: [String]
+    let italianProposals: [String]
+    let spanishProposals: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case english, german, french, italian, spanish
+        case englishProposals = "english_proposals"
+        case germanProposals = "german_proposals"
+        case frenchProposals = "french_proposals"
+        case italianProposals = "italian_proposals"
+        case spanishProposals = "spanish_proposals"
+    }
 }
 
 struct TranslateResult: Codable {
