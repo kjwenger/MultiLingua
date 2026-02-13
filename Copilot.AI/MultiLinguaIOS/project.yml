@@ -1,0 +1,66 @@
+name: MultiLinguaIOS
+options:
+  bundleIdPrefix: com.naturalstupidity.multilingua
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+
+settings:
+  SWIFT_VERSION: "5.9"
+  MARKETING_VERSION: "0.4.1"
+  CURRENT_PROJECT_VERSION: "1"
+  IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+
+targets:
+  MultiLinguaIOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: MultiLinguaIOS
+        excludes:
+          - "**/.DS_Store"
+    info:
+      path: MultiLinguaIOS/Info.plist
+      properties:
+        CFBundleDisplayName: MultiLingua
+        CFBundleShortVersionString: "0.4.1"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.naturalstupidity.multilingua.ios
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+      ENABLE_PREVIEWS: true
+      DEVELOPMENT_ASSET_PATHS: '"MultiLinguaIOS/Resources"'
+    scheme:
+      testTargets:
+        - MultiLinguaIOSTests
+        - MultiLinguaIOSUITests
+
+  MultiLinguaIOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - MultiLinguaIOSTests
+    dependencies:
+      - target: MultiLinguaIOS
+
+  MultiLinguaIOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - MultiLinguaIOSUITests
+    dependencies:
+      - target: MultiLinguaIOS
