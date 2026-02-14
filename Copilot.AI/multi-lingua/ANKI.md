@@ -1,131 +1,145 @@
 # Self-Hosting Anki on a Synology NAS with Portainer
 
-This guide outlines a strategy for deploying a personal Anki sync server on a Synology NAS using Docker. The primary goal is to gain control over your sync data and make it securely accessible from anywhere via the domain `anki.gertrun.synology.me`.
-
-We will use Docker Compose within Portainer to manage the required services as a single "stack".
+Self-hosted Anki sync server using Docker (Portainer) on a Synology NAS,
+with reverse proxy for HTTPS access.
 
 ## 1. Understanding the "API"
 
-It's crucial to understand the two different "APIs" in the Anki ecosystem:
+There are two different "APIs" in the Anki ecosystem:
 
-1.  **Syncing API:** This is the internal API that Anki clients (Desktop, AnkiDroid, AnkiMobile) use to synchronize your collection with a server. By self-hosting the **Anki Sync Server**, you are creating your own private endpoint for this API. This is the focus of this guide.
+1. **Syncing API:** The internal protocol that Anki clients (Desktop, AnkiDroid,
+   AnkiMobile) use to synchronize collections with a server. By self-hosting the
+   Anki Sync Server, you create your own private endpoint for this protocol.
+   This is the focus of this guide.
 
-2.  **Card Management API (Anki-Connect):** This is a RESTful API provided by the [Anki-Connect](https://github.com/FooSoft/anki-connect) plugin, which runs on the **Anki Desktop application**. It allows external applications to create cards, manage decks, and more. Self-hosting the sync server does **not** replace Anki-Connect. They serve different purposes but can be used together for a powerful, private setup.
+2. **Card Management API (AnkiConnect):** A RESTful API provided by the
+   [AnkiConnect](https://github.com/FooSoft/anki-connect) plugin, which runs on
+   the **Anki Desktop application**. It allows external applications to create
+   cards, manage decks, and more. Self-hosting the sync server does **not**
+   replace AnkiConnect. They serve different purposes but can be used together.
 
-## 2. Core Components
+See [API & Programmatic Access](#5-api--programmatic-access) for details.
 
-Our self-hosted setup will use two separate Docker containers managed by the `ankicommunity` project.
+## 2. Service
 
-*   **Anki Sync Server (`ankicommunity/anki-sync-server`):** The essential backend. It emulates the official AnkiWeb sync server.
-*   **Anki Web Server (`ankicommunity/anki-web-server`):** An optional web interface for reviewing cards. **Crucially, this service also acts as a proxy, directing sync requests to the sync server.** This simplifies our remote access setup.
-*   **Portainer:** A web UI to manage Docker containers on your Synology NAS.
+| Service          | Image                              | Internal Port | Exposed Port | Purpose                      |
+|------------------|------------------------------------|---------------|--------------|------------------------------|
+| anki-sync-server | jeankhawand/anki-sync-server:25.07 | 8080          | 27701        | Sync server for Anki clients |
 
-## 3. Deployment Strategy
+The image is from [jeankhawand/anki-sync-server](https://hub.docker.com/r/jeankhawand/anki-sync-server)
+on Docker Hub. It wraps the official Anki Rust sync server. There is no `latest`
+tag; use an explicit version tag (e.g., `25.07`).
 
-### Part 1: Prerequisites
+## 3. Deployment via Portainer
 
-1.  **Docker on Synology:** Ensure the "Docker" package is installed from the Package Center.
-2.  **Portainer:** Have Portainer installed and running.
-3.  **Domain and SSL:** You must have your Synology DDNS service configured so that `gertrun.synology.me` points to your NAS. You also need a valid SSL certificate for `*.gertrun.synology.me` or `anki.gertrun.synology.me`. You can get a free one from Let's Encrypt within the Synology Control Panel (**Security** > **Certificate**).
-4.  **Persistent Data Folder:** Create a dedicated folder on your NAS to store the Anki server data. This ensures your collection persists even if the container is removed or updated.
-    *   Example path: `/volume1/docker/anki-server`
+### Prerequisites
 
-### Part 2: Deploy the Anki Stack with Docker Compose
+1. **Docker on Synology:** Ensure the "Docker" package is installed from the Package Center.
+2. **Portainer:** Have Portainer installed and running.
+3. **Domain and SSL:** Configure your Synology DDNS so that your domain points to
+   your NAS. Obtain a valid SSL certificate (e.g., via Let's Encrypt in
+   **Control Panel > Security > Certificate**).
+4. **Persistent Data Folder:** Create a dedicated folder on your NAS:
+   - Example path: `/volume1/docker/anki-server`
 
-Instead of deploying containers individually, we will use Portainer's "Stacks" feature, which uses Docker Compose. This makes management much simpler.
+### Deploy the Stack
 
-1.  Navigate to your Portainer web interface.
-2.  Go to **Stacks** and click **+ Add stack**.
-3.  **Configuration:**
-    *   **Name:** `anki`
-    *   **Web editor:** Paste the following `docker-compose` configuration into the editor.
+1. In Portainer, go to **Stacks > Add stack**.
+2. **Name:** `anki`
+3. **Web editor:** Paste the contents of `portainer-stack-anki.yml`:
 
 ```yaml
-version: '3.8'
-
-# This file defines two services: the Anki sync server and a web interface.
-# The web server also acts as a proxy for the sync server, simplifying remote access.
+# Anki Sync Server for Synology NAS (Portainer Stack)
+# Image: https://hub.docker.com/r/jeankhawand/anki-sync-server
 
 services:
-  # The core sync server
   anki-sync-server:
-    image: ankicommunity/anki-sync-server:latest
+    image: jeankhawand/anki-sync-server:25.07
     container_name: anki-sync-server
-    volumes:
-      # Mounts a folder from your NAS to store the Anki database.
-      # IMPORTANT: Replace the path on the left with the real path on your Synology NAS.
-      - /volume1/docker/anki-server:/data
-    environment:
-      # Sets the first user account and password.
-      # IMPORTANT: Change this to a secure and private username and password.
-      - ANKI_SYNC_SERVER_USER_1=your_username:your_very_strong_password
-    restart: unless-stopped
-
-  # The web interface and sync proxy
-  anki-web-server:
-    image: ankicommunity/anki-web-server:latest
-    container_name: anki-web-server
     ports:
-      # Exposes the web server on port 8081 of your NAS.
-      - "8081:8080"
+      - "27701:8080"
+    volumes:
+      - /volume1/docker/anki-server:/anki_data
     environment:
-      # Tells the web server where to find the sync server.
-      # 'anki-sync-server' is the service name defined above.
-      - ANKI_SYNC_SERVER_URL=http://anki-sync-server:27701
-      - ANKI_WEB_SERVER_HOST=0.0.0.0
-    depends_on:
-      - anki-sync-server
+      - SYNC_USER1=your_username:your_very_strong_password
     restart: unless-stopped
 
-# Creates a dedicated network for the Anki services to communicate.
 networks:
   default:
     name: anki-network
 ```
 
-4.  **Deploy the Stack:**
-    *   **CRITICAL:** Before deploying, make sure you have edited the `volumes` path and the `ANKI_SYNC_SERVER_USER_1` environment variable in the web editor.
-    *   Click **Deploy the stack**. Portainer will now pull the images and start both containers.
+4. Before deploying, update:
+   - The volume path (`/volume1/docker/anki-server`) to match your NAS.
+   - The `SYNC_USER1` value to your desired `username:password`.
+   - Add `SYNC_USER2`, `SYNC_USER3`, etc. for additional accounts.
+5. Click **Deploy the stack**.
 
-### Part 3: Set Up the Reverse Proxy
+## 4. Reverse Proxy Setup (Synology DSM)
 
-This step will make your Anki stack securely available at `https://anki.gertrun.synology.me`.
+In **Control Panel > Login Portal > Advanced > Reverse Proxy**, create one entry:
 
-1.  On your Synology NAS, go to **Control Panel** > **Login Portal** > **Advanced** > **Reverse Proxy**.
-2.  Click **Create**.
-3.  **Reverse Proxy Settings:**
-    *   **Source:**
-        *   **Hostname:** `anki.gertrun.synology.me`
-        *   **Protocol:** `HTTPS`
-        *   **Port:** `443`
-        *   **Enable HSTS** (Recommended for security).
-        *   **Enable HTTP/2** (Recommended for performance).
-    *   **Destination:**
-        *   **Hostname:** `localhost`
-        *   **Protocol:** `HTTP`
-        *   **Port:** `8081` (This is the host port you mapped for the `anki-web-server`).
-4.  **Custom Header:**
-    *   Switch to the **Custom Header** tab.
-    *   Click the dropdown that says `Create` and select **WebSocket**. This will automatically add the required headers for the WebSocket protocol, which Anki's sync process may use.
-5.  Click **Save**.
+| Field                | Value                      |
+|----------------------|----------------------------|
+| Description          | Anki Sync Server           |
+| Source Protocol      | HTTPS                      |
+| Source Hostname      | `anki.your-domain.me`      |
+| Source Port          | 443                        |
+| Destination Protocol | HTTP                       |
+| Destination Hostname | `localhost`                |
+| Destination Port     | 27701                      |
 
-After a moment, you should be able to access the Anki web interface by navigating to `https://anki.gertrun.synology.me`.
+Under the **Custom Header** tab, click **Create > WebSocket** to add the
+required headers for the sync protocol.
 
-### Part 4: Configure Anki Clients
+Enable **HSTS** and **HTTP/2** for security and performance.
 
-Now, point your Anki clients to your new, secure sync server address.
+### Configuring Anki Clients
 
-1.  **Anki Desktop:**
-    *   Open Anki, go to **Preferences** > **Sync**.
-    *   Check the box for "Use self-hosted sync server".
-    *   In the "Server address" field, enter: `https://anki.gertrun.synology.me`
-    *   Click **OK**.
-    *   Press "Sync" and enter the credentials you configured.
+All clients connect to the same sync URL.
 
-2.  **AnkiDroid/AnkiMobile:**
-    *   In the app's sync settings, choose to use a custom server.
-    *   Enter the full URL (`https://anki.gertrun.synology.me`) and your credentials.
+**Anki Desktop (2.1.57+):**
 
-## 4. Backups (Crucial)
+1. Open Anki, go to **Preferences > Syncing**.
+2. Set the **Self-hosted sync server** URL to `https://anki.your-domain.me`
+3. Log in with the credentials from `SYNC_USER1`.
 
-Regularly back up the persistent data folder (`/volume1/docker/anki-server`) you created. This folder contains your entire Anki collection and user data. Use Synology's **Hyper Backup** or another backup solution of your choice.
+**AnkiDroid (Android):**
+
+1. Go to **Settings > Advanced > Custom sync server**.
+2. Set **Sync URL** to `https://anki.your-domain.me`
+3. Set **Media sync URL** to `https://anki.your-domain.me/msync`
+
+**AnkiMobile (iOS, 2.0.90+):**
+
+1. Go to **Settings > Syncing > Custom Server**.
+2. Enter the sync URL: `https://anki.your-domain.me`
+
+## 5. API & Programmatic Access
+
+### Sync Server Has No REST API
+
+The self-hosted sync server only speaks Anki's internal sync protocol.
+There are no endpoints to create decks, add/edit cards, or query collections.
+It is purely a data store and sync relay for Anki clients.
+
+### Options for Programmatic Card Creation
+
+| Option                                                                            | Type                | Headless/NAS | Description                                                                 |
+|-----------------------------------------------------------------------------------|---------------------|--------------|-----------------------------------------------------------------------------|
+| [genanki](https://github.com/kerrickstaley/genanki)                               | Python library      | Yes          | Generate `.apkg` files server-side; users import them into Anki, then sync  |
+| [AnkiConnect](https://github.com/FooSoft/anki-connect)                            | Anki desktop plugin | No           | JSON API on `localhost:8765` for full CRUD on decks, cards, tags, and notes |
+| [anki-api](https://github.com/0xdeadbeer/anki-api)                                | Anki desktop plugin | No           | REST API plugin, similar to AnkiConnect                                     |
+| [AnkiConnect MCP](https://mcpservers.org/servers/spacholski1225/anki-connect-mcp) | MCP server          | No           | AI-assisted card creation via AnkiConnect; requires desktop Anki            |
+
+AnkiConnect and anki-api both require a running Anki desktop instance with the
+plugin installed, so they cannot run headless on a NAS.
+
+For a NAS-only workflow (e.g., exporting MultiLingua vocabulary as flashcards),
+generating `.apkg` files with genanki is the most practical approach.
+
+## 6. Backups
+
+Regularly back up the persistent data folder (`/volume1/docker/anki-server`).
+This folder contains your entire Anki collection and user data. Use Synology's
+**Hyper Backup** or another backup solution.
