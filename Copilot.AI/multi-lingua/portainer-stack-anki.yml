@@ -1,0 +1,44 @@
+version: '3.8'
+
+# This file defines two services: the Anki sync server and a web interface.
+# The web server also acts as a proxy for the sync server, simplifying remote access.
+
+services:
+  # The core sync server
+  anki-sync-server:
+    image: ankicommunity/anki-sync-server:latest
+    container_name: anki-sync-server
+    ports:
+      # Exposes the sync server on port 27701 of your NAS.
+      # Anki desktop/mobile clients connect to this port for syncing.
+      - "27701:27701"
+    volumes:
+      # Mounts a folder from your NAS to store the Anki database.
+      # IMPORTANT: Replace the path on the left with the real path on your Synology NAS.
+      - /volume1/docker/anki-server:/data
+    environment:
+      # Sets the first user account and password.
+      # IMPORTANT: Change this to a secure and private username and password.
+      - ANKI_SYNC_SERVER_USER_1=your_username:your_very_strong_password
+    restart: unless-stopped
+
+  # The web interface and sync proxy
+  anki-web-server:
+    image: ankicommunity/anki-web-server:latest
+    container_name: anki-web-server
+    ports:
+      # Exposes the web server on port 8081 of your NAS.
+      - "8081:8080"
+    environment:
+      # Tells the web server where to find the sync server.
+      # 'anki-sync-server' is the service name defined above.
+      - ANKI_SYNC_SERVER_URL=http://anki-sync-server:27701
+      - ANKI_WEB_SERVER_HOST=0.0.0.0
+    depends_on:
+      - anki-sync-server
+    restart: unless-stopped
+
+# Creates a dedicated network for the Anki services to communicate.
+networks:
+  default:
+    name: anki-network
