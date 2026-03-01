@@ -15,7 +15,11 @@
       "Bash(docker-compose logs:*)",
       "Bash(docker exec:*)",
       "Bash(docker-compose:*)",
-      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI/**)"
+      "Read(D:\\com.github\\kjwenger\\NaturalStupidity\\MultiLingua\\Copilot.AI/**)",
+      "Bash(DEVELOPER_DIR=/Volumes/RayCue2TB/Applications/Xcode.app/Contents/Developer /Volumes/RayCue2TB/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild:*)",
+      "Bash(python3:*)",
+      "Bash(curl:*)",
+      "Bash(sips:*)"
     ],
     "deny": [],
     "ask": []
