@@ -1,3 +1,4 @@
-[submodule "Copilot.AI/multi-lingua-nextjs"]
-	path = Copilot.AI/multi-lingua-nextjs
+[submodule "multi-lingua-nextjs"]
+	path = multi-lingua-nextjs
 	url = git@github.com:kjwenger/multi-lingua-nextjs.git
+	branch = main
